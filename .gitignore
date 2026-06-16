@@ -1,0 +1,26 @@
+# secrets
+backend/.env
+.env
+
+# python
+__pycache__/
+*.pyc
+backend/.venv/
+.venv/
+venv/
+
+# data / local db
+*.db
+*.sqlite3
+
+# os / editor
+.DS_Store
+.thumbnail
+*.swp
+.idea/
+.vscode/
+
+# dev / test artifacts
+.playwright-mcp/
+*.log
+scraps/

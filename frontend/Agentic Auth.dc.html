@@ -1,0 +1,675 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Newsreader:opsz,wght@6..72,400;6..72,500;6..72,600&family=Hanken+Grotesk:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;}
+html,body{margin:0;padding:0;height:100%;}
+body{font-family:'Hanken Grotesk',system-ui,sans-serif;-webkit-font-smoothing:antialiased;}
+:root{
+ --bg-app:#F4F3EF; --bg-panel:#FFFFFF; --bg-sub:#FAF9F6; --bg-inset:#F2F1EC;
+ --border:#E7E5DE; --border-strong:#D9D6CD;
+ --ink-900:#1B1A17; --ink-700:#46443D; --ink-500:#78766C; --ink-400:#A4A299;
+ --violet:#6E56CF; --violet-bg:#F1EEFB; --violet-border:#DDD6F5;
+ --emerald:#0E9F6E; --emerald-ink:#067A52; --emerald-bg:#E8FAF1;
+ --amber:#D97706; --amber-ink:#B45309; --amber-bg:#FCF4E5;
+ --rose:#E0455C; --rose-bg:#FCEDEE;
+ --teal:#0E9F9A; --blue:#3B6FE0;
+ --shadow-sm:0 1px 2px rgba(28,27,24,.05);
+ --shadow-md:0 6px 20px -6px rgba(28,27,24,.12);
+ --shadow-lg:0 18px 44px -12px rgba(28,27,24,.20);
+ --shadow-xl:0 32px 70px -20px rgba(28,27,24,.32);
+}
+[data-theme="dark"]{
+ --bg-app:#0D0D10; --bg-panel:#16161A; --bg-sub:#121215; --bg-inset:#1D1D22;
+ --border:#26262D; --border-strong:#34343C;
+ --ink-900:#ECECEF; --ink-700:#B6B6C0; --ink-500:#83838E; --ink-400:#5F5F69;
+ --violet:#9A8BF2; --violet-bg:#201D33; --violet-border:#332C52;
+ --emerald:#34D399; --emerald-ink:#34D399; --emerald-bg:#0F2620;
+ --amber:#FBBF24; --amber-ink:#FBBF24; --amber-bg:#2A2012;
+ --rose:#F4707F; --rose-bg:#2C171B;
+ --teal:#2DD4CE; --blue:#6E9BFF;
+ --shadow-sm:0 1px 2px rgba(0,0,0,.4);
+ --shadow-md:0 8px 24px -8px rgba(0,0,0,.6);
+ --shadow-lg:0 22px 50px -14px rgba(0,0,0,.7);
+ --shadow-xl:0 36px 80px -24px rgba(0,0,0,.8);
+}
+@keyframes fadeUp{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}
+@keyframes floaty{0%,100%{transform:translateY(0)}50%{transform:translateY(-9px)}}
+@keyframes spin{to{transform:rotate(360deg)}}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
+::-webkit-scrollbar{width:10px;height:10px}
+::-webkit-scrollbar-thumb{background:rgba(130,128,118,.3);border-radius:9px;border:3px solid transparent;background-clip:content-box}
+::-webkit-scrollbar-track{background:transparent}
+</style>
+</helmet>
+
+<div data-theme="{{ theme }}" style="min-height:100vh;width:100%;overflow:auto;background:var(--bg-app);color:var(--ink-900);font-family:'Hanken Grotesk',system-ui,sans-serif;position:relative;">
+
+  <!-- theme toggle -->
+  <button onClick="{{ toggleTheme }}" style-hover="{{ ghostHover }}" style="position:fixed;top:18px;right:20px;z-index:120;width:36px;height:36px;border-radius:10px;border:1px solid var(--border);background:var(--bg-panel);color:var(--ink-500);display:flex;align-items:center;justify-content:center;cursor:pointer;box-shadow:var(--shadow-sm);">{{ themeIcon }}</button>
+
+  <!-- ============================ SIGN IN ============================ -->
+  <sc-if value="{{ isSignin }}" hint-placeholder-val="{{ true }}">
+    <div style="min-width:940px;min-height:100vh;display:flex;">
+
+      <!-- LEFT brand panel -->
+      <div style="flex:1.15;position:relative;overflow:hidden;background:linear-gradient(155deg,#241C46 0%,#3E2E96 52%,#6E56CF 100%);color:#fff;display:flex;flex-direction:column;justify-content:space-between;padding:48px 52px;">
+        <div style="position:absolute;top:-120px;right:-100px;width:420px;height:420px;border-radius:50%;background:radial-gradient(circle,rgba(255,255,255,.16),transparent 65%);"></div>
+        <div style="position:absolute;bottom:-160px;left:-120px;width:480px;height:480px;border-radius:50%;background:radial-gradient(circle,rgba(110,86,207,.5),transparent 60%);"></div>
+
+        <div style="position:relative;display:flex;align-items:center;gap:11px;">
+          <div style="width:34px;height:34px;border-radius:10px;background:rgba(255,255,255,.16);backdrop-filter:blur(8px);display:flex;align-items:center;justify-content:center;border:1px solid rgba(255,255,255,.2);">
+            <svg width="19" height="19" viewBox="0 0 24 24" fill="none"><path d="M12 2.5l2.2 5.6L20 10.3l-5.8 2.2L12 18l-2.2-5.5L4 10.3l5.8-2.2z" fill="#fff"/><circle cx="18.5" cy="5.5" r="1.7" fill="#fff" opacity=".85"/></svg>
+          </div>
+          <span style="font-family:'Newsreader',serif;font-weight:600;font-size:19px;">Agentic</span>
+          <span style="font-family:'IBM Plex Mono',monospace;font-size:9px;letter-spacing:.18em;opacity:.6;text-transform:uppercase;margin-top:3px;">Dashboard AI</span>
+        </div>
+
+        <div style="position:relative;max-width:520px;">
+          <h1 style="margin:0;font-family:'Newsreader',serif;font-weight:500;font-size:46px;line-height:1.08;letter-spacing:-.02em;text-wrap:balance;">Turn data into decisions with autonomous AI.</h1>
+          <p style="margin:20px 0 0;font-size:16px;line-height:1.55;color:rgba(255,255,255,.74);max-width:460px;">Transform spreadsheets, databases, documents, and raw business information into intelligent dashboards — automatically.</p>
+
+          <!-- workflow -->
+          <div style="display:flex;align-items:center;gap:8px;margin-top:30px;flex-wrap:wrap;">
+            <sc-for list="{{ flow }}" as="f" hint-placeholder-count="4">
+              <span style="display:flex;align-items:center;gap:8px;">
+                <span style="display:inline-flex;align-items:center;gap:7px;font-size:12.5px;font-weight:600;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.16);padding:7px 12px;border-radius:99px;backdrop-filter:blur(6px);">{{ f.icon }}{{ f.label }}</span>
+                <sc-if value="{{ f.arrow }}" hint-placeholder-val="{{ true }}"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,.5)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></sc-if>
+              </span>
+            </sc-for>
+          </div>
+
+          <!-- mini preview collage -->
+          <div style="position:relative;height:172px;margin-top:34px;">
+            <div style="position:absolute;left:0;top:8px;width:230px;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.16);border-radius:14px;padding:14px;backdrop-filter:blur(12px);box-shadow:0 18px 40px -16px rgba(0,0,0,.5);animation:floaty 6s ease-in-out infinite;">
+              <div style="display:flex;justify-content:space-between;align-items:center;"><span style="font-size:10px;font-weight:600;letter-spacing:.05em;text-transform:uppercase;color:rgba(255,255,255,.6);">Total Revenue</span><span style="width:7px;height:7px;border-radius:99px;background:#34D399;box-shadow:0 0 0 3px rgba(52,211,153,.25);"></span></div>
+              <div style="display:flex;align-items:baseline;gap:8px;margin-top:6px;"><span style="font-family:'Newsreader',serif;font-size:30px;">$4.82M</span><span style="font-family:'IBM Plex Mono',monospace;font-size:11px;font-weight:600;color:#34D399;">▲ 12.4%</span></div>
+              <svg viewBox="0 0 200 40" preserveAspectRatio="none" style="width:100%;height:32px;margin-top:6px;"><path d="M0,34 C30,30 45,18 70,20 C100,22 120,8 150,10 C175,12 188,6 200,5" fill="none" stroke="#34D399" stroke-width="2.4" stroke-linecap="round"/></svg>
+            </div>
+            <div style="position:absolute;right:4px;top:0;width:248px;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.16);border-radius:14px;padding:14px;backdrop-filter:blur(12px);box-shadow:0 18px 40px -16px rgba(0,0,0,.5);animation:floaty 6.5s ease-in-out .6s infinite;">
+              <div style="display:flex;align-items:center;gap:8px;"><span style="width:24px;height:24px;border-radius:7px;background:rgba(52,211,153,.2);color:#34D399;display:flex;align-items:center;justify-content:center;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 3h12v18l-6-4-6 4z"/></svg></span><span style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;letter-spacing:.08em;color:#6EE7B7;">AI INSIGHT</span></div>
+              <div style="font-family:'Newsreader',serif;font-size:15px;margin-top:8px;line-height:1.3;">Expansion revenue is accelerating — NRR hit 118%.</div>
+            </div>
+            <div style="position:absolute;left:54px;bottom:0;width:226px;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.16);border-radius:14px;padding:13px 14px;backdrop-filter:blur(12px);box-shadow:0 18px 40px -16px rgba(0,0,0,.5);animation:floaty 7s ease-in-out 1.1s infinite;">
+              <div style="display:flex;align-items:center;gap:8px;"><span style="width:24px;height:24px;border-radius:7px;background:rgba(251,191,36,.2);color:#FBBF24;display:flex;align-items:center;justify-content:center;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4l9 16H3z"/><path d="M12 10v4M12 17.5h.01"/></svg></span><span style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;letter-spacing:.08em;color:#FCD34D;">RISK ALERT</span><span style="margin-left:auto;font-family:'IBM Plex Mono',monospace;font-size:10px;color:rgba(255,255,255,.6);">88%</span></div>
+              <div style="font-family:'Newsreader',serif;font-size:15px;margin-top:8px;line-height:1.3;">Enterprise churn risk rising in 4 accounts.</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- social proof -->
+        <div style="position:relative;display:flex;align-items:center;gap:22px;flex-wrap:wrap;color:rgba(255,255,255,.7);">
+          <span style="font-size:12.5px;">Trusted by modern data teams</span>
+          <span style="display:flex;align-items:center;gap:7px;font-size:12.5px;"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l7 3v5c0 5-3.5 8.5-7 10-3.5-1.5-7-5-7-10V6z"/><path d="M9 12l2 2 4-4"/></svg>Enterprise-grade security</span>
+          <span style="display:flex;align-items:center;gap:7px;font-size:12px;font-weight:600;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.16);padding:5px 10px;border-radius:7px;">Privacy-first</span>
+        </div>
+      </div>
+
+      <!-- RIGHT auth card -->
+      <div style="width:452px;flex:0 0 auto;display:flex;align-items:center;justify-content:center;padding:36px 30px;background:var(--bg-app);">
+        <div style="width:100%;max-width:400px;">
+          <div style="width:40px;height:40px;border-radius:11px;background:linear-gradient(150deg,var(--violet),#4D38B0);display:flex;align-items:center;justify-content:center;box-shadow:var(--shadow-md);margin-bottom:22px;">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none"><path d="M12 2.5l2.2 5.6L20 10.3l-5.8 2.2L12 18l-2.2-5.5L4 10.3l5.8-2.2z" fill="#fff"/><circle cx="18.5" cy="5.5" r="1.7" fill="#fff" opacity=".85"/></svg>
+          </div>
+          <h2 style="margin:0;font-family:'Newsreader',serif;font-weight:600;font-size:27px;letter-spacing:-.01em;">Welcome back</h2>
+          <p style="margin:7px 0 26px;font-size:14px;color:var(--ink-500);">Sign in to your Agentic workspace.</p>
+
+          <label style="display:block;font-size:12.5px;font-weight:600;color:var(--ink-700);margin-bottom:7px;">Work email</label>
+          <input value="{{ si_email }}" onInput="{{ onSiEmail }}" type="email" placeholder="you@company.com" style-focus="{{ inputFocus }}" style="width:100%;height:44px;padding:0 14px;border:1px solid var(--border);border-radius:11px;background:var(--bg-panel);font:14px 'Hanken Grotesk',sans-serif;color:var(--ink-900);outline:none;transition:border-color .14s,box-shadow .14s;" />
+
+          <div style="display:flex;justify-content:space-between;align-items:center;margin:18px 0 7px;">
+            <label style="font-size:12.5px;font-weight:600;color:var(--ink-700);">Password</label>
+            <button onClick="{{ goReset }}" style="border:none;background:transparent;color:var(--violet);font-size:12.5px;font-weight:600;cursor:pointer;padding:0;">Forgot password?</button>
+          </div>
+          <div style="position:relative;">
+            <input value="{{ si_password }}" onInput="{{ onSiPassword }}" type="{{ siPwType }}" placeholder="Enter your password" style-focus="{{ inputFocus }}" style="width:100%;height:44px;padding:0 44px 0 14px;border:1px solid var(--border);border-radius:11px;background:var(--bg-panel);font:14px 'Hanken Grotesk',sans-serif;color:var(--ink-900);outline:none;transition:border-color .14s,box-shadow .14s;" />
+            <button onClick="{{ toggleSiPw }}" style="position:absolute;right:6px;top:6px;width:32px;height:32px;border:none;border-radius:8px;background:transparent;color:var(--ink-400);cursor:pointer;display:flex;align-items:center;justify-content:center;">{{ siEyeIcon }}</button>
+          </div>
+
+          <div style="display:flex;align-items:center;gap:9px;margin-top:18px;">
+            <button onClick="{{ toggleRemember }}" style="width:19px;height:19px;border-radius:6px;border:1.5px solid {{ rememberBorder }};background:{{ rememberBg }};cursor:pointer;display:flex;align-items:center;justify-content:center;flex:0 0 auto;transition:all .12s;">{{ rememberCheck }}</button>
+            <span onClick="{{ toggleRemember }}" style="font-size:13px;color:var(--ink-700);cursor:pointer;">Remember me for 30 days</span>
+          </div>
+
+          <sc-if value="{{ siError }}" hint-placeholder-val="{{ false }}">
+            <div style="display:flex;align-items:center;gap:8px;margin-top:18px;padding:10px 12px;border-radius:10px;background:var(--rose-bg);color:var(--rose);font-size:12.5px;font-weight:500;">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 8v5M12 16h.01"/></svg>{{ siError }}
+            </div>
+          </sc-if>
+
+          <button onClick="{{ signinSubmit }}" style-hover="{{ primaryHover }}" style="width:100%;height:46px;margin-top:22px;border:none;border-radius:11px;background:var(--violet);color:#fff;font-family:'Hanken Grotesk',sans-serif;font-weight:600;font-size:14.5px;cursor:pointer;box-shadow:var(--shadow-md);transition:filter .14s;">Sign in</button>
+
+          <div style="display:flex;align-items:center;gap:14px;margin:24px 0;"><span style="flex:1;height:1px;background:var(--border);"></span><span style="font-size:11.5px;color:var(--ink-400);">or continue with</span><span style="flex:1;height:1px;background:var(--border);"></span></div>
+
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+            <sc-for list="{{ sso }}" as="p" hint-placeholder-count="4">
+              <button onClick="{{ goDashboard }}" style-hover="{{ ssoHover }}" style="display:flex;align-items:center;justify-content:center;gap:9px;height:44px;border:1px solid var(--border);border-radius:11px;background:var(--bg-panel);color:var(--ink-900);font-family:'Hanken Grotesk',sans-serif;font-weight:600;font-size:13px;cursor:pointer;transition:all .12s;">{{ p.icon }}{{ p.name }}</button>
+            </sc-for>
+          </div>
+
+          <p style="text-align:center;margin:26px 0 0;font-size:13.5px;color:var(--ink-500);">New to Agentic Dashboard AI? <button onClick="{{ goSignup }}" style="border:none;background:transparent;color:var(--violet);font-weight:600;font-size:13.5px;cursor:pointer;padding:0;">Create account</button></p>
+        </div>
+      </div>
+    </div>
+  </sc-if>
+
+  <!-- ============================ SIGN UP / ONBOARDING ============================ -->
+  <sc-if value="{{ isSignup }}" hint-placeholder-val="{{ false }}">
+    <div style="min-height:100vh;display:flex;flex-direction:column;align-items:center;padding:30px 24px 56px;">
+      <!-- top -->
+      <div style="width:100%;max-width:760px;display:flex;align-items:center;justify-content:space-between;">
+        <div style="display:flex;align-items:center;gap:10px;">
+          <div style="width:30px;height:30px;border-radius:9px;background:linear-gradient(150deg,var(--violet),#4D38B0);display:flex;align-items:center;justify-content:center;"><svg width="17" height="17" viewBox="0 0 24 24" fill="none"><path d="M12 2.5l2.2 5.6L20 10.3l-5.8 2.2L12 18l-2.2-5.5L4 10.3l5.8-2.2z" fill="#fff"/></svg></div>
+          <span style="font-family:'Newsreader',serif;font-weight:600;font-size:17px;">Agentic</span>
+        </div>
+        <button onClick="{{ goSignin }}" style="border:none;background:transparent;color:var(--ink-500);font-size:13px;font-weight:500;cursor:pointer;">Already have an account? <span style="color:var(--violet);font-weight:600;">Sign in</span></button>
+      </div>
+
+      <!-- progress stepper -->
+      <div style="width:100%;max-width:760px;margin-top:36px;display:flex;align-items:center;">
+        <sc-for list="{{ wizardSteps }}" as="w" hint-placeholder-count="5">
+          <div style="display:flex;align-items:center;flex:{{ w.flex }};min-width:0;">
+            <div style="display:flex;flex-direction:column;align-items:center;gap:7px;flex:0 0 auto;">
+              <div style="width:30px;height:30px;border-radius:99px;display:flex;align-items:center;justify-content:center;font-family:'IBM Plex Mono',monospace;font-size:12px;font-weight:600;border:1.5px solid {{ w.ring }};background:{{ w.fill }};color:{{ w.fg }};transition:all .2s;">{{ w.mark }}</div>
+              <span style="font-size:11.5px;font-weight:{{ w.weight }};color:{{ w.labelColor }};white-space:nowrap;">{{ w.label }}</span>
+            </div>
+            <sc-if value="{{ w.line }}" hint-placeholder-val="{{ true }}"><div style="flex:1;height:2px;margin:0 8px;margin-bottom:22px;border-radius:9px;background:{{ w.lineColor }};"></div></sc-if>
+          </div>
+        </sc-for>
+      </div>
+
+      <!-- card -->
+      <div style="width:100%;max-width:640px;margin-top:34px;background:var(--bg-panel);border:1px solid var(--border);border-radius:18px;box-shadow:var(--shadow-lg);padding:34px 36px;">
+        <div style="font-family:'IBM Plex Mono',monospace;font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--violet);">Step {{ stepNum }} of 5</div>
+        <h2 style="margin:7px 0 4px;font-family:'Newsreader',serif;font-weight:600;font-size:25px;letter-spacing:-.01em;">{{ stepTitle }}</h2>
+        <p style="margin:0 0 26px;font-size:14px;color:var(--ink-500);">{{ stepSub }}</p>
+
+        <!-- STEP 0: Account -->
+        <sc-if value="{{ isStep0 }}" hint-placeholder-val="{{ true }}">
+          <div style="display:flex;flex-direction:column;gap:16px;">
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;">
+              <div><label style="display:block;font-size:12.5px;font-weight:600;color:var(--ink-700);margin-bottom:7px;">Full name</label><input value="{{ su_name }}" onInput="{{ onSuName }}" placeholder="Avery Kim" style-focus="{{ inputFocus }}" style="width:100%;height:44px;padding:0 14px;border:1px solid var(--border);border-radius:11px;background:var(--bg-sub);font:14px 'Hanken Grotesk',sans-serif;color:var(--ink-900);outline:none;transition:all .14s;" /></div>
+              <div><label style="display:block;font-size:12.5px;font-weight:600;color:var(--ink-700);margin-bottom:7px;">Company name</label><input value="{{ su_company }}" onInput="{{ onSuCompany }}" placeholder="Northwind Labs" style-focus="{{ inputFocus }}" style="width:100%;height:44px;padding:0 14px;border:1px solid var(--border);border-radius:11px;background:var(--bg-sub);font:14px 'Hanken Grotesk',sans-serif;color:var(--ink-900);outline:none;transition:all .14s;" /></div>
+            </div>
+            <div><label style="display:block;font-size:12.5px;font-weight:600;color:var(--ink-700);margin-bottom:7px;">Work email</label><input value="{{ su_email }}" onInput="{{ onSuEmail }}" type="email" placeholder="you@company.com" style-focus="{{ inputFocus }}" style="width:100%;height:44px;padding:0 14px;border:1px solid var(--border);border-radius:11px;background:var(--bg-sub);font:14px 'Hanken Grotesk',sans-serif;color:var(--ink-900);outline:none;transition:all .14s;" /></div>
+            <div>
+              <label style="display:block;font-size:12.5px;font-weight:600;color:var(--ink-700);margin-bottom:7px;">Password</label>
+              <input value="{{ su_password }}" onInput="{{ onSuPassword }}" type="password" placeholder="At least 8 characters" style-focus="{{ inputFocus }}" style="width:100%;height:44px;padding:0 14px;border:1px solid var(--border);border-radius:11px;background:var(--bg-sub);font:14px 'Hanken Grotesk',sans-serif;color:var(--ink-900);outline:none;transition:all .14s;" />
+              <sc-if value="{{ suPwShow }}" hint-placeholder-val="{{ false }}">
+                <div style="display:flex;align-items:center;gap:10px;margin-top:9px;">
+                  <div style="flex:1;height:5px;border-radius:99px;background:var(--bg-inset);overflow:hidden;"><div style="height:100%;width:{{ suPwPct }};background:{{ suPwColor }};border-radius:99px;transition:all .2s;"></div></div>
+                  <span style="font-family:'IBM Plex Mono',monospace;font-size:10.5px;font-weight:600;color:{{ suPwColor }};">{{ suPwLabel }}</span>
+                </div>
+              </sc-if>
+            </div>
+            <button onClick="{{ toggleTerms }}" style="display:flex;align-items:flex-start;gap:10px;border:none;background:transparent;cursor:pointer;text-align:left;padding:2px 0;">
+              <span style="width:19px;height:19px;border-radius:6px;border:1.5px solid {{ termsBorder }};background:{{ termsBg }};display:flex;align-items:center;justify-content:center;flex:0 0 auto;margin-top:1px;transition:all .12s;">{{ termsCheck }}</span>
+              <span style="font-size:12.5px;color:var(--ink-500);line-height:1.5;">I agree to the <span style="color:var(--violet);font-weight:600;">Terms of Service</span> and <span style="color:var(--violet);font-weight:600;">Privacy Policy</span>.</span>
+            </button>
+          </div>
+        </sc-if>
+
+        <!-- STEP 1: Company -->
+        <sc-if value="{{ isStep1 }}" hint-placeholder-val="{{ false }}">
+          <div style="display:flex;flex-direction:column;gap:20px;">
+            <div><label style="display:block;font-size:12.5px;font-weight:600;color:var(--ink-700);margin-bottom:9px;">Industry</label>
+              <select value="{{ su_industry }}" onChange="{{ onSuIndustry }}" style="width:100%;height:44px;padding:0 14px;border:1px solid var(--border);border-radius:11px;background:var(--bg-sub);font:14px 'Hanken Grotesk',sans-serif;color:var(--ink-900);outline:none;cursor:pointer;appearance:none;">
+                <sc-for list="{{ industries }}" as="opt" hint-placeholder-count="6"><option value="{{ opt.v }}">{{ opt.v }}</option></sc-for>
+              </select>
+            </div>
+            <div><label style="display:block;font-size:12.5px;font-weight:600;color:var(--ink-700);margin-bottom:9px;">Company size</label>
+              <div style="display:flex;flex-wrap:wrap;gap:8px;"><sc-for list="{{ sizes }}" as="c" hint-placeholder-count="5"><button onClick="{{ c.onPick }}" style="{{ c.style }}">{{ c.label }}</button></sc-for></div>
+            </div>
+            <div><label style="display:block;font-size:12.5px;font-weight:600;color:var(--ink-700);margin-bottom:9px;">Primary use case</label>
+              <div style="display:flex;flex-wrap:wrap;gap:8px;"><sc-for list="{{ useCases }}" as="c" hint-placeholder-count="4"><button onClick="{{ c.onPick }}" style="{{ c.style }}">{{ c.label }}</button></sc-for></div>
+            </div>
+            <div><label style="display:block;font-size:12.5px;font-weight:600;color:var(--ink-700);margin-bottom:9px;">Team size on Agentic</label>
+              <div style="display:flex;flex-wrap:wrap;gap:8px;"><sc-for list="{{ teams }}" as="c" hint-placeholder-count="4"><button onClick="{{ c.onPick }}" style="{{ c.style }}">{{ c.label }}</button></sc-for></div>
+            </div>
+          </div>
+        </sc-if>
+
+        <!-- STEP 2: Data sources -->
+        <sc-if value="{{ isStep2 }}" hint-placeholder-val="{{ false }}">
+          <div>
+            <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:11px;">
+              <sc-for list="{{ integrations }}" as="g" hint-placeholder-count="11">
+                <button onClick="{{ g.onToggle }}" style="{{ g.style }}">
+                  <span style="width:34px;height:34px;border-radius:9px;background:{{ g.tint }};color:{{ g.color }};display:flex;align-items:center;justify-content:center;font-family:'Newsreader',serif;font-weight:600;font-size:16px;flex:0 0 auto;">{{ g.letter }}</span>
+                  <span style="display:flex;flex-direction:column;text-align:left;flex:1;min-width:0;"><span style="font-size:13px;font-weight:600;color:var(--ink-900);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">{{ g.name }}</span><span style="font-size:10.5px;color:var(--ink-400);">{{ g.kind }}</span></span>
+                  <sc-if value="{{ g.selected }}" hint-placeholder-val="{{ false }}"><span style="position:absolute;top:8px;right:8px;width:17px;height:17px;border-radius:99px;background:var(--violet);display:flex;align-items:center;justify-content:center;"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l4 4L19 7"/></svg></span></sc-if>
+                </button>
+              </sc-for>
+            </div>
+            <div style="margin-top:18px;padding:16px;border:1px solid var(--violet-border);border-radius:14px;background:var(--violet-bg);">
+              <div style="font-size:13px;font-weight:700;color:var(--ink-900);margin-bottom:3px;">Connect your live data (Inflectiv)</div>
+              <div style="font-size:11.5px;color:var(--ink-500);line-height:1.5;margin-bottom:12px;">Paste your Inflectiv global key and pick the dataset the agent should analyze. This powers your real dashboard.</div>
+              <div style="display:flex;gap:8px;">
+                <input value="{{ su_inflectivKey }}" onInput="{{ onSuKey }}" type="password" placeholder="inf_global_…" style="flex:1;height:42px;padding:0 13px;border:1px solid var(--border);border-radius:10px;background:var(--bg-panel);font-family:'IBM Plex Mono',monospace;font-size:12.5px;color:var(--ink-900);outline:none;" />
+                <button onMouseDown="{{ loadSuDatasets }}" style="height:42px;padding:0 16px;border:none;border-radius:10px;background:var(--violet);color:#fff;font-family:'Hanken Grotesk',sans-serif;font-weight:600;font-size:13px;cursor:pointer;flex:0 0 auto;">{{ dsLoadLabel }}</button>
+              </div>
+              <sc-if value="{{ hasDatasets }}" hint-placeholder-val="{{ false }}">
+                <select value="{{ su_datasetId }}" onChange="{{ onDsSelect }}" style="width:100%;height:42px;margin-top:10px;padding:0 13px;border:1px solid var(--border);border-radius:10px;background:var(--bg-panel);font-family:'Hanken Grotesk',sans-serif;font-size:14px;color:var(--ink-900);outline:none;cursor:pointer;">
+                  <sc-for list="{{ suDatasetOptions }}" as="opt" hint-placeholder-count="3"><option value="{{ opt.value }}">{{ opt.label }}</option></sc-for>
+                </select>
+              </sc-if>
+              <sc-if value="{{ dsError }}" hint-placeholder-val="{{ false }}"><div style="margin-top:10px;font-size:12px;color:var(--rose);">{{ dsError }}</div></sc-if>
+            </div>
+            <div style="margin-top:14px;font-size:12px;color:var(--ink-400);display:flex;align-items:center;gap:7px;"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 16v-4M12 8h.01"/></svg>{{ sourcesNote }}</div>
+          </div>
+        </sc-if>
+
+        <!-- STEP 3: Goals -->
+        <sc-if value="{{ isStep3 }}" hint-placeholder-val="{{ false }}">
+          <div>
+            <div style="display:flex;align-items:center;gap:10px;height:50px;padding:0 10px 0 16px;border:1.5px solid var(--violet-border);border-radius:13px;background:var(--violet-bg);">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" style="color:var(--violet);flex:0 0 auto;"><path d="M12 3l1.7 4.3L18 9l-4.3 1.7L12 15l-1.7-4.3L6 9l4.3-1.7z" fill="currentColor"/></svg>
+              <input value="{{ su_goal }}" onInput="{{ onSuGoal }}" placeholder="Describe what you want to analyze…" style="flex:1;border:none;outline:none;background:transparent;font:15px 'Hanken Grotesk',sans-serif;color:var(--ink-900);min-width:0;" />
+            </div>
+            <div style="margin-top:16px;font-size:12px;font-weight:600;color:var(--ink-500);">Popular goals</div>
+            <div style="display:flex;flex-wrap:wrap;gap:9px;margin-top:11px;">
+              <sc-for list="{{ goalChips }}" as="c" hint-placeholder-count="5"><button onClick="{{ c.onPick }}" style="{{ c.style }}">{{ c.icon }}{{ c.label }}</button></sc-for>
+            </div>
+          </div>
+        </sc-if>
+
+        <!-- STEP 4: AI config -->
+        <sc-if value="{{ isStep4 }}" hint-placeholder-val="{{ false }}">
+          <div style="display:flex;flex-direction:column;gap:22px;">
+            <div><label style="display:block;font-size:12.5px;font-weight:600;color:var(--ink-700);margin-bottom:10px;">Preferred dashboard style</label>
+              <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;"><sc-for list="{{ styleCards }}" as="c" hint-placeholder-count="3">
+                <button onClick="{{ c.onPick }}" style="{{ c.style }}"><span style="display:flex;align-items:center;justify-content:center;height:34px;color:{{ c.iconColor }};">{{ c.icon }}</span><span style="font-size:13px;font-weight:600;color:var(--ink-900);">{{ c.title }}</span><span style="font-size:10.5px;color:var(--ink-400);">{{ c.desc }}</span></button>
+              </sc-for></div>
+            </div>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:18px;">
+              <div><label style="display:block;font-size:12.5px;font-weight:600;color:var(--ink-700);margin-bottom:10px;">Alert sensitivity</label><div style="display:flex;gap:4px;background:var(--bg-inset);padding:4px;border-radius:11px;"><sc-for list="{{ sensitivity }}" as="o" hint-placeholder-count="3"><button onClick="{{ o.onPick }}" style="{{ o.style }}">{{ o.label }}</button></sc-for></div></div>
+              <div><label style="display:block;font-size:12.5px;font-weight:600;color:var(--ink-700);margin-bottom:10px;">Insight depth</label><div style="display:flex;gap:4px;background:var(--bg-inset);padding:4px;border-radius:11px;"><sc-for list="{{ depth }}" as="o" hint-placeholder-count="3"><button onClick="{{ o.onPick }}" style="{{ o.style }}">{{ o.label }}</button></sc-for></div></div>
+            </div>
+            <div><label style="display:block;font-size:12.5px;font-weight:600;color:var(--ink-700);margin-bottom:10px;">Forecasting preference</label><div style="display:flex;gap:4px;background:var(--bg-inset);padding:4px;border-radius:11px;max-width:340px;"><sc-for list="{{ forecast }}" as="o" hint-placeholder-count="3"><button onClick="{{ o.onPick }}" style="{{ o.style }}">{{ o.label }}</button></sc-for></div></div>
+            <div style="display:flex;align-items:center;justify-content:space-between;padding:14px 16px;border:1px solid var(--border);border-radius:12px;background:var(--bg-sub);">
+              <div><div style="font-size:13.5px;font-weight:600;color:var(--ink-900);">Auto-generated executive summaries</div><div style="font-size:12px;color:var(--ink-500);margin-top:2px;">Agent writes a narrative summary after each analysis.</div></div>
+              <button onClick="{{ toggleAutoSummary }}" style="width:46px;height:26px;border-radius:99px;border:none;background:{{ autoBg }};cursor:pointer;position:relative;transition:background .18s;flex:0 0 auto;"><span style="position:absolute;top:3px;left:{{ autoLeft }};width:20px;height:20px;border-radius:99px;background:#fff;box-shadow:var(--shadow-sm);transition:left .18s;"></span></button>
+            </div>
+          </div>
+        </sc-if>
+
+        <!-- footer -->
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-top:30px;padding-top:22px;border-top:1px solid var(--border);">
+          <button onClick="{{ back }}" style="{{ backStyle }}"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M11 6l-6 6 6 6"/></svg>Back</button>
+          <button onClick="{{ next }}" style="{{ nextStyle }}">{{ continueLabel }}<sc-if value="{{ showNextArrow }}" hint-placeholder-val="{{ true }}"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></sc-if></button>
+        </div>
+      </div>
+      <div style="margin-top:18px;font-size:12px;color:var(--ink-400);display:flex;align-items:center;gap:7px;"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l7 3v5c0 5-3.5 8.5-7 10-3.5-1.5-7-5-7-10V6z"/></svg>Your data is encrypted in transit and at rest · Privacy-first</div>
+    </div>
+  </sc-if>
+
+  <!-- ============================ RESET PASSWORD ============================ -->
+  <sc-if value="{{ isReset }}" hint-placeholder-val="{{ false }}">
+    <div style="min-height:100vh;display:flex;align-items:center;justify-content:center;padding:40px 24px;">
+      <div style="width:100%;max-width:440px;">
+        <div style="width:42px;height:42px;border-radius:12px;background:linear-gradient(150deg,var(--violet),#4D38B0);display:flex;align-items:center;justify-content:center;box-shadow:var(--shadow-md);margin:0 auto 22px;">{{ resetGlyph }}</div>
+        <div style="background:var(--bg-panel);border:1px solid var(--border);border-radius:18px;box-shadow:var(--shadow-lg);padding:32px 34px;">
+          <!-- progress dots -->
+          <div style="display:flex;gap:6px;justify-content:center;margin-bottom:24px;"><sc-for list="{{ resetDots }}" as="d" hint-placeholder-count="4"><span style="{{ d.style }}"></span></sc-for></div>
+
+          <h2 style="margin:0;text-align:center;font-family:'Newsreader',serif;font-weight:600;font-size:23px;letter-spacing:-.01em;">{{ resetTitle }}</h2>
+          <p style="margin:9px 0 24px;text-align:center;font-size:13.5px;color:var(--ink-500);line-height:1.5;">{{ resetSub }}</p>
+
+          <sc-if value="{{ isR0 }}" hint-placeholder-val="{{ true }}">
+            <div>
+              <label style="display:block;font-size:12.5px;font-weight:600;color:var(--ink-700);margin-bottom:7px;">Work email</label>
+              <input value="{{ rs_email }}" onInput="{{ onRsEmail }}" type="email" placeholder="you@company.com" style-focus="{{ inputFocus }}" style="width:100%;height:44px;padding:0 14px;border:1px solid var(--border);border-radius:11px;background:var(--bg-sub);font:14px 'Hanken Grotesk',sans-serif;color:var(--ink-900);outline:none;transition:all .14s;" />
+              <button onClick="{{ resetNext }}" style="{{ resetBtnStyle }}">Send reset link</button>
+            </div>
+          </sc-if>
+
+          <sc-if value="{{ isR1 }}" hint-placeholder-val="{{ false }}">
+            <div style="text-align:center;">
+              <div style="display:inline-flex;align-items:center;justify-content:center;width:56px;height:56px;border-radius:99px;background:var(--emerald-bg);color:var(--emerald-ink);margin-bottom:6px;"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 7l9 6 9-6"/></svg></div>
+              <div style="font-size:13.5px;color:var(--ink-700);background:var(--bg-inset);border-radius:10px;padding:11px;margin:8px 0 4px;font-family:'IBM Plex Mono',monospace;">{{ rs_email }}</div>
+              <button onClick="{{ resetNext }}" style="{{ resetBtnStyle }}">I've opened the link</button>
+              <button onClick="{{ resetBack }}" style="width:100%;margin-top:10px;border:none;background:transparent;color:var(--ink-500);font-size:12.5px;font-weight:500;cursor:pointer;">Resend email</button>
+            </div>
+          </sc-if>
+
+          <sc-if value="{{ isR2 }}" hint-placeholder-val="{{ false }}">
+            <div style="display:flex;flex-direction:column;gap:14px;">
+              <div><label style="display:block;font-size:12.5px;font-weight:600;color:var(--ink-700);margin-bottom:7px;">New password</label><input value="{{ rs_password }}" onInput="{{ onRsPassword }}" type="password" placeholder="At least 8 characters" style-focus="{{ inputFocus }}" style="width:100%;height:44px;padding:0 14px;border:1px solid var(--border);border-radius:11px;background:var(--bg-sub);font:14px 'Hanken Grotesk',sans-serif;color:var(--ink-900);outline:none;transition:all .14s;" />
+                <sc-if value="{{ rsPwShow }}" hint-placeholder-val="{{ false }}"><div style="display:flex;align-items:center;gap:10px;margin-top:9px;"><div style="flex:1;height:5px;border-radius:99px;background:var(--bg-inset);overflow:hidden;"><div style="height:100%;width:{{ rsPwPct }};background:{{ rsPwColor }};border-radius:99px;transition:all .2s;"></div></div><span style="font-family:'IBM Plex Mono',monospace;font-size:10.5px;font-weight:600;color:{{ rsPwColor }};">{{ rsPwLabel }}</span></div></sc-if>
+              </div>
+              <div><label style="display:block;font-size:12.5px;font-weight:600;color:var(--ink-700);margin-bottom:7px;">Confirm password</label><input value="{{ rs_confirm }}" onInput="{{ onRsConfirm }}" type="password" placeholder="Re-enter password" style-focus="{{ inputFocus }}" style="width:100%;height:44px;padding:0 14px;border:1px solid var(--border);border-radius:11px;background:var(--bg-sub);font:14px 'Hanken Grotesk',sans-serif;color:var(--ink-900);outline:none;transition:all .14s;" /></div>
+              <div style="display:flex;align-items:flex-start;gap:8px;padding:11px 13px;border-radius:10px;background:var(--bg-inset);font-size:11.5px;color:var(--ink-500);line-height:1.5;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="flex:0 0 auto;margin-top:1px;"><circle cx="12" cy="12" r="9"/><path d="M12 16v-4M12 8h.01"/></svg>Use 8+ characters with a mix of letters, numbers, and symbols. Avoid reusing past passwords.</div>
+              <button onClick="{{ resetNext }}" style="{{ resetBtnStyle }}">Update password</button>
+            </div>
+          </sc-if>
+
+          <sc-if value="{{ isR3 }}" hint-placeholder-val="{{ false }}">
+            <div style="text-align:center;">
+              <div style="display:inline-flex;align-items:center;justify-content:center;width:60px;height:60px;border-radius:99px;background:var(--emerald-bg);color:var(--emerald-ink);margin-bottom:8px;"><svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg></div>
+              <button onClick="{{ goSignin }}" style="{{ resetBtnStyle }}">Back to sign in</button>
+            </div>
+          </sc-if>
+        </div>
+        <p style="text-align:center;margin:20px 0 0;font-size:12.5px;color:var(--ink-400);">Need help? <span style="color:var(--violet);font-weight:600;cursor:pointer;">Contact support</span></p>
+      </div>
+    </div>
+  </sc-if>
+
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+const h = React.createElement;
+const BACKEND = '/api';
+
+class Component extends DCLogic {
+  state = {
+    theme: 'light', screen: 'signin', step: 0, rstep: 0, busy: false,
+    si: { email: '', password: '', showPw: false, remember: true, error: '' },
+    su: {
+      name: '', email: '', company: '', password: '', terms: false,
+      industry: 'SaaS / Software', size: '', useCase: '', team: '',
+      sources: ['csv'], goal: '', goals: [],
+      inflectivKey: '', datasetId: '', datasetName: '', datasets: [], dsLoading: false, dsError: '',
+      style: 'Balanced', sensitivity: 'Medium', depth: 'Standard', autoSummary: true, forecast: 'Balanced'
+    },
+    suError: '',
+    rs: { email: '', password: '', confirm: '' }
+  };
+  componentDidMount() { try { const t = localStorage.getItem('ada-theme'); if (t === 'dark' || t === 'light') this.setState({ theme: t }); } catch (x) {} }
+  toggleTheme() { this.setState(s => { const t = s.theme === 'light' ? 'dark' : 'light'; try { localStorage.setItem('ada-theme', t); } catch (x) {} return { theme: t }; }); }
+
+  emailOk(e) { return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(e); }
+  strength(p) {
+    if (!p) return { pct: '0%', color: 'var(--border-strong)', label: '' };
+    let s = 0; if (p.length >= 8) s++; if (/[A-Z]/.test(p)) s++; if (/[0-9]/.test(p)) s++; if (/[^A-Za-z0-9]/.test(p)) s++;
+    const colors = ['var(--rose)', 'var(--rose)', 'var(--amber)', 'var(--violet)', 'var(--emerald)'];
+    const labels = ['Very weak', 'Weak', 'Fair', 'Good', 'Strong'];
+    return { pct: Math.max(10, s / 4 * 100) + '%', color: colors[s], label: labels[s] };
+  }
+  setSi(k, v) { this.setState(s => ({ si: Object.assign({}, s.si, { [k]: v, error: '' }) })); }
+  setSu(k, v) { this.setState(s => ({ su: Object.assign({}, s.su, { [k]: v }) })); }
+  setRs(k, v) { this.setState(s => ({ rs: Object.assign({}, s.rs, { [k]: v }) })); }
+  toggleSource(id) { this.setState(s => { const has = s.su.sources.includes(id); return { su: Object.assign({}, s.su, { sources: has ? s.su.sources.filter(x => x !== id) : s.su.sources.concat(id) }) }; }); }
+  toggleGoal(g) { this.setState(s => { const has = s.su.goals.includes(g); return { su: Object.assign({}, s.su, { goals: has ? s.su.goals.filter(x => x !== g) : s.su.goals.concat(g) }) }; }); }
+
+  canStep() {
+    const s = this.state.su, st = this.state.step;
+    if (st === 0) return !!(s.name && this.emailOk(s.email) && s.company && s.password.length >= 8 && s.terms);
+    if (st === 1) return !!(s.industry && s.size && s.useCase && s.team);
+    if (st === 2) return !!(s.inflectivKey.trim() && s.datasetId);
+    if (st === 3) return !!(s.goal.trim() || s.goals.length >= 1);
+    return true;
+  }
+  next() { if (!this.canStep() || this.state.busy) return; if (this.state.step >= 4) { this.doSignup(); return; } this.setState(s => ({ step: s.step + 1 })); }
+  back() { if (this.state.step === 0) { this.setState({ screen: 'signin' }); return; } this.setState(s => ({ step: Math.max(0, s.step - 1) })); }
+  goDashboard() { window.location.href = 'Agentic Dashboard AI.dc.html'; }
+  goSignup() { this.setState({ screen: 'signup', step: 0 }); }
+  goSignin() { this.setState({ screen: 'signin', rstep: 0 }); }
+  goReset() { this.setState({ screen: 'reset', rstep: 0 }); }
+
+  async loadSuDatasets() {
+    const key = this.state.su.inflectivKey.trim();
+    if (!key) { this.setSu('dsError', 'Paste your global API key first.'); return; }
+    this.setSu('dsLoading', true); this.setSu('dsError', '');
+    try {
+      const res = await fetch(BACKEND + '/datasets', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ global_key: key }) });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.detail || ('HTTP ' + res.status));
+      const list = (data.datasets || []).filter(d => d.id != null);
+      if (!list.length) throw new Error('No datasets found for this key.');
+      this.setState(s => ({ su: Object.assign({}, s.su, { datasets: list, datasetId: String(list[0].id), datasetName: list[0].name, dsLoading: false }) }));
+    } catch (e) {
+      this.setState(s => ({ su: Object.assign({}, s.su, { dsLoading: false, dsError: String(e.message || e) }) }));
+    }
+  }
+  onDsSelect(e) { const id = e.target.value; const ds = this.state.su.datasets.find(d => String(d.id) === id); this.setState(s => ({ su: Object.assign({}, s.su, { datasetId: id, datasetName: ds ? ds.name : '' }) })); }
+
+  async signinSubmit() {
+    const s = this.state.si;
+    if (!this.emailOk(s.email) || s.password.length < 1) { this.setSi('error', 'Enter a valid email and a password to continue.'); return; }
+    this.setState({ busy: true });
+    try {
+      const res = await fetch(BACKEND + '/auth/login', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ email: s.email, password: s.password }) });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.detail || 'Sign in failed.');
+      try { localStorage.setItem('ada-token', data.token); } catch (x) {}
+      this.goDashboard();
+    } catch (e) { this.setState({ busy: false }); this.setSi('error', String(e.message || e)); }
+  }
+  async doSignup() {
+    const su = this.state.su;
+    this.setState({ busy: true, suError: '' });
+    const payload = {
+      name: su.name, email: su.email, company: su.company, password: su.password,
+      inflectiv_key: su.inflectivKey.trim(), inflectiv_dataset_id: parseInt(su.datasetId, 10), inflectiv_dataset_name: su.datasetName,
+      onboarding: { industry: su.industry, size: su.size, useCase: su.useCase, team: su.team, sources: su.sources, goals: su.goals, goal: su.goal },
+      ai_prefs: { style: su.style, sensitivity: su.sensitivity, depth: su.depth, autoSummary: su.autoSummary, forecast: su.forecast }
+    };
+    try {
+      const res = await fetch(BACKEND + '/auth/signup', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.detail || 'Could not create account.');
+      try { localStorage.setItem('ada-token', data.token); } catch (x) {}
+      this.goDashboard();
+    } catch (e) { this.setState({ busy: false, suError: String(e.message || e) }); }
+  }
+  async resetNext() {
+    const st = this.state.rstep;
+    if (st === 0) { if (this.emailOk(this.state.rs.email)) { try { await fetch(BACKEND + '/auth/forgot', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ email: this.state.rs.email }) }); } catch (x) {} this.setState({ rstep: 1 }); } }
+    else if (st === 1) { this.setState({ rstep: 2 }); }
+    else if (st === 2) { const r = this.state.rs; if (r.password.length >= 8 && r.password === r.confirm) { try { await fetch(BACKEND + '/auth/reset', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ email: r.email, password: r.password }) }); } catch (x) {} this.setState({ rstep: 3 }); } }
+  }
+  resetBack() { this.setState({ rstep: 0 }); }
+
+  chip(label, current, setter) {
+    const a = current === label;
+    return { label, selected: a, onPick: () => setter(label),
+      style: 'padding:9px 14px;border-radius:10px;border:1px solid ' + (a ? 'var(--violet)' : 'var(--border)') + ';background:' + (a ? 'var(--violet-bg)' : 'var(--bg-panel)') + ';color:' + (a ? 'var(--violet)' : 'var(--ink-700)') + ';font:600 13px \'Hanken Grotesk\',sans-serif;cursor:pointer;transition:all .12s;' };
+  }
+  seg(label, current, setter) {
+    const a = current === label;
+    return { label, onPick: () => setter(label),
+      style: 'flex:1;height:34px;border:none;border-radius:8px;background:' + (a ? 'var(--bg-panel)' : 'transparent') + ';color:' + (a ? 'var(--violet)' : 'var(--ink-500)') + ';font:600 12.5px \'Hanken Grotesk\',sans-serif;cursor:pointer;box-shadow:' + (a ? 'var(--shadow-sm)' : 'none') + ';transition:all .12s;' };
+  }
+  ic(paths, sz, sw) { return h('svg', { width: sz || 15, height: sz || 15, viewBox: '0 0 24 24', fill: 'none', stroke: 'currentColor', strokeWidth: sw || 1.9, strokeLinecap: 'round', strokeLinejoin: 'round' }, paths.map((p, i) => h('path', { key: i, d: p }))); }
+  check(sz) { return h('svg', { width: sz || 12, height: sz || 12, viewBox: '0 0 24 24', fill: 'none', stroke: '#fff', strokeWidth: 3, strokeLinecap: 'round', strokeLinejoin: 'round' }, h('path', { d: 'M5 12l4 4L19 7' })); }
+
+  renderVals() {
+    const s = this.state, su = s.su, f = "'Hanken Grotesk',sans-serif";
+    const inputFocus = { borderColor: 'var(--violet)', boxShadow: '0 0 0 3px var(--violet-bg)' };
+    const primaryHover = { filter: 'brightness(1.08)' };
+
+    // sign in
+    const eye = s.si.showPw
+      ? this.ic(['M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7z', 'M2 2l20 20'], 17, 1.8)
+      : h('svg', { width: 17, height: 17, viewBox: '0 0 24 24', fill: 'none', stroke: 'currentColor', strokeWidth: 1.8, strokeLinecap: 'round', strokeLinejoin: 'round' }, h('path', { d: 'M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7z' }), h('circle', { cx: 12, cy: 12, r: 3 }));
+
+    const themeIcon = s.theme === 'light'
+      ? this.ic(['M21 12.8A9 9 0 1111.2 3 7 7 0 0021 12.8z'], 17, 1.8)
+      : h('svg', { width: 17, height: 17, viewBox: '0 0 24 24', fill: 'none', stroke: 'currentColor', strokeWidth: 1.8, strokeLinecap: 'round', strokeLinejoin: 'round' }, h('circle', { cx: 12, cy: 12, r: 4.5 }), h('path', { d: 'M12 2v2M12 20v2M4 12H2M22 12h-2M5 5l1.5 1.5M17.5 17.5L19 19M19 5l-1.5 1.5M6.5 17.5L5 19' }));
+
+    const flow = [
+      { label: 'Raw Data', arrow: true, icon: h('span', { style: { display: 'inline-flex' } }, this.ic(['M14 3H7a2 2 0 00-2 2v14a2 2 0 002 2h10a2 2 0 002-2V8z', 'M14 3v5h5'], 13)) },
+      { label: 'AI Analysis', arrow: true, icon: h('span', { style: { display: 'inline-flex' } }, this.ic(['M12 3a3 3 0 00-3 3 3 3 0 00-2 5.2A3 3 0 009 17h6a3 3 0 002-5.8A3 3 0 0015 6a3 3 0 00-3-3z'], 13)) },
+      { label: 'Components', arrow: true, icon: h('span', { style: { display: 'inline-flex' } }, this.ic(['M3 3h7v7H3zM14 3h7v7h-7zM14 14h7v7h-7zM3 14h7v7H3z'], 13)) },
+      { label: 'Dashboard', arrow: false, icon: h('span', { style: { display: 'inline-flex' } }, this.ic(['M3 12l9-9 9 9', 'M5 10v10h14V10'], 13)) }
+    ];
+
+    const ssoMark = (type) => {
+      if (type === 'ms') return h('svg', { width: 16, height: 16, viewBox: '0 0 24 24' }, h('rect', { x: 2, y: 2, width: 9, height: 9, fill: '#F25022' }), h('rect', { x: 13, y: 2, width: 9, height: 9, fill: '#7FBA00' }), h('rect', { x: 2, y: 13, width: 9, height: 9, fill: '#00A4EF' }), h('rect', { x: 13, y: 13, width: 9, height: 9, fill: '#FFB900' }));
+      if (type === 'slack') return h('svg', { width: 16, height: 16, viewBox: '0 0 24 24' }, h('rect', { x: 10, y: 2, width: 4, height: 11, rx: 2, fill: '#36C5F0' }), h('rect', { x: 10, y: 13, width: 4, height: 9, rx: 2, fill: '#2EB67D' }), h('rect', { x: 2, y: 10, width: 11, height: 4, rx: 2, fill: '#ECB22E' }), h('rect', { x: 13, y: 10, width: 9, height: 4, rx: 2, fill: '#E01E5A' }));
+      if (type === 'sso') return this.ic(['M7 11V8a5 5 0 0110 0v3', 'M5 11h14v9a1 1 0 01-1 1H6a1 1 0 01-1-1z'], 16, 1.9);
+      return h('span', { style: { fontFamily: "'Newsreader',serif", fontWeight: 600, fontSize: 16, color: '#4285F4' } }, 'G');
+    };
+    const sso = [
+      { name: 'Google', icon: h('span', { style: { display: 'inline-flex' } }, ssoMark('g')) },
+      { name: 'Microsoft', icon: h('span', { style: { display: 'inline-flex' } }, ssoMark('ms')) },
+      { name: 'Slack', icon: h('span', { style: { display: 'inline-flex' } }, ssoMark('slack')) },
+      { name: 'SSO', icon: h('span', { style: { display: 'inline-flex', color: 'var(--ink-500)' } }, ssoMark('sso')) }
+    ];
+
+    // wizard steps
+    const names = ['Account', 'Company', 'Data Sources', 'Goals', 'AI Setup'];
+    const wizardSteps = names.map((label, i) => {
+      const done = i < s.step, here = i === s.step;
+      return {
+        label, flex: i === names.length - 1 ? '0 0 auto' : 1, line: i < names.length - 1,
+        weight: here ? 700 : 500,
+        labelColor: here ? 'var(--ink-900)' : done ? 'var(--ink-700)' : 'var(--ink-400)',
+        ring: here ? 'var(--violet)' : done ? 'var(--emerald)' : 'var(--border-strong)',
+        fill: here ? 'var(--violet)' : done ? 'var(--emerald)' : 'transparent',
+        fg: (here || done) ? '#fff' : 'var(--ink-400)',
+        mark: done ? this.check(13) : (i + 1),
+        lineColor: i < s.step ? 'var(--emerald)' : 'var(--border-strong)'
+      };
+    });
+    const stepTitles = ['Create your account', 'Tell us about your company', 'Connect your data', 'What do you want to analyze?', 'Configure your AI agent'];
+    const stepSubs = [
+      'Start your Agentic workspace in under five minutes.',
+      'We use this to tailor AI recommendations to your business.',
+      'Select the sources your agent should analyze. You can add more later.',
+      'Your agent will generate dashboards and components from these goals.',
+      'Set how the autonomous agent should think, alert, and forecast.'
+    ];
+
+    const su_pw = this.strength(su.password);
+    const rs_pw = this.strength(s.rs.password);
+
+    const integrations = [
+      { id: 'csv', name: 'CSV Upload', kind: 'File', letter: 'C', color: 'var(--emerald-ink)', tint: 'var(--emerald-bg)' },
+      { id: 'excel', name: 'Excel', kind: 'File', letter: 'X', color: '#1D7044', tint: 'var(--emerald-bg)' },
+      { id: 'gsheets', name: 'Google Sheets', kind: 'Cloud', letter: 'G', color: '#1A8A4C', tint: 'var(--emerald-bg)' },
+      { id: 'salesforce', name: 'Salesforce', kind: 'CRM', letter: 'S', color: 'var(--blue)', tint: 'color-mix(in srgb,var(--blue) 14%,transparent)' },
+      { id: 'hubspot', name: 'HubSpot', kind: 'CRM', letter: 'H', color: 'var(--amber-ink)', tint: 'var(--amber-bg)' },
+      { id: 'stripe', name: 'Stripe', kind: 'Payments', letter: 'S', color: 'var(--violet)', tint: 'var(--violet-bg)' },
+      { id: 'postgres', name: 'PostgreSQL', kind: 'Database', letter: 'P', color: 'var(--blue)', tint: 'color-mix(in srgb,var(--blue) 14%,transparent)' },
+      { id: 'snowflake', name: 'Snowflake', kind: 'Warehouse', letter: 'S', color: 'var(--teal)', tint: 'color-mix(in srgb,var(--teal) 16%,transparent)' },
+      { id: 'bigquery', name: 'BigQuery', kind: 'Warehouse', letter: 'B', color: 'var(--blue)', tint: 'color-mix(in srgb,var(--blue) 14%,transparent)' },
+      { id: 'mysql', name: 'MySQL', kind: 'Database', letter: 'M', color: 'var(--amber-ink)', tint: 'var(--amber-bg)' },
+      { id: 'api', name: 'API Connector', kind: 'Custom', letter: '{ }', color: 'var(--ink-700)', tint: 'var(--bg-inset)' }
+    ].map(g => {
+      const sel = su.sources.includes(g.id);
+      return Object.assign({}, g, { selected: sel, onToggle: () => this.toggleSource(g.id),
+        style: 'position:relative;display:flex;align-items:center;gap:10px;padding:13px;border-radius:13px;border:1.5px solid ' + (sel ? 'var(--violet)' : 'var(--border)') + ';background:' + (sel ? 'var(--violet-bg)' : 'var(--bg-panel)') + ';cursor:pointer;transition:all .12s;text-align:left;' });
+    });
+    const sourcesNote = su.sources.length + ' source' + (su.sources.length === 1 ? '' : 's') + ' selected · the agent profiles schema, freshness, and quality automatically.';
+
+    const goalDefs = [
+      { g: 'Analyze revenue trends', d: ['M3 17l6-6 4 4 7-8', 'M17 7h4v4'] },
+      { g: 'Build executive dashboards', d: ['M3 3h7v7H3zM14 3h7v7h-7zM3 14h7v7H3z'] },
+      { g: 'Forecast growth', d: ['M3 12c4-6 6-6 9 0s5 6 9 0'] },
+      { g: 'Monitor churn risk', d: ['M12 4l9 16H3z', 'M12 10v4'] },
+      { g: 'Detect anomalies', d: ['M3 12h4l2-7 4 14 2-7h6'] }
+    ];
+    const goalChips = goalDefs.map(o => {
+      const sel = su.goals.includes(o.g);
+      return { label: o.g, icon: h('span', { style: { display: 'inline-flex', marginRight: 7, color: sel ? 'var(--violet)' : 'var(--ink-400)' } }, this.ic(o.d, 14)),
+        onPick: () => this.toggleGoal(o.g),
+        style: 'display:inline-flex;align-items:center;padding:9px 14px;border-radius:99px;border:1px solid ' + (sel ? 'var(--violet)' : 'var(--border)') + ';background:' + (sel ? 'var(--violet-bg)' : 'var(--bg-panel)') + ';color:' + (sel ? 'var(--violet)' : 'var(--ink-700)') + ';font:600 13px \'Hanken Grotesk\',sans-serif;cursor:pointer;transition:all .12s;' };
+    });
+
+    const styleDefs = [
+      { id: 'Minimal', title: 'Minimal', desc: 'Few focal widgets', d: ['M4 5h16v6H4z', 'M4 15h10v4H4z'] },
+      { id: 'Balanced', title: 'Balanced', desc: 'Linear / Vercel feel', d: ['M4 4h7v7H4z', 'M13 4h7v7h-7z', 'M4 13h16v7H4z'] },
+      { id: 'Dense', title: 'Dense', desc: 'Tableau / Power BI', d: ['M3 4h8v6H3z', 'M13 4h8v6h-8z', 'M3 13h8v7H3z', 'M13 13h8v7h-8z'] }
+    ];
+    const styleCards = styleDefs.map(o => {
+      const sel = su.style === o.id;
+      return { title: o.title, desc: o.desc, iconColor: sel ? 'var(--violet)' : 'var(--ink-400)',
+        icon: this.ic(o.d, 22, 1.7), onPick: () => this.setSu('style', o.id),
+        style: 'display:flex;flex-direction:column;align-items:center;gap:4px;padding:14px 8px;border-radius:13px;border:1.5px solid ' + (sel ? 'var(--violet)' : 'var(--border)') + ';background:' + (sel ? 'var(--violet-bg)' : 'var(--bg-panel)') + ';cursor:pointer;transition:all .12s;' };
+    });
+
+    const continueLabel = s.step === 4 ? 'Generate My First Dashboard' : 'Continue';
+    const canNext = this.canStep();
+    const nextStyle = 'display:inline-flex;align-items:center;gap:8px;height:44px;padding:0 ' + (s.step === 4 ? '22px' : '20px') + ';border:none;border-radius:11px;background:' + (canNext ? 'var(--violet)' : 'var(--border-strong)') + ';color:#fff;font:600 14px \'Hanken Grotesk\',sans-serif;cursor:' + (canNext ? 'pointer' : 'not-allowed') + ';box-shadow:' + (canNext ? 'var(--shadow-md)' : 'none') + ';transition:all .14s;opacity:' + (canNext ? '1' : '.7') + ';';
+    const backStyle = 'display:inline-flex;align-items:center;gap:7px;height:44px;padding:0 16px;border:1px solid var(--border);border-radius:11px;background:var(--bg-panel);color:var(--ink-700);font:600 14px \'Hanken Grotesk\',sans-serif;cursor:pointer;';
+
+    // reset
+    const resetTitles = ['Reset your password', 'Check your inbox', 'Create a new password', 'Password updated'];
+    const resetSubs = [
+      'Enter your work email and we\u2019ll send a secure reset link.',
+      'We sent a reset link to your email. It expires in 30 minutes.',
+      'Choose a strong password you haven\u2019t used before.',
+      'Your password has been changed. You can now sign in securely.'
+    ];
+    const resetDots = [0, 1, 2, 3].map(i => ({ style: 'width:' + (i === s.rstep ? '22px' : '6px') + ';height:6px;border-radius:99px;background:' + (i <= s.rstep ? 'var(--violet)' : 'var(--border-strong)') + ';transition:all .2s;' }));
+    const canSend = this.emailOk(s.rs.email);
+    const canPw = s.rs.password.length >= 8 && s.rs.password === s.rs.confirm;
+    const r0ok = (s.rstep === 0 ? canSend : (s.rstep === 2 ? canPw : true));
+    const resetBtnStyle = 'width:100%;height:46px;margin-top:18px;border:none;border-radius:11px;background:' + (r0ok ? 'var(--violet)' : 'var(--border-strong)') + ';color:#fff;font:600 14px \'Hanken Grotesk\',sans-serif;cursor:' + (r0ok ? 'pointer' : 'not-allowed') + ';box-shadow:' + (r0ok ? 'var(--shadow-md)' : 'none') + ';transition:all .14s;';
+    const resetGlyph = s.rstep === 3
+      ? h('svg', { width: 22, height: 22, viewBox: '0 0 24 24', fill: 'none', stroke: '#fff', strokeWidth: 2, strokeLinecap: 'round', strokeLinejoin: 'round' }, h('path', { d: 'M20 6L9 17l-5-5' }))
+      : this.ic(['M7 11V8a5 5 0 0110 0v3', 'M5 11h14v9a1 1 0 01-1 1H6a1 1 0 01-1-1z'].map(d => d), 22, 1.8);
+
+    return {
+      theme: s.theme, themeIcon, toggleTheme: () => this.toggleTheme(),
+      isSignin: s.screen === 'signin', isSignup: s.screen === 'signup', isReset: s.screen === 'reset',
+      inputFocus, primaryHover,
+      ghostHover: { background: 'var(--bg-inset)', color: 'var(--ink-900)' },
+      ssoHover: { borderColor: 'var(--border-strong)', background: 'var(--bg-sub)' },
+      flow, sso,
+
+      // sign in
+      si_email: s.si.email, si_password: s.si.password, siError: s.si.error,
+      siPwType: s.si.showPw ? 'text' : 'password', siEyeIcon: eye,
+      onSiEmail: (e) => this.setSi('email', e.target.value), onSiPassword: (e) => this.setSi('password', e.target.value),
+      toggleSiPw: () => this.setSi('showPw', !s.si.showPw),
+      toggleRemember: () => this.setSi('remember', !s.si.remember),
+      rememberBorder: s.si.remember ? 'var(--violet)' : 'var(--border-strong)',
+      rememberBg: s.si.remember ? 'var(--violet)' : 'transparent',
+      rememberCheck: s.si.remember ? this.check(12) : '',
+      signinSubmit: () => this.signinSubmit(), goReset: () => this.goReset(), goSignup: () => this.goSignup(), goSignin: () => this.goSignin(), goDashboard: () => this.goDashboard(),
+
+      // wizard
+      wizardSteps, stepNum: s.step + 1, stepTitle: stepTitles[s.step], stepSub: stepSubs[s.step],
+      isStep0: s.step === 0, isStep1: s.step === 1, isStep2: s.step === 2, isStep3: s.step === 3, isStep4: s.step === 4,
+      su_name: su.name, su_company: su.company, su_email: su.email, su_password: su.password, su_industry: su.industry, su_goal: su.goal,
+      onSuName: (e) => this.setSu('name', e.target.value), onSuCompany: (e) => this.setSu('company', e.target.value),
+      onSuEmail: (e) => this.setSu('email', e.target.value), onSuPassword: (e) => this.setSu('password', e.target.value),
+      onSuIndustry: (e) => this.setSu('industry', e.target.value), onSuGoal: (e) => this.setSu('goal', e.target.value),
+      su_inflectivKey: su.inflectivKey, onSuKey: (e) => this.setSu('inflectivKey', e.target.value),
+      loadSuDatasets: () => this.loadSuDatasets(), dsLoadLabel: su.dsLoading ? 'Loading…' : 'Load datasets',
+      hasDatasets: su.datasets.length > 0, su_datasetId: su.datasetId, onDsSelect: (e) => this.onDsSelect(e),
+      suDatasetOptions: su.datasets.map(d => ({ value: String(d.id), label: d.name + (d.knowledge_source_count ? ' · ' + d.knowledge_source_count + ' sources' : '') })),
+      dsError: su.dsError, suError: s.suError,
+      suPwShow: su.password.length > 0, suPwPct: su_pw.pct, suPwColor: su_pw.color, suPwLabel: su_pw.label,
+      toggleTerms: () => this.setSu('terms', !su.terms),
+      termsBorder: su.terms ? 'var(--violet)' : 'var(--border-strong)', termsBg: su.terms ? 'var(--violet)' : 'transparent', termsCheck: su.terms ? this.check(12) : '',
+      industries: ['SaaS / Software', 'E-commerce / Retail', 'Financial Services', 'Healthcare', 'Manufacturing', 'Media', 'Logistics', 'Other'].map(v => ({ v })),
+      sizes: ['1–10', '11–50', '51–200', '201–1k', '1k+'].map(v => this.chip(v, su.size, (x) => this.setSu('size', x))),
+      useCases: ['Revenue analytics', 'Executive reporting', 'Ops monitoring', 'Forecasting', 'Customer insights'].map(v => this.chip(v, su.useCase, (x) => this.setSu('useCase', x))),
+      teams: ['Just me', '2–5', '6–20', '20+'].map(v => this.chip(v, su.team, (x) => this.setSu('team', x))),
+      integrations, sourcesNote,
+      goalChips, styleCards,
+      sensitivity: ['Low', 'Medium', 'High'].map(v => this.seg(v, su.sensitivity, (x) => this.setSu('sensitivity', x))),
+      depth: ['Concise', 'Standard', 'Deep'].map(v => this.seg(v, su.depth, (x) => this.setSu('depth', x))),
+      forecast: ['Conservative', 'Balanced', 'Aggressive'].map(v => this.seg(v, su.forecast, (x) => this.setSu('forecast', x))),
+      toggleAutoSummary: () => this.setSu('autoSummary', !su.autoSummary),
+      autoBg: su.autoSummary ? 'var(--violet)' : 'var(--border-strong)', autoLeft: su.autoSummary ? '23px' : '3px',
+      continueLabel, nextStyle, backStyle, showNextArrow: s.step !== 4,
+      next: () => this.next(), back: () => this.back(),
+
+      // reset
+      isR0: s.rstep === 0, isR1: s.rstep === 1, isR2: s.rstep === 2, isR3: s.rstep === 3,
+      resetTitle: resetTitles[s.rstep], resetSub: resetSubs[s.rstep], resetDots, resetGlyph,
+      rs_email: s.rs.email, rs_password: s.rs.password, rs_confirm: s.rs.confirm,
+      onRsEmail: (e) => this.setRs('email', e.target.value), onRsPassword: (e) => this.setRs('password', e.target.value), onRsConfirm: (e) => this.setRs('confirm', e.target.value),
+      rsPwShow: s.rs.password.length > 0, rsPwPct: rs_pw.pct, rsPwColor: rs_pw.color, rsPwLabel: rs_pw.label,
+      resetBtnStyle, resetNext: () => this.resetNext(), resetBack: () => this.resetBack()
+    };
+  }
+}
+</script>
+</body>
+</html>

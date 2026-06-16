@@ -1,0 +1,1178 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Newsreader:opsz,wght@6..72,400;6..72,500;6..72,600&family=Hanken+Grotesk:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;}
+html,body{margin:0;padding:0;height:100%;}
+body{font-family:'Hanken Grotesk',system-ui,sans-serif;-webkit-font-smoothing:antialiased;}
+:root{
+ --bg-app:#F4F3EF; --bg-panel:#FFFFFF; --bg-sub:#FAF9F6; --bg-inset:#F2F1EC;
+ --border:#E7E5DE; --border-strong:#D9D6CD;
+ --ink-900:#1B1A17; --ink-700:#46443D; --ink-500:#78766C; --ink-400:#A4A299;
+ --violet:#6E56CF; --violet-bg:#F1EEFB; --violet-border:#DDD6F5;
+ --emerald:#0E9F6E; --emerald-ink:#067A52; --emerald-bg:#E8FAF1;
+ --amber:#D97706; --amber-ink:#B45309; --amber-bg:#FCF4E5;
+ --rose:#E0455C; --rose-ink:#C2334A; --rose-bg:#FCEDEE;
+ --teal:#0E9F9A; --blue:#3B6FE0;
+ --shadow-sm:0 1px 2px rgba(28,27,24,.05);
+ --shadow-md:0 6px 20px -6px rgba(28,27,24,.12);
+ --shadow-lg:0 18px 44px -12px rgba(28,27,24,.20);
+ --grid-dot:rgba(120,118,108,.16);
+}
+[data-theme="dark"]{
+ --bg-app:#0D0D10; --bg-panel:#16161A; --bg-sub:#121215; --bg-inset:#1D1D22;
+ --border:#26262D; --border-strong:#34343C;
+ --ink-900:#ECECEF; --ink-700:#B6B6C0; --ink-500:#83838E; --ink-400:#5F5F69;
+ --violet:#9A8BF2; --violet-bg:#201D33; --violet-border:#332C52;
+ --emerald:#34D399; --emerald-ink:#34D399; --emerald-bg:#0F2620;
+ --amber:#FBBF24; --amber-ink:#FBBF24; --amber-bg:#2A2012;
+ --rose:#F4707F; --rose-ink:#F4707F; --rose-bg:#2C171B;
+ --teal:#2DD4CE; --blue:#6E9BFF;
+ --shadow-sm:0 1px 2px rgba(0,0,0,.4);
+ --shadow-md:0 8px 24px -8px rgba(0,0,0,.6);
+ --shadow-lg:0 22px 50px -14px rgba(0,0,0,.7);
+ --grid-dot:rgba(200,200,210,.10);
+}
+@keyframes spin{to{transform:rotate(360deg)}}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
+::-webkit-scrollbar{width:10px;height:10px}
+::-webkit-scrollbar-thumb{background:rgba(130,128,118,.3);border-radius:9px;border:3px solid transparent;background-clip:content-box}
+::-webkit-scrollbar-track{background:transparent}
+</style>
+</helmet>
+
+<div data-theme="{{ theme }}" style="height:100vh;width:100%;overflow:auto;background:var(--bg-app);color:var(--ink-900);font-family:'Hanken Grotesk',system-ui,sans-serif;">
+<div style="height:100%;min-width:1180px;display:flex;flex-direction:column;overflow:hidden;">
+
+  <!-- TOP BAR -->
+  <div style="height:56px;flex:0 0 auto;display:flex;align-items:center;gap:16px;padding:0 16px;background:var(--bg-panel);border-bottom:1px solid var(--border);z-index:30;">
+    <div style="display:flex;align-items:center;gap:11px;width:228px;flex:0 0 auto;">
+      <div style="width:30px;height:30px;border-radius:9px;background:linear-gradient(150deg,var(--violet),#4D38B0);display:flex;align-items:center;justify-content:center;box-shadow:var(--shadow-sm);"><svg width="17" height="17" viewBox="0 0 24 24" fill="none"><path d="M12 2.5l2.2 5.6L20 10.3l-5.8 2.2L12 18l-2.2-5.5L4 10.3l5.8-2.2z" fill="#fff"/><circle cx="18.5" cy="5.5" r="1.7" fill="#fff" opacity=".85"/></svg></div>
+      <div style="display:flex;flex-direction:column;line-height:1;"><span style="font-family:'Newsreader',serif;font-weight:600;font-size:16px;">Agentic</span><span style="font-family:'IBM Plex Mono',monospace;font-size:8.5px;letter-spacing:.18em;color:var(--ink-400);text-transform:uppercase;margin-top:2px;">Dashboard AI</span></div>
+    </div>
+    <div style="flex:1;max-width:440px;display:flex;align-items:center;gap:9px;height:36px;padding:0 12px;background:var(--bg-sub);border:1px solid var(--border);border-radius:10px;">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--ink-400)" stroke-width="1.8" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4-4"/></svg>
+      <input placeholder="Search dashboards, datasets, people…" style="flex:1;border:none;outline:none;background:transparent;font:13.5px 'Hanken Grotesk',sans-serif;color:var(--ink-900);" />
+      <kbd style="font-family:'IBM Plex Mono',monospace;font-size:10px;color:var(--ink-400);border:1px solid var(--border);border-radius:5px;padding:2px 5px;background:var(--bg-panel);">⌘K</kbd>
+    </div>
+    <div style="flex:1;"></div>
+    <div style="display:flex;align-items:center;gap:6px;flex:0 0 auto;">
+      <a href="Agentic Dashboard AI.dc.html" style="display:flex;align-items:center;gap:7px;height:32px;padding:0 13px;border-radius:9px;background:var(--violet);color:#fff;font-weight:600;font-size:12.5px;text-decoration:none;box-shadow:var(--shadow-sm);"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12l9-9 9 9"/><path d="M5 10v10h14V10"/></svg>Open builder</a>
+      <button onClick="{{ toggleTheme }}" style-hover="{{ ghostHover }}" style="width:32px;height:32px;border-radius:9px;border:1px solid transparent;background:transparent;color:var(--ink-500);display:flex;align-items:center;justify-content:center;cursor:pointer;">{{ themeIcon }}</button>
+      <button onClick="{{ onLogout }}" title="Log out" style-hover="{{ ghostHover }}" style="width:32px;height:32px;border-radius:9px;border:1px solid transparent;background:transparent;color:var(--ink-500);display:flex;align-items:center;justify-content:center;cursor:pointer;"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"/><path d="M16 17l5-5-5-5M21 12H9"/></svg></button>
+      <button onClick="{{ goProfile }}" style="display:flex;align-items:center;gap:8px;height:36px;padding:3px 3px 3px 4px;border:1px solid transparent;border-radius:99px;background:transparent;cursor:pointer;" style-hover="{{ ghostHover }}"><div style="width:30px;height:30px;border-radius:99px;background:linear-gradient(135deg,#E8A87C,#C17B5B);display:flex;align-items:center;justify-content:center;color:#fff;font-weight:600;font-size:12px;">{{ userInitials }}</div></button>
+    </div>
+  </div>
+
+  <!-- BODY -->
+  <div style="flex:1;display:flex;min-height:0;">
+    <!-- SIDEBAR -->
+    <aside style="width:228px;flex:0 0 auto;background:var(--bg-sub);border-right:1px solid var(--border);display:flex;flex-direction:column;min-height:0;">
+      <div style="padding:12px 12px 6px;">
+        <button onClick="{{ goProfile }}" style-hover="{{ wsHover }}" style="width:100%;display:flex;align-items:center;gap:10px;padding:8px 10px;border:1px solid var(--border);border-radius:10px;background:var(--bg-panel);cursor:pointer;box-shadow:var(--shadow-sm);">
+          <span style="width:26px;height:26px;border-radius:7px;background:linear-gradient(135deg,#1B1A17,#46443D);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:12px;flex:0 0 auto;">N</span>
+          <span style="display:flex;flex-direction:column;line-height:1.15;text-align:left;flex:1;min-width:0;"><span style="font-weight:600;font-size:13px;color:var(--ink-900);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">{{ workspaceName }}</span><span style="font-size:10.5px;color:var(--ink-500);">Workspace</span></span>
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color:var(--ink-400);"><path d="M8 9l4-4 4 4M8 15l4 4 4-4"/></svg>
+        </button>
+      </div>
+      <div style="flex:1;overflow-y:auto;padding:6px 10px 10px;">
+        <div style="font-family:'IBM Plex Mono',monospace;font-size:9px;letter-spacing:.16em;text-transform:uppercase;color:var(--ink-400);padding:8px 8px 6px;">Workspace</div>
+        <sc-for list="{{ navMain }}" as="n" hint-placeholder-count="4"><button onClick="{{ n.onClick }}" style-hover="{{ n.hoverStyle }}" style="{{ n.rowStyle }}"><span style="display:flex;color:{{ n.iconColor }};flex:0 0 auto;">{{ n.icon }}</span><span style="flex:1;text-align:left;font-size:13px;font-weight:{{ n.weight }};">{{ n.label }}</span><sc-if value="{{ n.count }}" hint-placeholder-val="{{ true }}"><span style="{{ n.badgeStyle }}">{{ n.count }}</span></sc-if></button></sc-for>
+        <div style="font-family:'IBM Plex Mono',monospace;font-size:9px;letter-spacing:.16em;text-transform:uppercase;color:var(--ink-400);padding:16px 8px 6px;">Organization</div>
+        <sc-for list="{{ navOrg }}" as="n" hint-placeholder-count="3"><button onClick="{{ n.onClick }}" style-hover="{{ n.hoverStyle }}" style="{{ n.rowStyle }}"><span style="display:flex;color:{{ n.iconColor }};flex:0 0 auto;">{{ n.icon }}</span><span style="flex:1;text-align:left;font-size:13px;font-weight:{{ n.weight }};">{{ n.label }}</span><sc-if value="{{ n.count }}" hint-placeholder-val="{{ false }}"><span style="{{ n.badgeStyle }}">{{ n.count }}</span></sc-if></button></sc-for>
+      </div>
+      <div style="padding:10px;border-top:1px solid var(--border);display:flex;flex-direction:column;gap:4px;">
+        <button onClick="{{ goSettings }}" style-hover="{{ navHover }}" style="{{ settingsRowStyle }}"><span style="display:flex;color:{{ settingsIconColor }};">{{ settingsIcon }}</span><span style="flex:1;text-align:left;font-size:13px;font-weight:{{ settingsWeight }};">Settings</span></button>
+        <button onClick="{{ goProfile }}" style-hover="{{ wsHover }}" style="{{ userRowStyle }}"><span style="width:28px;height:28px;border-radius:99px;background:linear-gradient(135deg,#E8A87C,#C17B5B);display:flex;align-items:center;justify-content:center;color:#fff;font-weight:600;font-size:11px;flex:0 0 auto;">{{ userInitials }}</span><span style="display:flex;flex-direction:column;line-height:1.2;text-align:left;flex:1;min-width:0;"><span style="font-size:12.5px;font-weight:600;color:var(--ink-900);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">{{ userName }}</span><span style="font-size:10.5px;color:var(--ink-500);">{{ userRoleText }}</span></span></button>
+      </div>
+    </aside>
+
+    <!-- MAIN -->
+    <main style="flex:1;min-width:0;min-height:0;overflow-y:auto;">
+
+      <!-- ============ PROFILE ============ -->
+      <sc-if value="{{ isProfile }}" hint-placeholder-val="{{ true }}">
+        <div style="padding:26px 30px 60px;max-width:1080px;">
+          <div style="display:flex;align-items:flex-end;justify-content:space-between;gap:16px;margin-bottom:22px;">
+            <div><div style="font-family:'IBM Plex Mono',monospace;font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--ink-400);margin-bottom:5px;">Account</div><h1 style="margin:0;font-family:'Newsreader',serif;font-weight:600;font-size:27px;letter-spacing:-.015em;">Profile &amp; Preferences</h1></div>
+            <button onMouseDown="{{ onLogout }}" style-hover="{{ ghostHover }}" style="display:flex;align-items:center;gap:7px;height:36px;padding:0 14px;border:1px solid var(--border);border-radius:10px;background:var(--bg-panel);color:var(--ink-700);font-weight:600;font-size:13px;cursor:pointer;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"/><path d="M16 17l5-5-5-5M21 12H9"/></svg>Log out</button>
+          </div>
+
+          <div style="display:flex;gap:24px;">
+            <!-- sub nav -->
+            <nav style="width:204px;flex:0 0 auto;display:flex;flex-direction:column;gap:2px;position:sticky;top:0;">
+              <sc-for list="{{ profileNav }}" as="p" hint-placeholder-count="7"><button onClick="{{ p.onClick }}" style-hover="{{ navHover }}" style="{{ p.style }}"><span style="display:flex;color:{{ p.iconColor }};">{{ p.icon }}</span>{{ p.label }}</button></sc-for>
+            </nav>
+
+            <div style="flex:1;min-width:0;display:flex;flex-direction:column;gap:18px;">
+              <!-- profile header card -->
+              <div style="background:var(--bg-panel);border:1px solid var(--border);border-radius:16px;box-shadow:var(--shadow-sm);overflow:hidden;">
+                <div style="height:84px;background:linear-gradient(120deg,#3E2E96,#6E56CF 70%,#9A8BF2);"></div>
+                <div style="padding:0 24px 22px;">
+                  <div style="display:flex;align-items:flex-end;gap:18px;margin-top:-34px;">
+                    <div style="width:84px;height:84px;border-radius:22px;background:linear-gradient(135deg,#E8A87C,#C17B5B);border:4px solid var(--bg-panel);display:flex;align-items:center;justify-content:center;color:#fff;font-family:'Newsreader',serif;font-weight:600;font-size:34px;flex:0 0 auto;">{{ userInitials }}</div>
+                    <div style="flex:1;min-width:0;padding-bottom:4px;display:flex;align-items:flex-end;justify-content:space-between;gap:12px;">
+                      <div>
+                        <div style="display:flex;align-items:center;gap:9px;"><span style="font-family:'Newsreader',serif;font-weight:600;font-size:21px;">{{ userName }}</span><span style="display:inline-flex;align-items:center;gap:5px;font-size:11px;font-weight:600;color:var(--violet);background:var(--violet-bg);border:1px solid var(--violet-border);padding:2px 9px;border-radius:99px;">{{ userRoleText }}</span></div>
+                        <div style="font-size:13px;color:var(--ink-500);margin-top:3px;">{{ userSubtitle }}</div>
+                      </div>
+                    </div>
+                  </div>
+                  <div style="display:flex;gap:26px;margin-top:18px;flex-wrap:wrap;">
+                    <sc-for list="{{ profileMeta }}" as="m" hint-placeholder-count="3"><div style="display:flex;align-items:center;gap:8px;"><span style="display:flex;color:var(--ink-400);">{{ m.icon }}</span><div style="display:flex;flex-direction:column;line-height:1.3;"><span style="font-size:10.5px;color:var(--ink-400);text-transform:uppercase;letter-spacing:.04em;">{{ m.label }}</span><span style="font-size:13px;font-weight:600;color:var(--ink-700);">{{ m.value }}</span></div></div></sc-for>
+                  </div>
+                </div>
+              </div>
+
+              <!-- account details -->
+              <div style="background:var(--bg-panel);border:1px solid var(--border);border-radius:16px;box-shadow:var(--shadow-sm);padding:22px 24px;">
+                <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:18px;"><h3 style="margin:0;font-family:'Newsreader',serif;font-weight:600;font-size:16px;">Account details</h3><span style="font-size:11.5px;color:var(--emerald-ink);display:flex;align-items:center;gap:5px;"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>Auto-saved</span></div>
+                <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
+                  <div><label style="display:block;font-size:12px;font-weight:600;color:var(--ink-700);margin-bottom:6px;">Full name</label><input value="{{ p_name }}" onInput="{{ onPName }}" style-focus="{{ inputFocus }}" style="{{ inputStyle }}" /></div>
+                  <div><label style="display:block;font-size:12px;font-weight:600;color:var(--ink-700);margin-bottom:6px;">Department</label><input value="{{ p_dept }}" onInput="{{ onPDept }}" style-focus="{{ inputFocus }}" style="{{ inputStyle }}" /></div>
+                  <div><label style="display:block;font-size:12px;font-weight:600;color:var(--ink-700);margin-bottom:6px;">Timezone</label><select value="{{ p_tz }}" onChange="{{ onPTz }}" style="{{ selectStyle }}"><sc-for list="{{ tzOptions }}" as="o" hint-placeholder-count="4"><option value="{{ o.v }}">{{ o.v }}</option></sc-for></select></div>
+                  <div><label style="display:block;font-size:12px;font-weight:600;color:var(--ink-700);margin-bottom:6px;">Language</label><select value="{{ p_lang }}" onChange="{{ onPLang }}" style="{{ selectStyle }}"><sc-for list="{{ langOptions }}" as="o" hint-placeholder-count="3"><option value="{{ o.v }}">{{ o.v }}</option></sc-for></select></div>
+                  <div style="grid-column:span 2;"><label style="display:block;font-size:12px;font-weight:600;color:var(--ink-700);margin-bottom:6px;">Default workspace</label><select value="{{ p_ws }}" onChange="{{ onPWs }}" style="{{ selectStyle }}"><sc-for list="{{ wsOptions }}" as="o" hint-placeholder-count="2"><option value="{{ o.v }}">{{ o.v }}</option></sc-for></select></div>
+                </div>
+              </div>
+
+              <!-- AI preferences -->
+              <div style="background:var(--bg-panel);border:1px solid var(--border);border-radius:16px;box-shadow:var(--shadow-sm);padding:22px 24px;">
+                <div style="display:flex;align-items:center;gap:9px;margin-bottom:18px;"><span style="width:28px;height:28px;border-radius:8px;background:var(--violet-bg);color:var(--violet);display:flex;align-items:center;justify-content:center;">{{ aiPrefIcon }}</span><h3 style="margin:0;font-family:'Newsreader',serif;font-weight:600;font-size:16px;">AI preferences</h3></div>
+                <div style="display:flex;flex-direction:column;gap:20px;">
+                  <div style="display:grid;grid-template-columns:1fr 1fr;gap:18px;">
+                    <div><label style="display:block;font-size:12px;font-weight:600;color:var(--ink-700);margin-bottom:9px;">Preferred insight style</label>{{ insightStyleSegEl }}</div>
+                    <div><label style="display:block;font-size:12px;font-weight:600;color:var(--ink-700);margin-bottom:9px;">Executive summary tone</label>{{ toneSegEl }}</div>
+                  </div>
+                  <div>
+                    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:9px;"><label style="font-size:12px;font-weight:600;color:var(--ink-700);">AI confidence threshold</label><span style="font-family:'IBM Plex Mono',monospace;font-size:12px;font-weight:600;color:var(--violet);">{{ p_conf }}%</span></div>
+                    <input type="range" min="50" max="99" value="{{ p_conf }}" onInput="{{ onPConf }}" style="width:100%;accent-color:var(--violet);height:5px;cursor:pointer;" />
+                    <div style="display:flex;justify-content:space-between;font-size:10.5px;color:var(--ink-400);margin-top:5px;"><span>Show more suggestions</span><span>Only high-certainty</span></div>
+                  </div>
+                  <div>
+                    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:9px;"><label style="font-size:12px;font-weight:600;color:var(--ink-700);">Forecast aggressiveness</label><span style="font-family:'IBM Plex Mono',monospace;font-size:12px;font-weight:600;color:var(--violet);">{{ forecastLabel }}</span></div>
+                    <input type="range" min="0" max="100" value="{{ p_forecast }}" onInput="{{ onPForecast }}" style="width:100%;accent-color:var(--violet);height:5px;cursor:pointer;" />
+                    <div style="display:flex;justify-content:space-between;font-size:10.5px;color:var(--ink-400);margin-top:5px;"><span>Conservative</span><span>Balanced</span><span>Aggressive</span></div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- productivity -->
+              <div>
+                <h3 style="margin:0 0 12px;font-family:'Newsreader',serif;font-weight:600;font-size:16px;">Productivity</h3>
+                <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:14px;">
+                  <sc-for list="{{ stats }}" as="st" hint-placeholder-count="4">
+                    <div style="background:var(--bg-panel);border:1px solid var(--border);border-radius:14px;box-shadow:var(--shadow-sm);padding:15px 16px;">
+                      <div style="display:flex;align-items:center;justify-content:space-between;"><span style="width:30px;height:30px;border-radius:8px;background:{{ st.tint }};color:{{ st.color }};display:flex;align-items:center;justify-content:center;">{{ st.icon }}</span><span style="font-family:'IBM Plex Mono',monospace;font-size:10.5px;font-weight:600;color:var(--emerald-ink);">{{ st.delta }}</span></div>
+                      <div style="font-family:'Newsreader',serif;font-size:27px;color:var(--ink-900);margin-top:12px;letter-spacing:-.01em;">{{ st.value }}</div>
+                      <div style="font-size:11.5px;color:var(--ink-500);margin-top:1px;">{{ st.label }}</div>
+                    </div>
+                  </sc-for>
+                </div>
+              </div>
+
+              <!-- activity -->
+              <div style="background:var(--bg-panel);border:1px solid var(--border);border-radius:16px;box-shadow:var(--shadow-sm);padding:22px 24px;">
+                <h3 style="margin:0 0 16px;font-family:'Newsreader',serif;font-weight:600;font-size:16px;">Recent activity</h3>
+                <div style="display:flex;flex-direction:column;">
+                  <sc-for list="{{ activity }}" as="a" hint-placeholder-count="5">
+                    <div style="display:flex;gap:13px;padding-bottom:18px;position:relative;">
+                      <div style="display:flex;flex-direction:column;align-items:center;flex:0 0 auto;"><span style="width:30px;height:30px;border-radius:8px;background:{{ a.tint }};color:{{ a.color }};display:flex;align-items:center;justify-content:center;z-index:1;">{{ a.icon }}</span><sc-if value="{{ a.line }}" hint-placeholder-val="{{ true }}"><span style="width:1.5px;flex:1;background:var(--border);margin:3px 0;"></span></sc-if></div>
+                      <div style="flex:1;min-width:0;padding-top:5px;"><div style="font-size:13.5px;color:var(--ink-900);"><span style="font-weight:600;">{{ a.action }}</span> {{ a.target }}</div><div style="font-family:'IBM Plex Mono',monospace;font-size:10.5px;color:var(--ink-400);margin-top:2px;">{{ a.time }}</div></div>
+                    </div>
+                  </sc-for>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </sc-if>
+
+      <!-- ============ DATASETS ============ -->
+      <sc-if value="{{ isDatasets }}" hint-placeholder-val="{{ false }}">
+        <div style="padding:26px 30px 60px;">
+          <div style="display:flex;align-items:flex-end;justify-content:space-between;gap:16px;margin-bottom:20px;">
+            <div><div style="font-family:'IBM Plex Mono',monospace;font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--ink-400);margin-bottom:5px;">Workspace</div><h1 style="margin:0;font-family:'Newsreader',serif;font-weight:600;font-size:27px;letter-spacing:-.015em;">Dataset Management</h1></div>
+            <div style="display:flex;gap:8px;">
+              <button onMouseDown="{{ goBuilder }}" style-hover="{{ primaryHover }}" style="display:flex;align-items:center;gap:7px;height:36px;padding:0 14px;border:none;border-radius:10px;background:var(--violet);color:#fff;font-weight:600;font-size:13px;cursor:pointer;box-shadow:var(--shadow-sm);"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>Open builder</button>
+            </div>
+          </div>
+
+          <!-- AI data health -->
+          <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px;"><span style="width:24px;height:24px;border-radius:7px;background:var(--violet-bg);color:var(--violet);display:flex;align-items:center;justify-content:center;">{{ healthIcon }}</span><h3 style="margin:0;font-family:'Newsreader',serif;font-weight:600;font-size:15px;">AI data health</h3><span style="font-size:11.5px;color:var(--ink-500);">{{ dsScanned }}</span></div>
+          <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:24px;">
+            <sc-for list="{{ health }}" as="hh" hint-placeholder-count="4">
+              <div style="background:var(--bg-panel);border:1px solid var(--border);border-radius:14px;box-shadow:var(--shadow-sm);padding:15px 16px;">
+                <div style="display:flex;align-items:center;justify-content:space-between;"><span style="width:30px;height:30px;border-radius:8px;background:{{ hh.tint }};color:{{ hh.color }};display:flex;align-items:center;justify-content:center;">{{ hh.icon }}</span><span style="font-family:'Newsreader',serif;font-size:23px;color:var(--ink-900);">{{ hh.value }}</span></div>
+                <div style="font-size:12.5px;font-weight:600;color:var(--ink-900);margin-top:11px;">{{ hh.label }}</div>
+                <div style="font-size:11px;color:var(--ink-500);margin-top:2px;line-height:1.4;">{{ hh.note }}</div>
+              </div>
+            </sc-for>
+          </div>
+
+          <div style="display:flex;gap:18px;align-items:flex-start;">
+            <!-- table -->
+            <div style="flex:1;min-width:0;background:var(--bg-panel);border:1px solid var(--border);border-radius:16px;box-shadow:var(--shadow-sm);overflow:hidden;">
+              <div style="display:flex;align-items:center;justify-content:space-between;padding:15px 18px;border-bottom:1px solid var(--border);"><h3 style="margin:0;font-family:'Newsreader',serif;font-weight:600;font-size:16px;">All datasets</h3><span style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--ink-500);background:var(--bg-inset);padding:2px 8px;border-radius:99px;">{{ dsCountLabel }}</span></div>
+              <div style="display:grid;grid-template-columns:2.4fr 1.1fr 0.8fr 0.7fr 1.1fr 1fr 0.9fr;gap:12px;padding:10px 18px;border-bottom:1px solid var(--border);background:var(--bg-sub);">
+                <sc-for list="{{ dsCols }}" as="c" hint-placeholder-count="7"><span style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;letter-spacing:.06em;text-transform:uppercase;color:var(--ink-400);text-align:{{ c.align }};">{{ c.label }}</span></sc-for>
+              </div>
+              <sc-for list="{{ datasets }}" as="d" hint-placeholder-count="7">
+                <div style-hover="{{ rowHover }}" style="display:grid;grid-template-columns:2.4fr 1.1fr 0.8fr 0.7fr 1.1fr 1fr 0.9fr;gap:12px;padding:13px 18px;border-bottom:1px solid var(--border);align-items:center;cursor:pointer;transition:background .12s;">
+                  <div style="display:flex;align-items:center;gap:10px;min-width:0;"><span style="width:30px;height:30px;border-radius:8px;background:{{ d.tint }};color:{{ d.color }};display:flex;align-items:center;justify-content:center;font-family:'Newsreader',serif;font-weight:600;font-size:13px;flex:0 0 auto;">{{ d.letter }}</span><div style="min-width:0;"><div style="font-size:13px;font-weight:600;color:var(--ink-900);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">{{ d.name }}</div><div style="font-family:'IBM Plex Mono',monospace;font-size:10px;color:var(--ink-400);">{{ d.path }}</div></div></div>
+                  <span style="font-size:12px;color:var(--ink-700);">{{ d.source }}</span>
+                  <span style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--ink-900);text-align:right;">{{ d.rows }}</span>
+                  <span style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--ink-700);text-align:right;">{{ d.cols }}</span>
+                  <span style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--ink-500);text-align:right;">{{ d.updated }}</span>
+                  <span style="display:flex;justify-content:flex-start;"><span style="{{ d.statusStyle }}"><span style="width:5px;height:5px;border-radius:99px;background:{{ d.statusDot }};"></span>{{ d.status }}</span></span>
+                  <span style="display:flex;align-items:center;justify-content:flex-end;gap:3px;">
+                    <span style="width:22px;height:22px;border-radius:99px;background:{{ d.ownerColor }};color:#fff;display:flex;align-items:center;justify-content:center;font-size:9.5px;font-weight:600;" title="{{ d.owner }}">{{ d.ownerInitials }}</span>
+                  </span>
+                </div>
+              </sc-for>
+            </div>
+
+            <!-- AI recommendations -->
+            <div style="width:316px;flex:0 0 auto;background:var(--bg-panel);border:1px solid var(--border);border-radius:16px;box-shadow:var(--shadow-sm);overflow:hidden;">
+              <div style="padding:15px 17px;border-bottom:1px solid var(--border);background:linear-gradient(180deg,var(--violet-bg),transparent);">
+                <div style="display:flex;align-items:center;gap:8px;"><span style="width:26px;height:26px;border-radius:7px;background:var(--violet);color:#fff;display:flex;align-items:center;justify-content:center;"><svg width="15" height="15" viewBox="0 0 24 24" fill="none"><path d="M12 3l1.7 4.3L18 9l-4.3 1.7L12 15l-1.7-4.3L6 9l4.3-1.7z" fill="currentColor"/></svg></span><span style="font-family:'Newsreader',serif;font-weight:600;font-size:15px;">Suggested dashboards</span></div>
+                <div style="font-size:11.5px;color:var(--ink-500);margin-top:5px;">For <span style="font-family:'IBM Plex Mono',monospace;color:var(--ink-700);">{{ recForLabel }}</span></div>
+              </div>
+              <div style="padding:12px;display:flex;flex-direction:column;gap:9px;">
+                <sc-for list="{{ recommendations }}" as="r" hint-placeholder-count="4">
+                  <button onMouseDown="{{ goBuilder }}" style-hover="{{ recHover }}" style="display:flex;align-items:center;gap:11px;padding:11px 12px;border:1px solid var(--border);border-radius:12px;background:var(--bg-panel);cursor:pointer;text-align:left;transition:all .12s;">
+                    <span style="width:32px;height:32px;border-radius:9px;background:{{ r.tint }};color:{{ r.color }};display:flex;align-items:center;justify-content:center;flex:0 0 auto;">{{ r.icon }}</span>
+                    <span style="flex:1;min-width:0;"><span style="display:block;font-size:13px;font-weight:600;color:var(--ink-900);">{{ r.title }}</span><span style="display:block;font-size:11px;color:var(--ink-500);margin-top:1px;">{{ r.meta }}</span></span>
+                    <span style="font-family:'IBM Plex Mono',monospace;font-size:10px;font-weight:600;color:var(--emerald-ink);">{{ r.conf }}</span>
+                  </button>
+                </sc-for>
+              </div>
+            </div>
+          </div>
+        </div>
+      </sc-if>
+
+      <!-- ============ GENERATED COMPONENTS ============ -->
+      <sc-if value="{{ isComponents }}" hint-placeholder-val="{{ false }}">
+        <div style="padding:26px 30px 60px;">
+          <div style="display:flex;align-items:flex-end;justify-content:space-between;gap:16px;margin-bottom:18px;">
+            <div><div style="font-family:'IBM Plex Mono',monospace;font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--ink-400);margin-bottom:5px;">Workspace</div><h1 style="margin:0;font-family:'Newsreader',serif;font-weight:600;font-size:27px;letter-spacing:-.015em;">Generated Components</h1></div>
+            <div style="display:flex;align-items:center;gap:10px;"><span style="font-size:12.5px;color:var(--ink-500);">{{ compCount }} AI-generated assets</span></div>
+          </div>
+
+          <!-- workflow banner -->
+          <div style="display:flex;align-items:center;gap:14px;padding:13px 18px;border:1px solid var(--violet-border);border-radius:14px;background:linear-gradient(100deg,var(--violet-bg),transparent 70%);margin-bottom:20px;">
+            <div style="display:flex;align-items:center;gap:9px;flex:1;flex-wrap:wrap;">
+              <sc-for list="{{ compFlow }}" as="f" hint-placeholder-count="4"><span style="display:flex;align-items:center;gap:9px;"><span style="display:inline-flex;align-items:center;gap:7px;font-size:12.5px;font-weight:600;color:{{ f.color }};">{{ f.icon }}{{ f.label }}</span><sc-if value="{{ f.arrow }}" hint-placeholder-val="{{ true }}"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--ink-400)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></sc-if></span></sc-for>
+            </div>
+            <span style="font-size:12px;color:var(--ink-500);font-style:italic;flex:0 0 auto;">AI generates suggestions — you retain control.</span>
+          </div>
+
+          <!-- filters -->
+          <div style="margin-bottom:18px;">{{ compFiltersEl }}</div>
+
+          <!-- grid -->
+          <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(264px,1fr));gap:16px;">
+            <sc-for list="{{ comps }}" as="c" hint-placeholder-count="9">
+              <div style-hover="{{ compCardHover }}" style="border:1px solid var(--border);border-radius:15px;background:var(--bg-panel);box-shadow:var(--shadow-sm);overflow:hidden;transition:box-shadow .16s,border-color .16s,transform .12s;">
+                <div style="position:relative;height:108px;background:var(--bg-inset);border-bottom:1px solid var(--border);padding:13px 15px;overflow:hidden;">
+                  {{ c.thumb }}
+                  <span style="position:absolute;top:9px;left:9px;display:inline-flex;align-items:center;gap:5px;background:var(--bg-panel);border:1px solid var(--border);border-radius:7px;padding:2px 8px;font-family:'IBM Plex Mono',monospace;font-size:9.5px;color:var(--ink-500);text-transform:uppercase;letter-spacing:.04em;box-shadow:var(--shadow-sm);">{{ c.typeLabel }}</span>
+                  <span style="position:absolute;top:9px;right:9px;display:inline-flex;align-items:center;gap:4px;background:var(--bg-panel);border:1px solid var(--border);border-radius:99px;padding:2px 8px;box-shadow:var(--shadow-sm);"><span style="width:6px;height:6px;border-radius:99px;background:{{ c.confDot }};"></span><span style="font-family:'IBM Plex Mono',monospace;font-size:10px;font-weight:600;color:{{ c.confColor }};">{{ c.conf }}%</span></span>
+                </div>
+                <div style="padding:13px 15px 14px;">
+                  <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:8px;">
+                    <span style="font-weight:600;font-size:14px;color:var(--ink-900);line-height:1.25;">{{ c.title }}</span>
+                    <button onClick="{{ c.onFav }}" style="flex:0 0 auto;width:26px;height:26px;border:none;border-radius:7px;background:transparent;cursor:pointer;display:flex;align-items:center;justify-content:center;color:{{ c.favColor }};">{{ c.favIcon }}</button>
+                  </div>
+                  <div style="display:flex;align-items:center;gap:6px;margin-top:5px;font-family:'IBM Plex Mono',monospace;font-size:10px;color:var(--ink-400);"><span>{{ c.source }}</span><span>·</span><span>{{ c.time }}</span></div>
+                  <p style="margin:9px 0 0;font-size:12px;color:var(--ink-500);line-height:1.45;min-height:34px;">{{ c.summary }}</p>
+                  <div style="display:flex;align-items:center;gap:5px;margin-top:12px;">
+                    <button onMouseDown="{{ goBuilder }}" style-hover="{{ primaryHover }}" style="flex:1;display:flex;align-items:center;justify-content:center;gap:6px;height:32px;border:none;border-radius:8px;background:var(--violet);color:#fff;font-weight:600;font-size:12px;cursor:pointer;"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>Open in builder</button>
+                    <button onClick="{{ c.onDelete }}" title="Delete" style-hover="{{ iconBtnHover }}" style="width:32px;height:32px;flex:0 0 auto;border:1px solid var(--border);border-radius:8px;background:var(--bg-panel);color:var(--ink-500);cursor:pointer;display:flex;align-items:center;justify-content:center;"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18M8 6V4h8v2M19 6l-1 14H6L5 6"/></svg></button>
+                  </div>
+                </div>
+              </div>
+            </sc-for>
+          </div>
+        </div>
+      </sc-if>
+
+      <!-- ============ TEAM ============ -->
+      <sc-if value="{{ isTeam }}" hint-placeholder-val="{{ false }}">
+        <div style="padding:26px 30px 60px;">
+          <div style="display:flex;align-items:flex-end;justify-content:space-between;gap:16px;margin-bottom:20px;">
+            <div><div style="font-family:'IBM Plex Mono',monospace;font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--ink-400);margin-bottom:5px;">Organization</div><h1 style="margin:0;font-family:'Newsreader',serif;font-weight:600;font-size:27px;letter-spacing:-.015em;">Team Workspace</h1></div>
+            <div style="display:flex;gap:8px;">
+              <button onMouseDown="{{ inviteMember }}" style-hover="{{ primaryHover }}" style="display:flex;align-items:center;gap:7px;height:36px;padding:0 14px;border:none;border-radius:10px;background:var(--violet);color:#fff;font-weight:600;font-size:13px;cursor:pointer;box-shadow:var(--shadow-sm);"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 19v-2a4 4 0 00-4-4H7a4 4 0 00-4 4v2M9.5 9a3.5 3.5 0 100-7 3.5 3.5 0 000 7zM19 8v6M22 11h-6"/></svg>Invite members</button>
+            </div>
+          </div>
+
+          <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:22px;">
+            <sc-for list="{{ teamStats }}" as="st" hint-placeholder-count="4">
+              <div style="background:var(--bg-panel);border:1px solid var(--border);border-radius:14px;box-shadow:var(--shadow-sm);padding:15px 16px;">
+                <div style="display:flex;align-items:center;gap:9px;"><span style="width:28px;height:28px;border-radius:8px;background:{{ st.tint }};color:{{ st.color }};display:flex;align-items:center;justify-content:center;">{{ st.icon }}</span><span style="font-size:11.5px;color:var(--ink-500);">{{ st.label }}</span></div>
+                <div style="font-family:'Newsreader',serif;font-size:27px;color:var(--ink-900);margin-top:10px;">{{ st.value }}</div>
+              </div>
+            </sc-for>
+          </div>
+
+          <div style="display:flex;gap:18px;align-items:flex-start;">
+            <!-- directory -->
+            <div style="flex:1;min-width:0;background:var(--bg-panel);border:1px solid var(--border);border-radius:16px;box-shadow:var(--shadow-sm);overflow:hidden;">
+              <div style="display:flex;align-items:center;justify-content:space-between;padding:15px 18px;border-bottom:1px solid var(--border);"><h3 style="margin:0;font-family:'Newsreader',serif;font-weight:600;font-size:16px;">Team directory</h3><span style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--ink-500);background:var(--bg-inset);padding:2px 8px;border-radius:99px;">{{ memberCountLabel }}</span></div>
+              <div style="display:grid;grid-template-columns:2.2fr 1.2fr 1fr 1fr 1fr;gap:12px;padding:10px 18px;border-bottom:1px solid var(--border);background:var(--bg-sub);">
+                <sc-for list="{{ teamCols }}" as="c" hint-placeholder-count="5"><span style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;letter-spacing:.06em;text-transform:uppercase;color:var(--ink-400);">{{ c }}</span></sc-for>
+              </div>
+              <sc-for list="{{ members }}" as="m" hint-placeholder-count="6">
+                <div style-hover="{{ rowHover }}" style="display:grid;grid-template-columns:2.2fr 1.2fr 1fr 1fr 1fr;gap:12px;padding:12px 18px;border-bottom:1px solid var(--border);align-items:center;transition:background .12s;">
+                  <div style="display:flex;align-items:center;gap:11px;min-width:0;"><span style="width:32px;height:32px;border-radius:99px;background:{{ m.color }};color:#fff;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:600;flex:0 0 auto;">{{ m.initials }}</span><div style="min-width:0;"><div style="font-size:13px;font-weight:600;color:var(--ink-900);">{{ m.name }}</div><div style="font-family:'IBM Plex Mono',monospace;font-size:10px;color:var(--ink-400);">{{ m.email }}</div></div></div>
+                  <span style="font-size:12.5px;color:var(--ink-700);">{{ m.dept }}</span>
+                  <span style="display:flex;"><span style="{{ m.roleStyle }}">{{ m.role }}</span></span>
+                  <span style="display:flex;"><span style="display:inline-flex;align-items:center;gap:5px;font-size:11.5px;font-weight:500;color:{{ m.statusColor }};"><span style="width:6px;height:6px;border-radius:99px;background:{{ m.statusDot }};"></span>{{ m.status }}</span></span>
+                  <span style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--ink-500);">{{ m.last }}</span>
+                </div>
+              </sc-for>
+            </div>
+
+            <!-- shared resources -->
+            <div style="width:300px;flex:0 0 auto;display:flex;flex-direction:column;gap:16px;">
+              <div style="background:var(--bg-panel);border:1px solid var(--border);border-radius:16px;box-shadow:var(--shadow-sm);padding:16px 17px;">
+                <h3 style="margin:0 0 12px;font-family:'Newsreader',serif;font-weight:600;font-size:15px;">Shared resources</h3>
+                <div style="display:flex;flex-direction:column;gap:8px;">
+                  <sc-for list="{{ sharedRes }}" as="r" hint-placeholder-count="4">
+                    <div style="display:flex;align-items:center;gap:11px;padding:9px 10px;border-radius:10px;background:var(--bg-sub);">
+                      <span style="width:30px;height:30px;border-radius:8px;background:{{ r.tint }};color:{{ r.color }};display:flex;align-items:center;justify-content:center;flex:0 0 auto;">{{ r.icon }}</span>
+                      <span style="flex:1;font-size:13px;font-weight:500;color:var(--ink-700);">{{ r.label }}</span>
+                      <span style="font-family:'IBM Plex Mono',monospace;font-size:12px;font-weight:600;color:var(--ink-900);">{{ r.count }}</span>
+                    </div>
+                  </sc-for>
+                </div>
+              </div>
+              <div style="background:var(--bg-panel);border:1px solid var(--border);border-radius:16px;box-shadow:var(--shadow-sm);padding:16px 17px;">
+                <h3 style="margin:0 0 4px;font-family:'Newsreader',serif;font-weight:600;font-size:15px;">Permissions matrix</h3>
+                <p style="margin:0 0 12px;font-size:11.5px;color:var(--ink-500);">Access by role</p>
+                <div style="display:grid;grid-template-columns:1.5fr repeat(4,1fr);gap:6px;align-items:center;">
+                  <span></span>
+                  <sc-for list="{{ permRoles }}" as="pr" hint-placeholder-count="4"><span style="font-family:'IBM Plex Mono',monospace;font-size:9px;text-align:center;color:var(--ink-500);text-transform:uppercase;">{{ pr }}</span></sc-for>
+                  <sc-for list="{{ permRows }}" as="row" hint-placeholder-count="5">
+                    <span style="font-size:11px;color:var(--ink-700);">{{ row.cap }}</span>
+                    <sc-for list="{{ row.cells }}" as="cell" hint-placeholder-count="4"><span style="display:flex;justify-content:center;">{{ cell }}</span></sc-for>
+                  </sc-for>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </sc-if>
+
+      <!-- ============ BILLING ============ -->
+      <sc-if value="{{ isBilling }}" hint-placeholder-val="{{ false }}">
+        <div style="padding:26px 30px 60px;max-width:1120px;">
+          <div style="margin-bottom:20px;"><div style="font-family:'IBM Plex Mono',monospace;font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--ink-400);margin-bottom:5px;">Organization</div><h1 style="margin:0;font-family:'Newsreader',serif;font-weight:600;font-size:27px;letter-spacing:-.015em;">Billing &amp; Subscription</h1></div>
+
+          <!-- overview -->
+          <div style="background:var(--bg-panel);border:1px solid var(--border);border-radius:16px;box-shadow:var(--shadow-sm);overflow:hidden;margin-bottom:24px;">
+            <div style="display:flex;align-items:stretch;">
+              <div style="flex:1;padding:22px 24px;border-right:1px solid var(--border);">
+                <div style="display:flex;align-items:center;gap:9px;"><span style="display:inline-flex;align-items:center;gap:6px;font-size:11px;font-weight:700;color:var(--violet);background:var(--violet-bg);border:1px solid var(--violet-border);padding:3px 10px;border-radius:99px;">FREE PLAN</span><span style="font-size:12px;color:var(--ink-500);">Demo workspace</span></div>
+                <div style="display:flex;align-items:baseline;gap:6px;margin-top:14px;"><span style="font-family:'Newsreader',serif;font-size:38px;color:var(--ink-900);">$0</span><span style="font-size:14px;color:var(--ink-500);">/ month</span></div>
+                <div style="font-size:12.5px;color:var(--ink-500);margin-top:6px;display:flex;align-items:center;gap:6px;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 9h18M8 3v4M16 3v4"/></svg>No billing on file</div>
+              </div>
+              <div style="flex:1.4;padding:22px 24px;">
+                <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:7px;"><span style="font-size:12.5px;font-weight:600;color:var(--ink-700);">AI credits used</span><span style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--ink-900);">{{ billCredits }}</span></div>
+                <div style="height:8px;border-radius:99px;background:var(--bg-inset);overflow:hidden;"><div style="height:100%;width:{{ billCreditsPct }};border-radius:99px;background:linear-gradient(90deg,var(--violet),#9A8BF2);"></div></div>
+                <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-top:18px;">
+                  <div><div style="font-family:'Newsreader',serif;font-size:22px;color:var(--ink-900);">{{ billAnalyses }}</div><div style="font-size:11px;color:var(--ink-500);">AI analyses run</div></div>
+                  <div><div style="font-family:'Newsreader',serif;font-size:22px;color:var(--ink-900);">{{ billDashboards }}</div><div style="font-size:11px;color:var(--ink-500);">Dashboards saved</div></div>
+                  <div><div style="font-family:'Newsreader',serif;font-size:22px;color:var(--ink-900);">{{ billComponents }}</div><div style="font-size:11px;color:var(--ink-500);">Components generated</div></div>
+                </div>
+              </div>
+              <div style="flex:0 0 auto;display:flex;flex-direction:column;justify-content:center;gap:9px;padding:22px 24px;background:var(--bg-sub);border-left:1px solid var(--border);">
+                <button onMouseDown="{{ contactSales }}" style-hover="{{ primaryHover }}" style="height:40px;padding:0 20px;border:none;border-radius:10px;background:var(--violet);color:#fff;font-weight:600;font-size:13.5px;cursor:pointer;box-shadow:var(--shadow-sm);white-space:nowrap;">Upgrade plan</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- plans -->
+          <h3 style="margin:0 0 13px;font-family:'Newsreader',serif;font-weight:600;font-size:17px;">Plans</h3>
+          <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-bottom:26px;">
+            <sc-for list="{{ tiers }}" as="t" hint-placeholder-count="3">
+              <div style="{{ t.cardStyle }}">
+                <sc-if value="{{ t.current }}" hint-placeholder-val="{{ false }}"><span style="position:absolute;top:14px;right:14px;font-size:10px;font-weight:700;color:#fff;background:var(--violet);padding:3px 9px;border-radius:99px;letter-spacing:.04em;">CURRENT</span></sc-if>
+                <div style="font-size:13px;font-weight:700;color:{{ t.accent }};letter-spacing:.03em;text-transform:uppercase;">{{ t.name }}</div>
+                <div style="display:flex;align-items:baseline;gap:5px;margin-top:12px;"><span style="font-family:'Newsreader',serif;font-size:32px;color:var(--ink-900);">{{ t.price }}</span><span style="font-size:13px;color:var(--ink-500);">{{ t.per }}</span></div>
+                <div style="font-size:12.5px;color:var(--ink-500);margin-top:6px;line-height:1.4;">{{ t.tagline }}</div>
+                <div style="height:1px;background:var(--border);margin:16px 0;"></div>
+                <div style="display:flex;flex-direction:column;gap:9px;">
+                  <sc-for list="{{ t.features }}" as="ft" hint-placeholder-count="4"><div style="display:flex;align-items:flex-start;gap:9px;font-size:12.5px;color:var(--ink-700);"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="{{ t.accent }}" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" style="flex:0 0 auto;margin-top:1px;"><path d="M20 6L9 17l-5-5"/></svg>{{ ft }}</div></sc-for>
+                </div>
+                <button onMouseDown="{{ contactSales }}" style="{{ t.btnStyle }}">{{ t.cta }}</button>
+              </div>
+            </sc-for>
+          </div>
+
+          <div style="display:flex;gap:18px;align-items:flex-start;">
+            <!-- usage analytics -->
+            <div style="flex:1.3;min-width:0;background:var(--bg-panel);border:1px solid var(--border);border-radius:16px;box-shadow:var(--shadow-sm);padding:20px 22px;">
+              <h3 style="margin:0 0 16px;font-family:'Newsreader',serif;font-weight:600;font-size:16px;">Usage this cycle</h3>
+              <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:14px;">
+                <sc-for list="{{ usageStats }}" as="u" hint-placeholder-count="3">
+                  <div style="border:1px solid var(--border);border-radius:13px;padding:13px 14px;">
+                    <div style="font-size:11.5px;color:var(--ink-500);">{{ u.label }}</div>
+                    <div style="display:flex;align-items:baseline;gap:7px;margin-top:5px;"><span style="font-family:'Newsreader',serif;font-size:23px;color:var(--ink-900);">{{ u.value }}</span><span style="font-family:'IBM Plex Mono',monospace;font-size:10.5px;font-weight:600;color:var(--emerald-ink);">{{ u.delta }}</span></div>
+                    <div style="height:34px;margin-top:8px;">{{ u.spark }}</div>
+                  </div>
+                </sc-for>
+              </div>
+            </div>
+            <!-- payment + invoices -->
+            <div style="width:340px;flex:0 0 auto;display:flex;flex-direction:column;gap:16px;">
+              <div style="background:var(--bg-panel);border:1px solid var(--border);border-radius:16px;box-shadow:var(--shadow-sm);padding:18px 19px;">
+                <h3 style="margin:0 0 13px;font-family:'Newsreader',serif;font-weight:600;font-size:15px;">Payment method</h3>
+                <div style="display:flex;align-items:center;gap:12px;padding:14px 12px;border:1px dashed var(--border-strong);border-radius:12px;background:var(--bg-sub);">
+                  <div style="flex:1;text-align:center;"><div style="font-size:12.5px;color:var(--ink-500);">No payment method on file</div></div>
+                </div>
+              </div>
+              <div style="background:var(--bg-panel);border:1px solid var(--border);border-radius:16px;box-shadow:var(--shadow-sm);overflow:hidden;">
+                <div style="display:flex;align-items:center;justify-content:space-between;padding:15px 18px;border-bottom:1px solid var(--border);"><h3 style="margin:0;font-family:'Newsreader',serif;font-weight:600;font-size:15px;">Billing history</h3></div>
+                <sc-for list="{{ invoices }}" as="iv" hint-placeholder-count="4">
+                  <div style="display:flex;align-items:center;gap:10px;padding:12px 18px;border-bottom:1px solid var(--border);">
+                    <div style="flex:1;"><div style="font-size:12.5px;font-weight:600;color:var(--ink-900);">{{ iv.date }}</div><div style="font-family:'IBM Plex Mono',monospace;font-size:10px;color:var(--ink-400);">{{ iv.id }}</div></div>
+                    <span style="font-family:'IBM Plex Mono',monospace;font-size:12.5px;color:var(--ink-900);">{{ iv.amount }}</span>
+                    <span style="display:inline-flex;align-items:center;gap:4px;font-size:10.5px;font-weight:600;color:var(--emerald-ink);background:var(--emerald-bg);padding:2px 7px;border-radius:99px;">Paid</span>
+                  </div>
+                </sc-for>
+                <sc-if value="{{ noInvoices }}" hint-placeholder-val="{{ false }}">
+                  <div style="padding:22px 18px;text-align:center;font-size:12.5px;color:var(--ink-500);">No invoices yet — you're on the free plan.</div>
+                </sc-if>
+              </div>
+            </div>
+          </div>
+        </div>
+      </sc-if>
+
+      <!-- ============ SETTINGS ============ -->
+      <sc-if value="{{ isSettings }}" hint-placeholder-val="{{ false }}">
+        <div style="padding:26px 30px 60px;max-width:1080px;">
+          <div style="margin-bottom:22px;"><div style="font-family:'IBM Plex Mono',monospace;font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--ink-400);margin-bottom:5px;">Workspace</div><h1 style="margin:0;font-family:'Newsreader',serif;font-weight:600;font-size:27px;letter-spacing:-.015em;">Settings</h1></div>
+          <div style="display:flex;gap:24px;">
+            <nav style="width:212px;flex:0 0 auto;display:flex;flex-direction:column;gap:2px;position:sticky;top:0;align-self:flex-start;">
+              <sc-for list="{{ settingsNav }}" as="n" hint-placeholder-count="12"><button onClick="{{ n.onClick }}" style="{{ n.style }}"><span style="display:flex;color:{{ n.iconColor }};">{{ n.icon }}</span>{{ n.label }}</button></sc-for>
+            </nav>
+            <div style="flex:1;min-width:0;display:flex;flex-direction:column;gap:18px;">
+
+              <sc-if value="{{ isSecGeneral }}" hint-placeholder-val="{{ true }}">
+                <div style="{{ cardStyle }}">
+                  <h3 style="margin:0 0 18px;font-family:'Newsreader',serif;font-weight:600;font-size:16px;">General</h3>
+                  <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
+                    <div style="grid-column:span 2;"><label style="{{ labelStyle }}">Workspace name</label><input value="{{ st_wsName }}" onInput="{{ onWsName }}" style-focus="{{ inputFocus }}" style="{{ inputStyle }}" /></div>
+                    <div><label style="{{ labelStyle }}">Date format</label><select value="{{ st_dateFormat }}" onChange="{{ onDateFormat }}" style="{{ selectStyle }}"><sc-for list="{{ dateFormats }}" as="o" hint-placeholder-count="3"><option value="{{ o.v }}">{{ o.v }}</option></sc-for></select></div>
+                    <div><label style="{{ labelStyle }}">Regional settings</label><select value="{{ st_region }}" onChange="{{ onRegion }}" style="{{ selectStyle }}"><sc-for list="{{ regions }}" as="o" hint-placeholder-count="3"><option value="{{ o.v }}">{{ o.v }}</option></sc-for></select></div>
+                  </div>
+                </div>
+                <div style="{{ cardStyle }}">
+                  <h3 style="margin:0 0 16px;font-family:'Newsreader',serif;font-weight:600;font-size:16px;">Branding</h3>
+                  <div style="display:flex;align-items:center;gap:16px;">
+                    <div style="width:60px;height:60px;border-radius:14px;background:linear-gradient(135deg,#1B1A17,#46443D);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:24px;flex:0 0 auto;">N</div>
+                    <div style="flex:1;"><div style="font-size:13px;font-weight:600;color:var(--ink-900);">Workspace logo</div><div style="font-size:12px;color:var(--ink-500);margin-top:2px;">PNG or SVG, at least 256×256px.</div></div>
+                  </div>
+                </div>
+              </sc-if>
+
+              <sc-if value="{{ isSecAI }}" hint-placeholder-val="{{ false }}">
+                <div style="{{ cardStyle }}">
+                  <div style="display:flex;align-items:center;gap:9px;margin-bottom:18px;"><span style="width:28px;height:28px;border-radius:8px;background:var(--violet-bg);color:var(--violet);display:flex;align-items:center;justify-content:center;">{{ aiSettingsIcon }}</span><h3 style="margin:0;font-family:'Newsreader',serif;font-weight:600;font-size:16px;">AI Agent Settings</h3></div>
+                  <div style="display:flex;flex-direction:column;gap:20px;">
+                    <div style="display:grid;grid-template-columns:1fr 1fr;gap:18px;">
+                      <div><label style="{{ labelStyle }}">Insight generation sensitivity</label>{{ aiSensSegEl }}</div>
+                      <div><label style="{{ labelStyle }}">KPI recommendation aggressiveness</label>{{ kpiSegEl }}</div>
+                    </div>
+                    <div><div style="display:flex;justify-content:space-between;margin-bottom:9px;"><label style="{{ labelStyle }}">Anomaly detection threshold</label><span style="font-family:'IBM Plex Mono',monospace;font-size:12px;font-weight:600;color:var(--violet);">{{ st_anomaly }}%</span></div><input type="range" min="0" max="100" value="{{ st_anomaly }}" onInput="{{ onAnomaly }}" style="width:100%;accent-color:var(--violet);height:5px;cursor:pointer;" /></div>
+                    <div><div style="display:flex;justify-content:space-between;margin-bottom:9px;"><label style="{{ labelStyle }}">Forecasting confidence level</label><span style="font-family:'IBM Plex Mono',monospace;font-size:12px;font-weight:600;color:var(--violet);">{{ st_forecastConf }}%</span></div><input type="range" min="50" max="99" value="{{ st_forecastConf }}" onInput="{{ onForecastConf }}" style="width:100%;accent-color:var(--violet);height:5px;cursor:pointer;" /></div>
+                    <div><label style="{{ labelStyle }}">Executive summary verbosity</label>{{ verbositySegEl }}</div>
+                    <div style="display:flex;align-items:center;justify-content:space-between;padding-top:6px;border-top:1px solid var(--border);"><div style="padding-top:14px;"><div style="font-size:13.5px;font-weight:600;color:var(--ink-900);">Auto-categorization</div><div style="font-size:12px;color:var(--ink-500);margin-top:2px;">Let the agent tag and group new components.</div></div><button onClick="{{ onAutoCat }}" style="{{ autoCatToggle }}"><span style="{{ autoCatThumb }}"></span></button></div>
+                  </div>
+                </div>
+              </sc-if>
+
+              <sc-if value="{{ isSecSecurity }}" hint-placeholder-val="{{ false }}">
+                <div style="{{ cardStyle }}">
+                  <h3 style="margin:0 0 8px;font-family:'Newsreader',serif;font-weight:600;font-size:16px;">Authentication</h3>
+                  <div style="display:flex;align-items:center;justify-content:space-between;padding:15px 0;border-bottom:1px solid var(--border);"><div><div style="font-size:13.5px;font-weight:600;color:var(--ink-900);">Two-factor authentication</div><div style="font-size:12px;color:var(--ink-500);margin-top:2px;">Require a second factor at sign-in.</div></div><button onClick="{{ on2fa }}" style="{{ twofaToggle }}"><span style="{{ twofaThumb }}"></span></button></div>
+                  <div style="display:flex;align-items:center;justify-content:space-between;padding:15px 0;border-bottom:1px solid var(--border);"><div><div style="font-size:13.5px;font-weight:600;color:var(--ink-900);">Single Sign-On (SSO)</div><div style="font-size:12px;color:var(--ink-500);margin-top:2px;">SAML / OIDC via your identity provider.</div></div><button onClick="{{ onSso }}" style="{{ ssoToggle }}"><span style="{{ ssoThumb }}"></span></button></div>
+                  <div style="display:flex;align-items:center;justify-content:space-between;padding:15px 0 4px;"><div><div style="font-size:13.5px;font-weight:600;color:var(--ink-900);">Active sessions</div><div style="font-size:12px;color:var(--ink-500);margin-top:2px;">3 devices · last active 2m ago.</div></div><button style-hover="{{ ghostHover }}" style="height:34px;padding:0 13px;border:1px solid var(--border);border-radius:9px;background:var(--bg-panel);color:var(--ink-700);font-weight:600;font-size:12.5px;cursor:pointer;">Manage</button></div>
+                </div>
+                <div style="{{ cardStyle }}">
+                  <h3 style="margin:0 0 16px;font-family:'Newsreader',serif;font-weight:600;font-size:16px;">Data &amp; compliance</h3>
+                  <div style="display:flex;align-items:center;justify-content:space-between;gap:16px;margin-bottom:16px;"><div style="flex:1;"><label style="{{ labelStyle }}">Data retention policy</label><select value="{{ st_retention }}" onChange="{{ onRetention }}" style="{{ selectStyle }}"><sc-for list="{{ retentions }}" as="o" hint-placeholder-count="3"><option value="{{ o.v }}">{{ o.v }}</option></sc-for></select></div><div style="flex:1;align-self:flex-end;"><div style="display:flex;align-items:center;gap:8px;height:42px;padding:0 13px;border-radius:10px;background:var(--emerald-bg);"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="var(--emerald-ink)" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M5 11h14v10H5z"/><path d="M8 11V7a4 4 0 018 0v4"/></svg><span style="font-size:12.5px;font-weight:600;color:var(--emerald-ink);">AES-256 encryption · enabled</span></div></div></div>
+                  <div style="display:flex;gap:9px;"><sc-for list="{{ compliance }}" as="cb" hint-placeholder-count="3"><span style="display:inline-flex;align-items:center;gap:6px;font-size:12px;font-weight:600;color:var(--ink-700);background:var(--bg-inset);border:1px solid var(--border);padding:6px 12px;border-radius:9px;"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="var(--emerald-ink)" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>{{ cb }}</span></sc-for></div>
+                </div>
+              </sc-if>
+
+              <sc-if value="{{ isSecNotif }}" hint-placeholder-val="{{ false }}">
+                <div style="{{ cardStyle }}">
+                  <h3 style="margin:0 0 6px;font-family:'Newsreader',serif;font-weight:600;font-size:16px;">Notifications</h3>
+                  <sc-for list="{{ notifRows }}" as="r" hint-placeholder-count="6">
+                    <div style="display:flex;align-items:center;justify-content:space-between;padding:14px 0;border-bottom:1px solid var(--border);"><div><div style="font-size:13.5px;font-weight:600;color:var(--ink-900);">{{ r.label }}</div><div style="font-size:12px;color:var(--ink-500);margin-top:2px;">{{ r.desc }}</div></div><button onClick="{{ r.onToggle }}" style="{{ r.toggle }}"><span style="{{ r.thumb }}"></span></button></div>
+                  </sc-for>
+                </div>
+              </sc-if>
+
+              <sc-if value="{{ isSecAppearance }}" hint-placeholder-val="{{ false }}">
+                <div style="{{ cardStyle }}">
+                  <h3 style="margin:0 0 18px;font-family:'Newsreader',serif;font-weight:600;font-size:16px;">Appearance</h3>
+                  <div style="margin-bottom:22px;"><label style="{{ labelStyle }}">Theme</label>{{ themeCardsEl }}</div>
+                  <div><label style="{{ labelStyle }}">Layout density</label>{{ densitySegEl }}</div>
+                </div>
+              </sc-if>
+
+              <sc-if value="{{ isSecOther }}" hint-placeholder-val="{{ false }}">
+                <div style="{{ cardStyle }}">
+                  <h3 style="margin:0 0 6px;font-family:'Newsreader',serif;font-weight:600;font-size:16px;">{{ otherTitle }}</h3>
+                  <p style="margin:0 0 16px;font-size:13px;color:var(--ink-500);line-height:1.5;">{{ otherDesc }}</p>
+                  <div style="display:flex;align-items:center;justify-content:space-between;padding:14px 0;border-top:1px solid var(--border);"><div><div style="font-size:13.5px;font-weight:600;color:var(--ink-900);">{{ otherRow1 }}</div></div><span style="display:inline-flex;align-items:center;gap:6px;font-size:11.5px;font-weight:600;color:var(--emerald-ink);background:var(--emerald-bg);padding:3px 10px;border-radius:99px;"><span style="width:6px;height:6px;border-radius:99px;background:var(--emerald);"></span>Active</span></div>
+                </div>
+              </sc-if>
+
+            </div>
+          </div>
+        </div>
+      </sc-if>
+
+      <!-- ============ ADMIN ============ -->
+      <sc-if value="{{ isAdmin }}" hint-placeholder-val="{{ false }}">
+        <div style="padding:26px 30px 60px;">
+          <div style="display:flex;align-items:flex-end;justify-content:space-between;gap:16px;margin-bottom:20px;">
+            <div><div style="font-family:'IBM Plex Mono',monospace;font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--ink-400);margin-bottom:5px;display:flex;align-items:center;gap:7px;"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="var(--violet)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l7 3v5c0 5-3.5 8.5-7 10-3.5-1.5-7-5-7-10V6z"/><path d="M9 12l2 2 4-4"/></svg>Organization · {{ orgLabel }}</div><h1 style="margin:0;font-family:'Newsreader',serif;font-weight:600;font-size:27px;letter-spacing:-.015em;">Admin Console</h1></div>
+            <button onMouseDown="{{ exportReport }}" style-hover="{{ ghostHover }}" style="display:flex;align-items:center;gap:7px;height:36px;padding:0 14px;border:1px solid var(--border);border-radius:10px;background:var(--bg-panel);color:var(--ink-700);font-weight:600;font-size:13px;cursor:pointer;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 16V4M7 11l5 5 5-5M4 20h16"/></svg>Export report</button>
+          </div>
+
+          <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:22px;">
+            <sc-for list="{{ adminStats }}" as="st" hint-placeholder-count="4">
+              <div style="background:var(--bg-panel);border:1px solid var(--border);border-radius:14px;box-shadow:var(--shadow-sm);padding:16px 17px;">
+                <div style="display:flex;align-items:center;justify-content:space-between;"><span style="width:30px;height:30px;border-radius:8px;background:{{ st.tint }};color:{{ st.color }};display:flex;align-items:center;justify-content:center;">{{ st.icon }}</span><span style="font-family:'IBM Plex Mono',monospace;font-size:10.5px;font-weight:600;color:var(--emerald-ink);">{{ st.delta }}</span></div>
+                <div style="font-family:'Newsreader',serif;font-size:28px;color:var(--ink-900);margin-top:12px;">{{ st.value }}</div>
+                <div style="font-size:11.5px;color:var(--ink-500);margin-top:1px;">{{ st.label }}</div>
+              </div>
+            </sc-for>
+          </div>
+
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:18px;align-items:start;">
+            <!-- security monitoring -->
+            <div style="background:var(--bg-panel);border:1px solid var(--border);border-radius:16px;box-shadow:var(--shadow-sm);overflow:hidden;">
+              <div style="display:flex;align-items:center;justify-content:space-between;padding:15px 18px;border-bottom:1px solid var(--border);"><h3 style="margin:0;font-family:'Newsreader',serif;font-weight:600;font-size:16px;">Security monitoring</h3><span style="display:inline-flex;align-items:center;gap:5px;font-size:11px;font-weight:600;color:var(--emerald-ink);"><span style="width:6px;height:6px;border-radius:99px;background:var(--emerald);animation:pulse 1.8s infinite;"></span>All systems normal</span></div>
+              <sc-for list="{{ secEvents }}" as="e" hint-placeholder-count="5">
+                <div style="display:flex;align-items:center;gap:12px;padding:12px 18px;border-bottom:1px solid var(--border);">
+                  <span style="width:30px;height:30px;border-radius:8px;background:{{ e.tint }};color:{{ e.color }};display:flex;align-items:center;justify-content:center;flex:0 0 auto;">{{ e.icon }}</span>
+                  <div style="flex:1;min-width:0;"><div style="font-size:13px;font-weight:500;color:var(--ink-900);">{{ e.text }}</div><div style="font-family:'IBM Plex Mono',monospace;font-size:10px;color:var(--ink-400);">{{ e.meta }}</div></div>
+                  <span style="{{ e.badge }}">{{ e.type }}</span>
+                </div>
+              </sc-for>
+              <div style="padding:13px 18px;display:flex;align-items:center;gap:8px;"><sc-if value="{{ hasCompliance }}" hint-placeholder-val="{{ false }}"><span style="font-size:11.5px;color:var(--ink-500);margin-right:4px;">Compliance:</span></sc-if><sc-for list="{{ adminCompliance }}" as="cb" hint-placeholder-count="3"><span style="display:inline-flex;align-items:center;gap:5px;font-size:11px;font-weight:600;color:var(--emerald-ink);background:var(--emerald-bg);padding:3px 9px;border-radius:7px;"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>{{ cb }}</span></sc-for></div>
+            </div>
+
+            <!-- org controls -->
+            <div style="background:var(--bg-panel);border:1px solid var(--border);border-radius:16px;box-shadow:var(--shadow-sm);overflow:hidden;">
+              <div style="padding:15px 18px;border-bottom:1px solid var(--border);"><h3 style="margin:0;font-family:'Newsreader',serif;font-weight:600;font-size:16px;">Organization controls</h3></div>
+              <sc-for list="{{ orgControls }}" as="o" hint-placeholder-count="4">
+                <div style="display:flex;align-items:center;gap:12px;padding:13px 18px;border-bottom:1px solid var(--border);">
+                  <span style="width:30px;height:30px;border-radius:8px;background:var(--bg-inset);color:var(--ink-500);display:flex;align-items:center;justify-content:center;flex:0 0 auto;">{{ o.icon }}</span>
+                  <div style="flex:1;min-width:0;"><div style="font-size:13px;font-weight:600;color:var(--ink-900);">{{ o.label }}</div><div style="font-family:'IBM Plex Mono',monospace;font-size:10.5px;color:var(--ink-400);">{{ o.value }}</div></div>
+                  <span style="{{ o.statusStyle }}"><span style="width:5px;height:5px;border-radius:99px;background:{{ o.dot }};"></span>{{ o.status }}</span>
+                </div>
+              </sc-for>
+            </div>
+
+            <!-- AI governance -->
+            <div style="background:var(--bg-panel);border:1px solid var(--border);border-radius:16px;box-shadow:var(--shadow-sm);overflow:hidden;">
+              <div style="display:flex;align-items:center;gap:9px;padding:15px 18px;border-bottom:1px solid var(--border);"><span style="width:26px;height:26px;border-radius:7px;background:var(--violet-bg);color:var(--violet);display:flex;align-items:center;justify-content:center;">{{ govIcon }}</span><h3 style="margin:0;font-family:'Newsreader',serif;font-weight:600;font-size:16px;">AI governance</h3></div>
+              <sc-for list="{{ governance }}" as="g" hint-placeholder-count="5">
+                <div style="display:flex;align-items:center;justify-content:space-between;padding:13px 18px;border-bottom:1px solid var(--border);">
+                  <span style="font-size:13px;color:var(--ink-700);">{{ g.label }}</span>
+                  <span style="{{ g.valStyle }}">{{ g.value }}</span>
+                </div>
+              </sc-for>
+            </div>
+
+            <!-- billing admin -->
+            <div style="background:var(--bg-panel);border:1px solid var(--border);border-radius:16px;box-shadow:var(--shadow-sm);overflow:hidden;">
+              <div style="display:flex;align-items:center;justify-content:space-between;padding:15px 18px;border-bottom:1px solid var(--border);"><h3 style="margin:0;font-family:'Newsreader',serif;font-weight:600;font-size:16px;">Department usage</h3><span style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--ink-500);">{{ adminCreditsLabel }}</span></div>
+              <div style="padding:16px 18px;display:flex;flex-direction:column;gap:15px;">
+                <sc-for list="{{ deptUsage }}" as="d" hint-placeholder-count="4">
+                  <div>
+                    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;"><span style="font-size:13px;font-weight:500;color:var(--ink-900);">{{ d.dept }}</span><span style="font-family:'IBM Plex Mono',monospace;font-size:11.5px;color:var(--ink-700);">{{ d.credits }} · {{ d.pct }}%</span></div>
+                    <div style="height:7px;border-radius:99px;background:var(--bg-inset);overflow:hidden;"><div style="height:100%;width:{{ d.width }};border-radius:99px;background:{{ d.color }};"></div></div>
+                  </div>
+                </sc-for>
+              </div>
+            </div>
+          </div>
+        </div>
+      </sc-if>
+
+      <!-- placeholders for pages built next -->
+      <sc-if value="{{ isInsights }}" hint-placeholder-val="{{ false }}">
+        <div style="padding:26px 30px 60px;max-width:1000px;">
+          <div style="margin-bottom:20px;"><div style="font-family:'IBM Plex Mono',monospace;font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--ink-400);margin-bottom:5px;">Library</div><h1 style="margin:0;font-family:'Newsreader',serif;font-weight:600;font-size:27px;letter-spacing:-.015em;">Saved Insights</h1></div>
+          <sc-if value="{{ hasInsights }}" hint-placeholder-val="{{ true }}">
+            <div style="display:flex;flex-direction:column;gap:12px;">
+              <sc-for list="{{ insightItems }}" as="it" hint-placeholder-count="4">
+                <div style="background:var(--bg-panel);border:1px solid var(--border);border-radius:14px;box-shadow:var(--shadow-sm);padding:16px 18px;">
+                  <div style="display:flex;align-items:center;gap:9px;margin-bottom:6px;"><span style="display:inline-flex;align-items:center;font-size:10px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;color:{{ it.tagColor }};background:{{ it.tagBg }};padding:2px 8px;border-radius:6px;">{{ it.typeLabel }}</span><span style="font-family:'IBM Plex Mono',monospace;font-size:10.5px;color:var(--ink-400);">{{ it.time }}</span></div>
+                  <div style="font-family:'Newsreader',serif;font-size:16px;color:var(--ink-900);margin-bottom:4px;">{{ it.headline }}</div>
+                  <div style="font-size:13px;line-height:1.55;color:var(--ink-700);">{{ it.body }}</div>
+                </div>
+              </sc-for>
+            </div>
+          </sc-if>
+          <sc-if value="{{ noInsights }}" hint-placeholder-val="{{ false }}">
+            <div style="height:300px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;color:var(--ink-400);text-align:center;">
+              <div style="width:52px;height:52px;border-radius:14px;background:var(--bg-panel);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;box-shadow:var(--shadow-sm);">{{ placeholderIcon }}</div>
+              <div style="font-family:'Newsreader',serif;font-size:17px;color:var(--ink-700);">No saved insights yet</div>
+              <div style="font-size:12.5px;max-width:340px;line-height:1.5;">Generate insight, risk, or summary components in the builder — they'll be collected here automatically.</div>
+            </div>
+          </sc-if>
+        </div>
+      </sc-if>
+
+    </main>
+  </div>
+</div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+const h = React.createElement;
+const BACKEND = '/api';
+function authHeaders() { const hd = { 'Content-Type': 'application/json' }; try { const t = localStorage.getItem('ada-token'); if (t) hd['Authorization'] = 'Bearer ' + t; } catch (x) {} return hd; }
+function timeAgo(iso) { try { const d = (Date.now() - new Date(iso).getTime()) / 1000; if (d < 60) return 'just now'; if (d < 3600) return Math.floor(d / 60) + 'm ago'; if (d < 86400) return Math.floor(d / 3600) + 'h ago'; return Math.floor(d / 86400) + 'd ago'; } catch (x) { return ''; } }
+
+class Component extends DCLogic {
+  state = {
+    theme: 'light', page: 'profile', settingsSection: 'general',
+    me: null, statsData: null, activityData: null, compData: null, insightData: null, dsData: null, dashData: null, teamData: null,
+    compFilter: 'all', compFavs: ['c1', 'c5'], compDeleted: [],
+    settings: {
+      wsName: '', dateFormat: 'MMM D, YYYY', region: 'United States',
+      twofa: true, sso: true, retention: '90 days', density: 'Comfortable',
+      aiSensitivity: 'Medium', anomaly: 70, forecastConf: 80, kpiAggr: 'Balanced', verbosity: 'Standard', autoCat: true,
+      notif: { dashboards: true, weekly: true, risk: true, insights: false, email: true, slack: true }
+    },
+    profile: {
+      name: '', dept: '', tz: '(GMT+00:00) UTC', lang: 'English (US)', ws: '',
+      insightStyle: 'Balanced', tone: 'Executive', conf: 82, forecast: 55
+    }
+  };
+  componentDidMount() {
+    try { const t = localStorage.getItem('ada-theme'); if (t === 'dark' || t === 'light') this.setState({ theme: t }); } catch (x) {}
+    try { const hsh = decodeURIComponent((location.hash || '').replace('#', '')); if (hsh) this.setState({ page: hsh }); } catch (x) {}
+    this.loadAll();
+  }
+  async loadAll() {
+    let token = null; try { token = localStorage.getItem('ada-token'); } catch (x) {}
+    if (!token) { window.location.href = 'Agentic Auth.dc.html'; return; }
+    const get = (p) => fetch(BACKEND + p, { headers: authHeaders() }).then(r => r.ok ? r.json() : null).catch(() => null);
+    const me = await get('/me');
+    if (!me) { try { localStorage.removeItem('ada-token'); } catch (x) {} window.location.href = 'Agentic Auth.dc.html'; return; }
+    const prof = Object.assign({}, this.state.profile);
+    if (me.user) { prof.name = me.user.name || prof.name; prof.email = me.user.email; prof.company = me.user.company || ''; prof.ws = (me.user.company || 'Workspace'); if (me.user.ai_prefs) { const a = me.user.ai_prefs; if (a.style) prof.insightStyle = a.style; if (a.tone) prof.tone = a.tone; } }
+    this.setState({ me: me.user, statsData: me.stats, profile: prof });
+    const [act, comps, ins, ds, dash, setres, team] = await Promise.all([
+      get('/activity'), get('/components'), get('/insights'), get('/my-datasets'), get('/dashboards'), get('/settings'), get('/team')
+    ]);
+    const patch = { activityData: act && act.activity, compData: comps && comps.components, insightData: ins && ins.insights, dsData: ds && ds.datasets, dashData: dash && dash.dashboards, teamData: team && team.members };
+    if (setres && setres.settings && Object.keys(setres.settings).length) patch.settings = Object.assign({}, this.state.settings, setres.settings);
+    else patch.settings = Object.assign({}, this.state.settings, { wsName: (me.user && me.user.company) || '' });
+    this.setState(patch);
+  }
+  saveSettings() { try { fetch(BACKEND + '/settings', { method: 'PATCH', headers: authHeaders(), body: JSON.stringify({ settings: this.state.settings }) }); } catch (x) {} }
+  saveProfile() { const p = this.state.profile; try { fetch(BACKEND + '/me', { method: 'PATCH', headers: authHeaders(), body: JSON.stringify({ name: p.name, company: p.company, ai_prefs: { style: p.insightStyle, tone: p.tone } }) }); } catch (x) {} }
+  logout() { try { localStorage.removeItem('ada-token'); } catch (x) {} window.location.href = 'Agentic Auth.dc.html'; }
+  goBuilder() { window.location.href = 'Agentic Dashboard AI.dc.html'; }
+  contactSales() { try { window.location.href = 'mailto:sales@agentic.ai?subject=Agentic%20Dashboard%20AI%20—%20Plan%20enquiry'; } catch (x) {} }
+  exportReport() {
+    const data = { generated_at: new Date().toISOString(), account: (this.state.me && this.state.me.email), stats: this.state.statsData, datasets: (this.state.dsData || []).map(d => ({ id: d.id, name: d.name, sources: d.knowledge_source_count })), activity: this.state.activityData };
+    try {
+      const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+      const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = 'agentic-report.json'; a.click();
+    } catch (x) {}
+  }
+  async inviteMember() {
+    const email = (window.prompt && window.prompt('Invite teammate — email address:')) || '';
+    if (!email.trim()) return;
+    try { await fetch(BACKEND + '/team', { method: 'POST', headers: authHeaders(), body: JSON.stringify({ email: email.trim(), role: 'analyst' }) }); const r = await fetch(BACKEND + '/team', { headers: authHeaders() }).then(x => x.json()); this.setState({ teamData: r.members }); } catch (x) {}
+  }
+  async removeMember(id) { try { await fetch(BACKEND + '/team/' + id, { method: 'DELETE', headers: authHeaders() }); const r = await fetch(BACKEND + '/team', { headers: authHeaders() }).then(x => x.json()); this.setState({ teamData: r.members }); } catch (x) {} }
+  toggleTheme() { this.setState(s => { const t = s.theme === 'light' ? 'dark' : 'light'; try { localStorage.setItem('ada-theme', t); } catch (x) {} return { theme: t }; }); }
+  go(p) { this.setState({ page: p }); try { history.replaceState(null, '', '#' + p); } catch (x) {} const m = document.querySelector('main'); if (m) m.scrollTop = 0; }
+  setP(k, v) { this.setState(s => ({ profile: Object.assign({}, s.profile, { [k]: v }) })); this.pSave(); }
+  sSave() { clearTimeout(this._sT); this._sT = setTimeout(() => this.saveSettings(), 600); }
+  pSave() { clearTimeout(this._pT); this._pT = setTimeout(() => this.saveProfile(), 600); }
+  toggleFav(id) { this.setState(s => ({ compFavs: s.compFavs.includes(id) ? s.compFavs.filter(x => x !== id) : s.compFavs.concat(id) })); }
+  delComp(id) { this.setState(s => ({ compDeleted: s.compDeleted.concat(id) })); }
+  setFilter(fp) { this.setState({ compFilter: fp }); }
+  setSec(sec) { this.setState({ settingsSection: sec }); }
+  setS(k, v) { this.setState(s => ({ settings: Object.assign({}, s.settings, { [k]: v }) })); this.sSave(); }
+  toggleS(k) { this.setState(s => ({ settings: Object.assign({}, s.settings, { [k]: !s.settings[k] }) })); this.sSave(); }
+  toggleNotif(k) { this.setState(s => ({ settings: Object.assign({}, s.settings, { notif: Object.assign({}, s.settings.notif, { [k]: !s.settings.notif[k] }) }) })); this.sSave(); }
+  setThemeMode(mode) { const t = mode === 'Dark' ? 'dark' : 'light'; try { localStorage.setItem('ada-theme', t); } catch (x) {} this.setState({ theme: t, settings: Object.assign({}, this.state.settings, { themeMode: mode }) }); }
+  segEl(opts, current, setter, maxW) {
+    return h('div', { style: { display: 'flex', gap: 4, background: 'var(--bg-inset)', padding: 4, borderRadius: 11, maxWidth: maxW || 'none' } },
+      opts.map(v => { const a = current === v; return h('button', { key: v, onClick: () => setter(v), style: { flex: 1, height: 34, border: 'none', borderRadius: 8, background: a ? 'var(--bg-panel)' : 'transparent', color: a ? 'var(--violet)' : 'var(--ink-500)', font: "600 12px 'Hanken Grotesk',sans-serif", cursor: 'pointer', boxShadow: a ? 'var(--shadow-sm)' : 'none', transition: 'all .12s' } }, v); }));
+  }
+  navEl(defs, activeId, onPick, opts) {
+    opts = opts || {};
+    return defs.map(d => {
+      const a = d.id === activeId;
+      return h('button', { key: d.id, onClick: () => onPick(d), style: { display: 'flex', alignItems: 'center', gap: 10, padding: '8px 11px', borderRadius: 9, border: '1px solid ' + (a ? 'var(--violet-border)' : 'transparent'), background: a ? 'var(--violet-bg)' : 'transparent', color: a ? 'var(--violet)' : 'var(--ink-700)', font: (a ? '600' : '500') + " 13px 'Hanken Grotesk',sans-serif", cursor: 'pointer', textAlign: 'left', transition: 'all .12s', width: '100%' } },
+        h('span', { style: { display: 'flex', color: a ? 'var(--violet)' : 'var(--ink-500)' } }, this.icon(d.icon, 15)), d.label);
+    });
+  }
+
+  ic(paths, sz, sw) { return h('svg', { width: sz || 17, height: sz || 17, viewBox: '0 0 24 24', fill: 'none', stroke: 'currentColor', strokeWidth: sw || 1.8, strokeLinecap: 'round', strokeLinejoin: 'round' }, (Array.isArray(paths) ? paths : [paths]).map((p, i) => h('path', { key: i, d: p }))); }
+  icon(name, sz) {
+    const M = {
+      grid: ['M4 4h6v6H4zM14 4h6v6h-6zM14 14h6v6h-6zM4 14h6v6H4z'],
+      datasets: ['M4 6c0 1.7 3.6 3 8 3s8-1.3 8-3-3.6-3-8-3-8 1.3-8 3z', 'M4 6v6c0 1.7 3.6 3 8 3s8-1.3 8-3V6', 'M4 12v6c0 1.7 3.6 3 8 3s8-1.3 8-3v-6'],
+      components: ['M12 3l1.7 4.3L18 9l-4.3 1.7L12 15l-1.7-4.3L6 9l4.3-1.7z'],
+      bookmark: ['M6 3h12v18l-6-4-6 4z'],
+      team: ['M16 19v-2a4 4 0 00-4-4H6a4 4 0 00-4 4v2', 'M9 9a3.5 3.5 0 100-7 3.5 3.5 0 000 7z', 'M22 19v-2a4 4 0 00-3-3.8', 'M16 2.2A3.5 3.5 0 0116 9'],
+      billing: ['M3 6h18v12H3z', 'M3 10h18'],
+      admin: ['M12 3l7 3v5c0 5-3.5 8.5-7 10-3.5-1.5-7-5-7-10V6z', 'M9 12l2 2 4-4'],
+      settings: ['M12 9.5a2.5 2.5 0 100 5 2.5 2.5 0 000-5z', 'M19 12a7 7 0 00-.1-1.2l2-1.6-2-3.4-2.4 1a7 7 0 00-2-1.2l-.4-2.6H8.9l-.4 2.6a7 7 0 00-2 1.2l-2.4-1-2 3.4 2 1.6A7 7 0 004 12a7 7 0 00.1 1.2l-2 1.6 2 3.4 2.4-1a7 7 0 002 1.2l.4 2.6h4.2l.4-2.6a7 7 0 002-1.2l2.4 1 2-3.4-2-1.6c.1-.4.1-.8.1-1.2z'],
+      user: ['M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2', 'M12 11a4 4 0 100-8 4 4 0 000 8z'],
+      lock: ['M5 11h14v10H5z', 'M8 11V7a4 4 0 018 0v4'],
+      bell: ['M18 8a6 6 0 10-12 0c0 7-3 9-3 9h18s-3-2-3-9', 'M13.7 21a2 2 0 01-3.4 0'],
+      brain: ['M12 3a3 3 0 00-3 3 3 3 0 00-2 5.2A3 3 0 009 17h6a3 3 0 002-5.8A3 3 0 0015 6a3 3 0 00-3-3z', 'M12 8v9'],
+      chart: ['M3 17l6-6 4 4 7-8', 'M17 7h4v4'],
+      key: ['M15 7a4 4 0 11-4 4', 'M11 11l-7 7v3h3l1-1v-2h2v-2h2'],
+      mail: ['M3 5h18v14H3z', 'M3 7l9 6 9-6'],
+      calendar: ['M3 5h18v16H3z', 'M3 9h18', 'M8 3v4M16 3v4'],
+      building: ['M4 21V5l8-2v18', 'M12 21V8l8 2v11', 'M4 21h16'],
+      upload: ['M12 16V4', 'M7 9l5-5 5 5', 'M4 20h16'],
+      share: ['M18 5a3 3 0 10-2.8-4M6 12a3 3 0 10-3 3M18 19a3 3 0 10-2.8 4', 'M8.6 13.5l6.8 4M15.4 6.5l-6.8 4'],
+      edit: ['M12 20h9', 'M16.5 3.5a2.1 2.1 0 013 3L7 19l-4 1 1-4z'],
+      check: ['M20 6L9 17l-5-5']
+    };
+    return this.ic(M[name] || M.grid, sz || 17, 1.8);
+  }
+  seg(label, current, setter) {
+    const a = current === label;
+    return { label, onPick: () => setter(label), style: 'flex:1;height:34px;border:none;border-radius:8px;background:' + (a ? 'var(--bg-panel)' : 'transparent') + ';color:' + (a ? 'var(--violet)' : 'var(--ink-500)') + ';font:600 12px \'Hanken Grotesk\',sans-serif;cursor:pointer;box-shadow:' + (a ? 'var(--shadow-sm)' : 'none') + ';transition:all .12s;' };
+  }
+  hash(str) { let x = 0; str = String(str); for (let i = 0; i < str.length; i++) x = (x * 31 + str.charCodeAt(i)) | 0; return x; }
+  rng(seed) { let s = (Math.abs(seed) * 2654435761) % 2147483647; if (s <= 0) s += 2147483646; return () => (s = s * 16807 % 2147483647) / 2147483647; }
+  series(n, seed, trend) { const r = this.rng(seed); let v = 30; const out = []; for (let i = 0; i < n; i++) { v += (trend == null ? 8 : trend) + (r() - 0.5) * 16; v = Math.max(8, v); out.push(v); } return out; }
+  pts(d, w, hh, pad) { const mx = Math.max.apply(null, d), mn = Math.min.apply(null, d), sp = (mx - mn) || 1; return d.map((v, i) => [pad + i * (w - 2 * pad) / (d.length - 1), hh - pad - (v - mn) / sp * (hh - 2 * pad)]); }
+  smooth(p) { if (p.length < 3) return 'M' + p.map(q => q.join(',')).join(' L'); let dd = 'M' + p[0][0] + ',' + p[0][1]; for (let i = 0; i < p.length - 1; i++) { const a = p[i - 1] || p[i], b = p[i], c = p[i + 1], e = p[i + 2] || c; dd += ' C' + (b[0] + (c[0] - a[0]) / 6) + ',' + (b[1] + (c[1] - a[1]) / 6) + ' ' + (c[0] - (e[0] - b[0]) / 6) + ',' + (c[1] - (e[1] - b[1]) / 6) + ' ' + c[0] + ',' + c[1]; } return dd; }
+  thumb(c) {
+    const seed = this.hash(c.id), f = "'Newsreader',serif";
+    const spark = (col) => { const d = this.series(14, seed, 6); const P = this.pts(d, 200, 52, 4); const gid = 'tg' + seed; return h('svg', { viewBox: '0 0 200 52', preserveAspectRatio: 'none', style: { width: '100%', height: '100%' } }, h('defs', null, h('linearGradient', { id: gid, x1: 0, y1: 0, x2: 0, y2: 1 }, h('stop', { offset: '0%', stopColor: col, stopOpacity: 0.22 }), h('stop', { offset: '100%', stopColor: col, stopOpacity: 0 }))), h('path', { d: this.smooth(P) + ' L196,52 L4,52 Z', fill: 'url(#' + gid + ')' }), h('path', { d: this.smooth(P), fill: 'none', stroke: col, strokeWidth: 2.4, strokeLinecap: 'round' })); };
+    const wrap = (el) => h('div', { style: { width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center' } }, el);
+    if (c.type === 'kpi') return h('div', { style: { display: 'flex', flexDirection: 'column', justifyContent: 'center', height: '100%', gap: 4 } }, h('div', { style: { display: 'flex', alignItems: 'baseline', gap: 8 } }, h('span', { style: { font: '500 26px ' + f, color: 'var(--ink-900)' } }, c.value || '—'), c.delta ? h('span', { style: { font: "600 11px 'IBM Plex Mono',monospace", color: c.tone === 'warn' ? 'var(--amber-ink)' : 'var(--emerald-ink)' } }, (c.tone === 'warn' ? '▼ ' : '▲ ') + c.delta) : null), h('div', { style: { height: 26 } }, spark(c.tone === 'warn' ? 'var(--amber)' : 'var(--emerald)')));
+    if (c.type === 'area' || c.type === 'line') return spark('var(--violet)');
+    if (c.type === 'forecast') { const d = this.series(16, seed, 6); const P = this.pts(d, 200, 56, 4); const split = Math.floor(P.length * 0.6); const hist = P.slice(0, split), fut = P.slice(split - 1); return h('svg', { viewBox: '0 0 200 56', preserveAspectRatio: 'none', style: { width: '100%', height: '100%' } }, h('path', { d: this.smooth(hist), fill: 'none', stroke: 'var(--violet)', strokeWidth: 2.4, strokeLinecap: 'round' }), h('path', { d: this.smooth(fut), fill: 'none', stroke: 'var(--violet)', strokeWidth: 2.2, strokeDasharray: '5 4', strokeLinecap: 'round', opacity: 0.7 })); }
+    if (c.type === 'bar') { const d = this.series(7, seed, 0).map(v => Math.max(14, v)); const mx = Math.max.apply(null, d); const cols = ['var(--violet)', 'var(--blue)', 'var(--teal)', 'var(--emerald)', 'var(--amber)', 'var(--violet)', 'var(--blue)']; return h('div', { style: { display: 'flex', alignItems: 'flex-end', gap: 6, height: '100%', padding: '6px 0' } }, d.map((v, i) => h('div', { key: i, style: { flex: 1, height: (v / mx * 100) + '%', background: cols[i % cols.length], borderRadius: '4px 4px 2px 2px' } }))); }
+    if (c.type === 'donut') { const segs = [['var(--violet)', 42], ['var(--blue)', 31], ['var(--teal)', 18], ['var(--amber)', 9]]; const C = 2 * Math.PI * 20; let acc = 0; return wrap(h('svg', { width: 60, height: 60, viewBox: '0 0 60 60' }, h('circle', { cx: 30, cy: 30, r: 20, fill: 'none', stroke: 'var(--bg-panel)', strokeWidth: 9 }), segs.map((sg, i) => { const el = h('circle', { key: i, cx: 30, cy: 30, r: 20, fill: 'none', stroke: sg[0], strokeWidth: 9, strokeDasharray: (sg[1] / 100 * C - 1.5) + ' ' + C, strokeDashoffset: -acc * C, transform: 'rotate(-90 30 30)' }); acc += sg[1] / 100; return el; }))); }
+    if (c.type === 'heatmap') { const r = this.rng(seed); return h('div', { style: { display: 'flex', flexDirection: 'column', gap: 3, justifyContent: 'center', height: '100%' } }, [0, 1, 2, 3].map(ri => h('div', { key: ri, style: { display: 'flex', gap: 3 } }, [0, 1, 2, 3, 4, 5, 6].map(ci => h('div', { key: ci, style: { flex: 1, height: 11, borderRadius: 3, background: 'color-mix(in srgb, var(--violet) ' + Math.round((0.12 + r() * 0.85) * 100) + '%, var(--bg-panel))' } }))))); }
+    if (c.type === 'funnel') { const steps = [100, 64, 38, 17]; return h('div', { style: { display: 'flex', flexDirection: 'column', gap: 6, justifyContent: 'center', height: '100%' } }, steps.map((v, i) => h('div', { key: i, style: { height: 10, width: v + '%', background: ['var(--violet)', 'var(--blue)', 'var(--teal)', 'var(--emerald)'][i], borderRadius: 5 } }))); }
+    if (c.type === 'risk' || c.type === 'insight') { const warn = c.type === 'risk'; return h('div', { style: { display: 'flex', flexDirection: 'column', gap: 7, justifyContent: 'center', height: '100%' } }, h('span', { style: { width: 28, height: 28, borderRadius: 8, background: warn ? 'var(--amber-bg)' : 'var(--emerald-bg)', color: warn ? 'var(--amber)' : 'var(--emerald)', display: 'flex', alignItems: 'center', justifyContent: 'center' } }, this.icon(warn ? 'admin' : 'bookmark', 16)), h('div', { style: { height: 6, width: '78%', borderRadius: 9, background: 'var(--bg-panel)' } }), h('div', { style: { height: 6, width: '55%', borderRadius: 9, background: 'var(--bg-panel)' } })); }
+    return h('div', { style: { display: 'flex', flexDirection: 'column', gap: 6, justifyContent: 'center', height: '100%' } }, [92, 76, 84, 60].map((w, i) => h('div', { key: i, style: { height: 6, width: w + '%', borderRadius: 9, background: 'var(--bg-panel)' } })));
+  }
+
+  navRow(active) {
+    const base = 'display:flex;align-items:center;gap:11px;width:100%;padding:8px 10px;border-radius:9px;border:1px solid transparent;cursor:pointer;margin-bottom:1px;transition:background .12s;';
+    return active ? base + 'background:var(--violet-bg);border-color:var(--violet-border);color:var(--violet);' : base + 'background:transparent;color:var(--ink-700);';
+  }
+  mkNav(id, label, icon, count, pageFor) {
+    const active = this.state.page === pageFor;
+    return {
+      id, label, count: count || '', weight: active ? 600 : 500, icon: this.icon(icon, 16),
+      iconColor: active ? 'var(--violet)' : 'var(--ink-500)', rowStyle: this.navRow(active),
+      hoverStyle: { background: active ? 'var(--violet-bg)' : 'var(--bg-inset)' },
+      badgeStyle: 'font-family:\'IBM Plex Mono\',monospace;font-size:10.5px;font-weight:500;color:' + (active ? 'var(--violet)' : 'var(--ink-400)') + ';background:' + (active ? 'var(--bg-panel)' : 'var(--bg-inset)') + ';padding:1px 7px;border-radius:99px;',
+      onClick: id === 'dashboards' ? () => { window.location.href = 'Agentic Dashboard AI.dc.html'; } : () => this.go(pageFor)
+    };
+  }
+
+  renderVals() {
+    const s = this.state, p = s.profile;
+    const themeIcon = s.theme === 'light'
+      ? this.ic(['M21 12.8A9 9 0 1111.2 3 7 7 0 0021 12.8z'], 17, 1.8)
+      : h('svg', { width: 17, height: 17, viewBox: '0 0 24 24', fill: 'none', stroke: 'currentColor', strokeWidth: 1.8, strokeLinecap: 'round', strokeLinejoin: 'round' }, h('circle', { cx: 12, cy: 12, r: 4.5 }), h('path', { d: 'M12 2v2M12 20v2M4 12H2M22 12h-2M5 5l1.5 1.5M17.5 17.5L19 19M19 5l-1.5 1.5M6.5 17.5L5 19' }));
+
+    const inputStyle = 'width:100%;height:42px;padding:0 13px;border:1px solid var(--border);border-radius:10px;background:var(--bg-sub);font:14px \'Hanken Grotesk\',sans-serif;color:var(--ink-900);outline:none;transition:all .14s;';
+    const selectStyle = inputStyle + 'cursor:pointer;appearance:none;';
+    const inputFocus = { borderColor: 'var(--violet)', boxShadow: '0 0 0 3px var(--violet-bg)' };
+
+    const cnt = (arr) => (arr && arr.length) ? String(arr.length) : '';
+    const navMain = [
+      this.mkNav('dashboards', 'Dashboards', 'grid', cnt(s.dashData), 'dashboards'),
+      this.mkNav('datasets', 'Datasets', 'datasets', cnt(s.dsData), 'datasets'),
+      this.mkNav('components', 'Generated Components', 'components', cnt(s.compData), 'components'),
+      this.mkNav('insights', 'Saved Insights', 'bookmark', cnt(s.insightData), 'insights')
+    ];
+    const navOrg = [
+      this.mkNav('team', 'Team Workspaces', 'team', cnt(s.teamData), 'team'),
+      this.mkNav('billing', 'Billing & Plans', 'billing', '', 'billing'),
+      this.mkNav('admin', 'Admin Console', 'admin', '', 'admin')
+    ];
+    const settingsActive = s.page === 'settings' || s.page.indexOf('settings-') === 0;
+    const profileActive = s.page === 'profile';
+
+    const profileNavDefs = [
+      { id: 'profile', label: 'Profile', icon: 'user', page: 'profile' },
+      { id: 'security', label: 'Security', icon: 'lock', page: 'settings' },
+      { id: 'notifications', label: 'Notifications', icon: 'bell', page: 'settings' },
+      { id: 'ai', label: 'AI Preferences', icon: 'brain', page: 'profile' },
+      { id: 'usage', label: 'Usage Analytics', icon: 'chart', page: 'billing' },
+      { id: 'apikeys', label: 'API Keys', icon: 'key', page: 'settings' },
+      { id: 'billing', label: 'Billing', icon: 'billing', page: 'billing' }
+    ];
+    const profileNav = profileNavDefs.map(d => {
+      const a = d.id === 'profile' || d.id === 'ai';
+      return { label: d.label, icon: this.icon(d.icon, 15), iconColor: a ? 'var(--violet)' : 'var(--ink-500)',
+        onClick: () => this.go(d.page),
+        style: 'display:flex;align-items:center;gap:10px;padding:8px 11px;border-radius:9px;border:1px solid ' + (a ? 'var(--violet-border)' : 'transparent') + ';background:' + (a ? 'var(--violet-bg)' : 'transparent') + ';color:' + (a ? 'var(--violet)' : 'var(--ink-700)') + ';font:' + (a ? '600' : '500') + ' 13px \'Hanken Grotesk\',sans-serif;cursor:pointer;text-align:left;transition:all .12s;' };
+    });
+
+    const profileMeta = [
+      { label: 'Email', value: (p.email || 'you@company.com'), icon: this.icon('mail', 15) },
+      { label: 'Role', value: (s.me && s.me.role ? s.me.role : 'Owner'), icon: this.icon('admin', 15) },
+      { label: 'Member since', value: (s.me && s.me.created_at ? new Date(s.me.created_at).toLocaleDateString(undefined, { month: 'short', year: 'numeric' }) : '—'), icon: this.icon('calendar', 15) }
+    ];
+
+    const sd = s.statsData;
+    const stats = [
+      { label: 'Dashboards created', value: sd ? String(sd.dashboards) : '—', delta: '', tint: 'var(--violet-bg)', color: 'var(--violet)', icon: this.icon('grid', 15) },
+      { label: 'AI analyses run', value: sd ? String(sd.analyses) : '—', delta: '', tint: 'var(--emerald-bg)', color: 'var(--emerald-ink)', icon: this.icon('brain', 15) },
+      { label: 'Components generated', value: sd ? String(sd.components) : '—', delta: '', tint: 'color-mix(in srgb,var(--blue) 14%,transparent)', color: 'var(--blue)', icon: this.icon('components', 15) },
+      { label: 'Saved insights', value: sd ? String(sd.insights) : '—', delta: '', tint: 'var(--amber-bg)', color: 'var(--amber-ink)', icon: this.icon('bookmark', 15) }
+    ];
+
+    const actIcon = { signup: 'user', login: 'lock', generate: 'brain', save_dashboard: 'grid', settings_change: 'settings', credits: 'chart' };
+    const actLabel = { signup: 'Created account', login: 'Signed in', generate: 'Generated components', save_dashboard: 'Saved dashboard', settings_change: 'Updated settings', credits: 'Used AI credits' };
+    let activity;
+    if (s.activityData && s.activityData.length) {
+      activity = s.activityData.filter(a => a.kind !== 'credits').slice(0, 8).map((a, i, arr) => ({
+        action: actLabel[a.kind] || a.kind, target: a.detail || '', time: timeAgo(a.created_at),
+        icon: this.icon(actIcon[a.kind] || 'check', 14), tint: 'var(--violet-bg)', color: 'var(--violet)', line: i < arr.length - 1
+      }));
+    } else {
+      activity = [];
+    }
+
+    const forecastLabel = p.forecast < 33 ? 'Conservative' : p.forecast < 67 ? 'Balanced' : 'Aggressive';
+    const placeholders = {
+      components: 'Generated Components', insights: 'Saved Insights',
+      team: 'Team Workspaces', billing: 'Billing & Subscription', admin: 'Admin Console', settings: 'Settings Center'
+    };
+
+    // ---- datasets ----
+    const statusStyle = (c) => 'display:inline-flex;align-items:center;gap:5px;font-size:11px;font-weight:600;color:' + c.ink + ';background:' + c.bg + ';padding:3px 9px;border-radius:99px;';
+    const ST = {
+      Synced: { ink: 'var(--emerald-ink)', bg: 'var(--emerald-bg)', dot: 'var(--emerald)' },
+      Syncing: { ink: 'var(--amber-ink)', bg: 'var(--amber-bg)', dot: 'var(--amber)' },
+      Error: { ink: 'var(--rose-ink)', bg: 'var(--rose-bg)', dot: 'var(--rose)' },
+      Ready: { ink: 'var(--blue)', bg: 'color-mix(in srgb,var(--blue) 13%,transparent)', dot: 'var(--blue)' }
+    };
+    const dsCols = [
+      { label: 'Dataset', align: 'left' }, { label: 'Source', align: 'left' }, { label: 'Rows', align: 'right' },
+      { label: 'Cols', align: 'right' }, { label: 'Updated', align: 'right' }, { label: 'Status', align: 'left' }, { label: 'Owner', align: 'right' }
+    ];
+    const ownerName = (s.me && s.me.name) || 'You';
+    const rawDatasets = (s.dsData && s.dsData.length)
+      ? s.dsData.map(d => ({
+          name: d.name || d.api_name || 'Untitled', path: d.api_name || '', source: 'Inflectiv',
+          rows: String(d.knowledge_source_count != null ? d.knowledge_source_count : '—'), cols: String(d.vector_count || '—'),
+          updated: timeAgo(d.updated_at || d.created_at), status: 'Synced',
+          letter: (d.name || 'D')[0].toUpperCase(), color: 'var(--violet)', tint: 'var(--violet-bg)', owner: ownerName, oc: '#6E56CF'
+        }))
+      : [];
+    const datasets = rawDatasets.map(d => Object.assign({}, d, {
+      statusStyle: statusStyle(ST[d.status] || ST.Synced), statusDot: (ST[d.status] || ST.Synced).dot,
+      ownerColor: d.oc, ownerInitials: (d.owner || 'Y').split(' ').map(w => w[0]).join('').slice(0, 2)
+    }));
+    const _dsList = s.dsData || [];
+    const _totalKs = _dsList.reduce((a, d) => a + (d.knowledge_source_count || 0), 0);
+    const _withData = _dsList.filter(d => (d.knowledge_source_count || 0) > 0).length;
+    const _fresh = _dsList.length ? Math.round(_withData / _dsList.length * 100) : 0;
+    const health = (s.dsData ? [
+      { label: 'Connected datasets', value: String(_dsList.length), note: 'Live from your Inflectiv account', tint: 'var(--violet-bg)', color: 'var(--violet)', icon: this.icon('datasets', 15) },
+      { label: 'Knowledge sources', value: String(_totalKs), note: 'Across all datasets', tint: 'var(--emerald-bg)', color: 'var(--emerald-ink)', icon: this.icon('check', 15) },
+      { label: 'Datasets with data', value: _fresh + '%', note: _withData + ' of ' + _dsList.length + ' populated', tint: 'color-mix(in srgb,var(--blue) 14%,transparent)', color: 'var(--blue)', icon: this.icon('chart', 15) },
+      { label: 'Ready to query', value: String(_withData), note: 'Datasets the agent can analyze', tint: 'var(--amber-bg)', color: 'var(--amber-ink)', icon: this.icon('components', 15) }
+    ] : [
+      { label: 'Connected datasets', value: '—', note: 'Loading…', tint: 'var(--violet-bg)', color: 'var(--violet)', icon: this.icon('datasets', 15) },
+      { label: 'Knowledge sources', value: '—', note: 'Loading…', tint: 'var(--emerald-bg)', color: 'var(--emerald-ink)', icon: this.icon('check', 15) },
+      { label: 'Datasets with data', value: '—', note: 'Loading…', tint: 'color-mix(in srgb,var(--blue) 14%,transparent)', color: 'var(--blue)', icon: this.icon('chart', 15) },
+      { label: 'Ready to query', value: '—', note: 'Loading…', tint: 'var(--amber-bg)', color: 'var(--amber-ink)', icon: this.icon('components', 15) }
+    ]);
+    const recommendations = [
+      { title: 'Revenue Performance', meta: 'KPIs · trends · forecast', conf: '96%', tint: 'var(--violet-bg)', color: 'var(--violet)', icon: this.icon('grid', 16) },
+      { title: 'Churn Risk Monitor', meta: 'Anomalies · cohorts', conf: '88%', tint: 'var(--amber-bg)', color: 'var(--amber-ink)', icon: this.icon('chart', 16) },
+      { title: 'Executive Summary', meta: 'Narrative · highlights', conf: '94%', tint: 'var(--emerald-bg)', color: 'var(--emerald-ink)', icon: this.icon('bookmark', 16) },
+      { title: 'Pipeline Funnel', meta: 'Conversion · stages', conf: '91%', tint: 'color-mix(in srgb,var(--blue) 14%,transparent)', color: 'var(--blue)', icon: this.icon('components', 16) }
+    ];
+
+    // ---- generated components ----
+    const compFlow = [
+      { label: 'Raw Data', arrow: true, color: 'var(--ink-500)', icon: h('span', { style: { display: 'inline-flex' } }, this.icon('datasets', 13)) },
+      { label: 'AI Analysis', arrow: true, color: 'var(--ink-500)', icon: h('span', { style: { display: 'inline-flex' } }, this.icon('brain', 13)) },
+      { label: 'Components', arrow: true, color: 'var(--violet)', icon: h('span', { style: { display: 'inline-flex' } }, this.icon('components', 13)) },
+      { label: 'Dashboard', arrow: false, color: 'var(--ink-500)', icon: h('span', { style: { display: 'inline-flex' } }, this.icon('grid', 13)) }
+    ];
+    const catOf = (t) => t === 'kpi' ? 'kpi' : (t === 'forecast' ? 'forecast' : (t === 'summary' || t === 'insight' ? 'summary' : (t === 'risk' ? 'alert' : 'chart')));
+    const allComps = ((s.compData && s.compData.length)
+      ? s.compData.map(c => { const sp = c.spec || {}; return { id: 'sc' + c.id, type: sp.type || 'kpi', title: sp.title || 'Component', cat: catOf(sp.type), source: sp.source || c.dataset_name || '', time: timeAgo(c.created_at), conf: sp.confidence || 80, value: sp.value, delta: sp.delta, tone: sp.tone, summary: sp.body || sp.headline || '' }; })
+      : []).filter(c => !s.compDeleted.includes(c.id));
+    const compShown = allComps.filter(c => s.compFilter === 'all' || c.cat === s.compFilter);
+    const typeLabels = { kpi: 'KPI Card', area: 'Line Chart', line: 'Line Chart', bar: 'Bar Chart', forecast: 'Forecast', donut: 'Donut', heatmap: 'Heatmap', funnel: 'Funnel', risk: 'Risk Alert', insight: 'Insight', summary: 'Summary' };
+    const comps = compShown.map(c => {
+      const fav = s.compFavs.includes(c.id);
+      const confColor = c.conf >= 90 ? 'var(--emerald-ink)' : c.conf >= 80 ? 'var(--violet)' : 'var(--amber-ink)';
+      return Object.assign({}, c, {
+        thumb: this.thumb(c), typeLabel: typeLabels[c.type] || 'Widget',
+        confColor, confDot: c.conf >= 90 ? 'var(--emerald)' : c.conf >= 80 ? 'var(--violet)' : 'var(--amber)',
+        favColor: fav ? 'var(--amber)' : 'var(--ink-400)',
+        favIcon: fav ? h('svg', { width: 15, height: 15, viewBox: '0 0 24 24', fill: 'var(--amber)' }, h('path', { d: 'M12 3l2.6 5.6 6 .7-4.4 4.1 1.2 6L12 16.8 6.6 19.4l1.2-6L3.4 9.3l6-.7z' })) : this.ic(['M12 3l2.6 5.6 6 .7-4.4 4.1 1.2 6L12 16.8 6.6 19.4l1.2-6L3.4 9.3l6-.7z'], 15, 1.8),
+        onFav: () => this.toggleFav(c.id), onDelete: () => this.delComp(c.id)
+      });
+    });
+    const filterDefs = [['all', 'All'], ['kpi', 'KPI Cards'], ['chart', 'Charts'], ['forecast', 'Forecasts'], ['summary', 'Summaries'], ['alert', 'Alerts']];
+    const compFilters = filterDefs.map(fd => {
+      const a = s.compFilter === fd[0];
+      const cnt = fd[0] === 'all' ? allComps.length : allComps.filter(c => c.cat === fd[0]).length;
+      return { label: fd[1], onPick: () => this.setFilter(fd[0]),
+        style: 'display:inline-flex;align-items:center;gap:7px;height:34px;padding:0 13px;border-radius:9px;border:1px solid ' + (a ? 'var(--violet)' : 'var(--border)') + ';background:' + (a ? 'var(--violet-bg)' : 'var(--bg-panel)') + ';color:' + (a ? 'var(--violet)' : 'var(--ink-700)') + ';font:600 12.5px \'Hanken Grotesk\',sans-serif;cursor:pointer;transition:all .12s;',
+        count: cnt, countStyle: 'font-family:\'IBM Plex Mono\',monospace;font-size:10px;color:' + (a ? 'var(--violet)' : 'var(--ink-400)') + ';background:' + (a ? 'var(--bg-panel)' : 'var(--bg-inset)') + ';padding:1px 6px;border-radius:99px;' };
+    });
+
+    // ---- team ----
+    const PALC = ['#C17B5B', '#5BA17B', '#7CA3E8', '#B07BC1', '#C1A35B', '#5B6BC1'];
+    const roleStyle = (c) => 'display:inline-flex;align-items:center;font-size:11px;font-weight:600;color:' + c.ink + ';background:' + c.bg + ';padding:3px 9px;border-radius:7px;';
+    const ROLE = { Owner: { ink: 'var(--violet)', bg: 'var(--violet-bg)' }, Admin: { ink: 'var(--blue)', bg: 'color-mix(in srgb,var(--blue) 13%,transparent)' }, Analyst: { ink: 'var(--teal)', bg: 'color-mix(in srgb,var(--teal) 15%,transparent)' }, Viewer: { ink: 'var(--ink-500)', bg: 'var(--bg-inset)' } };
+    const STAT = { Active: { c: 'var(--emerald-ink)', d: 'var(--emerald)' }, Away: { c: 'var(--ink-500)', d: 'var(--ink-400)' }, Invited: { c: 'var(--amber-ink)', d: 'var(--amber)' } };
+    const cap = (x) => x ? x[0].toUpperCase() + x.slice(1) : '';
+    const rawMembers = (s.teamData && s.teamData.length)
+      ? s.teamData.map((m, i) => ({ id: m.id, name: m.name || (m.email || '').split('@')[0], email: m.email, dept: '—', role: cap(m.role) || 'Member', status: m.status === 'invited' ? 'Invited' : 'Active', last: m.status === 'invited' ? 'Pending' : timeAgo(m.created_at), color: PALC[i % PALC.length] }))
+      : [{ name: (s.me && s.me.name) || 'You', email: (s.me && s.me.email) || '', dept: '—', role: 'Owner', status: 'Active', last: 'Online now', color: '#C17B5B' }];
+    const teamStats = [
+      { label: 'Total members', value: String(rawMembers.length), tint: 'var(--violet-bg)', color: 'var(--violet)', icon: this.icon('team', 15) },
+      { label: 'Dashboards', value: sd ? String(sd.dashboards) : '—', tint: 'var(--emerald-bg)', color: 'var(--emerald-ink)', icon: this.icon('grid', 15) },
+      { label: 'Datasets', value: String((s.dsData || []).length), tint: 'color-mix(in srgb,var(--blue) 14%,transparent)', color: 'var(--blue)', icon: this.icon('datasets', 15) },
+      { label: 'AI credits used', value: sd ? String(sd.credits_used) : '—', tint: 'var(--amber-bg)', color: 'var(--amber-ink)', icon: this.icon('brain', 15) }
+    ];
+    const members = rawMembers.map(m => Object.assign({}, m, { initials: (m.name || 'U').split(' ').map(w => w[0]).join('').slice(0, 2).toUpperCase(), roleStyle: roleStyle(ROLE[m.role] || ROLE.Viewer), statusColor: STAT[m.status].c, statusDot: STAT[m.status].d, onRemove: m.id ? () => this.removeMember(m.id) : null }));
+    const teamCols = ['Member', 'Department', 'Role', 'Status', 'Last active'];
+    const sharedRes = [
+      { label: 'Dashboards', count: sd ? String(sd.dashboards) : '0', tint: 'var(--violet-bg)', color: 'var(--violet)', icon: this.icon('grid', 16) },
+      { label: 'Saved insights', count: sd ? String(sd.insights) : '0', tint: 'var(--emerald-bg)', color: 'var(--emerald-ink)', icon: this.icon('bookmark', 16) },
+      { label: 'Components', count: sd ? String(sd.components) : '0', tint: 'color-mix(in srgb,var(--blue) 14%,transparent)', color: 'var(--blue)', icon: this.icon('components', 16) },
+      { label: 'Datasets', count: String((s.dsData || []).length), tint: 'var(--amber-bg)', color: 'var(--amber-ink)', icon: this.icon('datasets', 16) }
+    ];
+    const yes = h('svg', { width: 15, height: 15, viewBox: '0 0 24 24', fill: 'none', stroke: 'var(--emerald)', strokeWidth: 2.4, strokeLinecap: 'round', strokeLinejoin: 'round' }, h('path', { d: 'M20 6L9 17l-5-5' }));
+    const no = h('span', { style: { width: 10, height: 2, borderRadius: 9, background: 'var(--border-strong)' } });
+    const permRoles = ['Owner', 'Admin', 'Analyst', 'Viewer'];
+    const permDefs = [
+      ['Dashboard editing', [1, 1, 1, 0]], ['Dataset uploads', [1, 1, 1, 0]], ['AI generation', [1, 1, 1, 0]], ['Billing access', [1, 1, 0, 0]], ['API access', [1, 1, 1, 0]]
+    ];
+    const permRows = permDefs.map(d => ({ cap: d[0], cells: d[1].map(v => v ? yes : no) }));
+
+    // ---- billing ----
+    const barSpark = (seed, col) => { const d = this.series(12, seed, 4); const mx = Math.max.apply(null, d); return h('div', { style: { display: 'flex', alignItems: 'flex-end', gap: 3, height: '100%' } }, d.map((v, i) => h('div', { key: i, style: { flex: 1, height: (v / mx * 100) + '%', background: col, opacity: 0.35 + 0.65 * (i / d.length), borderRadius: 2 } }))); };
+    const tierCard = (cur) => 'position:relative;border:1.5px solid ' + (cur ? 'var(--violet)' : 'var(--border)') + ';border-radius:16px;background:var(--bg-panel);box-shadow:' + (cur ? 'var(--shadow-md)' : 'var(--shadow-sm)') + ';padding:20px 21px;display:flex;flex-direction:column;';
+    const tierBtn = (cur, accent) => cur
+      ? 'margin-top:18px;height:40px;border:none;border-radius:10px;background:var(--bg-inset);color:var(--ink-500);font:600 13px \'Hanken Grotesk\',sans-serif;cursor:default;'
+      : 'margin-top:18px;height:40px;border:1px solid ' + accent + ';border-radius:10px;background:transparent;color:' + accent + ';font:600 13px \'Hanken Grotesk\',sans-serif;cursor:pointer;';
+    const tiers = [
+      { name: 'Free', accent: 'var(--teal)', price: '$0', per: '', tagline: 'What you are on now.', current: true, cta: 'Current plan', features: ['Connect 1 dataset', 'AI dashboard generation', 'Provenance on every component', 'Save & reload dashboards'] },
+      { name: 'Growth', accent: 'var(--violet)', price: '$199', per: '/mo', tagline: 'For growing data teams.', current: false, cta: 'Contact sales', features: ['Unlimited dashboards', 'Higher AI limits', 'Team collaboration', 'All integrations'] },
+      { name: 'Enterprise', accent: 'var(--ink-900)', price: 'Custom', per: '', tagline: 'For large organizations.', current: false, cta: 'Contact sales', features: ['Unlimited everything', 'Custom AI agents', 'SSO & audit logs', 'Dedicated support'] }
+    ].map(t => Object.assign({}, t, { cardStyle: tierCard(t.current), btnStyle: tierBtn(t.current, t.accent) }));
+    const usageStats = [
+      { label: 'AI credits used', value: sd ? String(sd.credits_used) : '0', delta: '', spark: barSpark(11, 'var(--violet)') },
+      { label: 'Dashboards', value: sd ? String(sd.dashboards) : '0', delta: '', spark: barSpark(27, 'var(--emerald)') },
+      { label: 'Components generated', value: sd ? String(sd.components) : '0', delta: '', spark: barSpark(43, 'var(--blue)') }
+    ];
+    const invoices = [];
+
+    // ---- settings ----
+    const st = s.settings;
+    const inSettings = s.page === 'settings' || s.page.indexOf('settings-') === 0;
+    const sec = !inSettings ? '' : (s.page === 'settings' ? 'general' : s.page.slice(9));
+    const secPage = (id) => id === 'general' ? 'settings' : 'settings-' + id;
+    const tg = (on) => ({ toggle: 'width:44px;height:25px;border-radius:99px;border:none;background:' + (on ? 'var(--violet)' : 'var(--border-strong)') + ';cursor:pointer;position:relative;flex:0 0 auto;transition:background .18s;', thumb: 'position:absolute;top:3px;left:' + (on ? '22px' : '3px') + ';width:19px;height:19px;border-radius:99px;background:#fff;box-shadow:var(--shadow-sm);transition:left .18s;' });
+    const labelStyle = 'display:block;font-size:12px;font-weight:600;color:var(--ink-700);margin-bottom:7px;';
+    const cardStyle = 'background:var(--bg-panel);border:1px solid var(--border);border-radius:16px;box-shadow:var(--shadow-sm);padding:22px 24px;';
+    const snDefs = [
+      ['general', 'General', 'settings'], ['workspace', 'Workspace', 'building'], ['ai', 'AI Agent Settings', 'brain'],
+      ['data', 'Data Connections', 'datasets', 'datasets'], ['security', 'Security & Privacy', 'lock'], ['notifications', 'Notifications', 'bell'],
+      ['billing', 'Billing & Plans', 'billing', 'billing'], ['api', 'API Access', 'key'], ['audit', 'Audit Logs', 'chart'],
+      ['permissions', 'Team Permissions', 'team', 'team'], ['integrations', 'Integrations', 'components'], ['appearance', 'Appearance', 'grid']
+    ];
+    const settingsNav = snDefs.map(d => {
+      const a = !d[3] && sec === d[0];
+      return { label: d[1], icon: this.icon(d[2], 15), iconColor: a ? 'var(--violet)' : 'var(--ink-500)',
+        onClick: d[3] ? () => this.go(d[3]) : () => this.go(secPage(d[0])),
+        style: 'display:flex;align-items:center;gap:10px;padding:8px 11px;border-radius:9px;border:1px solid ' + (a ? 'var(--violet-border)' : 'transparent') + ';background:' + (a ? 'var(--violet-bg)' : 'transparent') + ';color:' + (a ? 'var(--violet)' : 'var(--ink-700)') + ';font:' + (a ? '600' : '500') + ' 13px \'Hanken Grotesk\',sans-serif;cursor:pointer;text-align:left;transition:all .12s;' };
+    });
+    const twofa = tg(st.twofa), sso = tg(st.sso), autoCat = tg(st.autoCat);
+    const notifDefs = [
+      ['dashboards', 'Dashboard alerts', 'Threshold breaches and status changes.'],
+      ['weekly', 'Weekly summaries', 'A digest of activity every Monday.'],
+      ['risk', 'Risk notifications', 'Churn and anomaly alerts from the agent.'],
+      ['insights', 'AI insight updates', 'When new insights are generated.'],
+      ['email', 'Email delivery', 'Send notifications to your inbox.'],
+      ['slack', 'Slack delivery', 'Post to #analytics in your workspace.']
+    ];
+    const notifRows = notifDefs.map(d => { const on = st.notif[d[0]]; const t = tg(on); return { label: d[1], desc: d[2], onToggle: () => this.toggleNotif(d[0]), toggle: t.toggle, thumb: t.thumb }; });
+    const themeDefs = [['Light', '#FFFFFF'], ['Dark', '#16161A'], ['System', 'linear-gradient(120deg,#FFFFFF 50%,#16161A 50%)']];
+    const themeActive = st.themeMode || (s.theme === 'dark' ? 'Dark' : 'Light');
+    const themeCards = themeDefs.map(d => { const a = themeActive === d[0]; return { label: d[0], onPick: () => this.setThemeMode(d[0]),
+      swatch: 'width:100%;height:42px;border-radius:9px;border:1px solid var(--border);background:' + d[1] + ';margin-bottom:9px;display:block;',
+      style: 'display:flex;flex-direction:column;padding:11px;border-radius:13px;border:1.5px solid ' + (a ? 'var(--violet)' : 'var(--border)') + ';background:' + (a ? 'var(--violet-bg)' : 'var(--bg-panel)') + ';cursor:pointer;transition:all .12s;' }; });
+    const otherMap = { workspace: ['Workspace', 'Manage your workspace identity and defaults.', (s.me && s.me.company) || 'Your workspace'], api: ['API Access', 'Programmatic access via REST. Generate a key on your Profile → API Keys.', 'No API key generated yet'], audit: ['Audit Logs', 'A record of recent actions on your account.', String((s.activityData || []).length) + ' events recorded'], integrations: ['Integrations', 'Connected data sources for the agent.', 'Inflectiv · connected'] };
+    const om = otherMap[sec] || ['Settings', '', ''];
+    const settingsNavEl = h('div', { style: { display: 'flex', flexDirection: 'column', gap: 2 } }, snDefs.map(d => {
+      const a = !d[3] && sec === d[0];
+      return h('button', { key: d[0], onClick: d[3] ? () => this.go(d[3]) : () => this.go(secPage(d[0])), style: { display: 'flex', alignItems: 'center', gap: 10, padding: '8px 11px', borderRadius: 9, border: '1px solid ' + (a ? 'var(--violet-border)' : 'transparent'), background: a ? 'var(--violet-bg)' : 'transparent', color: a ? 'var(--violet)' : 'var(--ink-700)', font: (a ? '600' : '500') + " 13px 'Hanken Grotesk',sans-serif", cursor: 'pointer', textAlign: 'left', transition: 'all .12s', width: '100%' } }, h('span', { style: { display: 'flex', color: a ? 'var(--violet)' : 'var(--ink-500)' } }, this.icon(d[2], 15)), d[1]);
+    }));
+    const aiSensSegEl = this.segEl(['Low', 'Medium', 'High'], st.aiSensitivity, x => this.setS('aiSensitivity', x));
+    const kpiSegEl = this.segEl(['Cautious', 'Balanced', 'Bold'], st.kpiAggr, x => this.setS('kpiAggr', x));
+    const verbositySegEl = this.segEl(['Concise', 'Standard', 'Detailed'], st.verbosity, x => this.setS('verbosity', x), 340);
+    const densitySegEl = this.segEl(['Compact', 'Comfortable'], st.density, x => this.setS('density', x), 280);
+    const insightStyleSegEl = this.segEl(['Concise', 'Balanced', 'Detailed'], p.insightStyle, x => this.setP('insightStyle', x));
+    const toneSegEl = this.segEl(['Casual', 'Executive', 'Technical'], p.tone, x => this.setP('tone', x));
+    const themeCardsEl = h('div', { style: { display: 'grid', gridTemplateColumns: 'repeat(3,1fr)', gap: 10, maxWidth: 420 } }, themeDefs.map(d => { const a = themeActive === d[0]; return h('button', { key: d[0], onClick: () => this.setThemeMode(d[0]), style: { display: 'flex', flexDirection: 'column', padding: 11, borderRadius: 13, border: '1.5px solid ' + (a ? 'var(--violet)' : 'var(--border)'), background: a ? 'var(--violet-bg)' : 'var(--bg-panel)', cursor: 'pointer', transition: 'all .12s' } }, h('span', { style: { width: '100%', height: 42, borderRadius: 9, border: '1px solid var(--border)', background: d[1], marginBottom: 9, display: 'block' } }), h('span', { style: { fontSize: 12.5, fontWeight: 600, color: 'var(--ink-900)' } }, d[0])); }));
+    const compFiltersEl = h('div', { style: { display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap' } }, filterDefs.map(fd => {
+      const a = s.compFilter === fd[0]; const cnt = fd[0] === 'all' ? allComps.length : allComps.filter(c => c.cat === fd[0]).length;
+      return h('button', { key: fd[0], onClick: () => this.setFilter(fd[0]), style: { display: 'inline-flex', alignItems: 'center', gap: 7, height: 34, padding: '0 13px', borderRadius: 9, border: '1px solid ' + (a ? 'var(--violet)' : 'var(--border)'), background: a ? 'var(--violet-bg)' : 'var(--bg-panel)', color: a ? 'var(--violet)' : 'var(--ink-700)', font: "600 12.5px 'Hanken Grotesk',sans-serif", cursor: 'pointer', transition: 'all .12s' } }, fd[1], h('span', { style: { fontFamily: "'IBM Plex Mono',monospace", fontSize: 10, color: a ? 'var(--violet)' : 'var(--ink-400)', background: a ? 'var(--bg-panel)' : 'var(--bg-inset)', padding: '1px 6px', borderRadius: 99 } }, cnt));
+    }));
+
+    // ---- admin (real / honest) ----
+    const teamCount = (s.teamData || []).length || 1;
+    const adminStats = [
+      { label: 'Members', value: String(teamCount), delta: '', tint: 'var(--violet-bg)', color: 'var(--violet)', icon: this.icon('team', 15) },
+      { label: 'Datasets', value: String((s.dsData || []).length), delta: '', tint: 'color-mix(in srgb,var(--blue) 14%,transparent)', color: 'var(--blue)', icon: this.icon('grid', 15) },
+      { label: 'AI credits used', value: sd ? String(sd.credits_used) : '0', delta: '', tint: 'var(--emerald-bg)', color: 'var(--emerald-ink)', icon: this.icon('brain', 15) },
+      { label: 'Components', value: sd ? String(sd.components) : '0', delta: '', tint: 'var(--amber-bg)', color: 'var(--amber-ink)', icon: this.icon('datasets', 15) }
+    ];
+    const sevMap = { ok: { ink: 'var(--emerald-ink)', bg: 'var(--emerald-bg)', dot: 'var(--emerald)' }, info: { ink: 'var(--blue)', bg: 'color-mix(in srgb,var(--blue) 13%,transparent)', dot: 'var(--blue)' }, warn: { ink: 'var(--amber-ink)', bg: 'var(--amber-bg)', dot: 'var(--amber)' } };
+    const sevBadge = (sev, type) => 'display:inline-flex;align-items:center;font-size:10.5px;font-weight:600;color:' + sevMap[sev].ink + ';background:' + sevMap[sev].bg + ';padding:3px 9px;border-radius:7px;';
+    const actMeta = { signup: 'Account', login: 'Login', generate: 'Generation', save_dashboard: 'Dashboard', settings_change: 'Settings', credits: 'Usage' };
+    const myEmail = (s.me && s.me.email) || '';
+    const secEvents = ((s.activityData || []).filter(a => a.kind !== 'credits').slice(0, 6).map(a => ({
+      type: actMeta[a.kind] || 'Event', text: (actLabel[a.kind] || a.kind) + (a.detail ? ' · ' + a.detail : ''), meta: myEmail + ' · ' + timeAgo(a.created_at),
+      sev: a.kind === 'login' || a.kind === 'signup' ? 'ok' : 'info', icon: actIcon[a.kind] || 'check'
+    }))).map(e => Object.assign({}, e, { icon: h('span', { style: { display: 'flex' } }, this.icon(e.icon, 15)), tint: sevMap[e.sev].bg, color: sevMap[e.sev].ink, badge: sevBadge(e.sev, e.type) }));
+    const adminCompliance = [];
+    const ctlStatus = (ok) => 'display:inline-flex;align-items:center;gap:5px;font-size:11px;font-weight:600;color:' + (ok ? 'var(--emerald-ink)' : 'var(--ink-500)') + ';background:' + (ok ? 'var(--emerald-bg)' : 'var(--bg-inset)') + ';padding:3px 9px;border-radius:99px;';
+    const orgControls = [
+      { label: 'Workspace', value: (s.me && s.me.company) || '—', status: 'Active', ok: true, icon: 'building' },
+      { label: 'Single Sign-On', value: 'Email + password', status: 'Default', ok: false, icon: 'lock' },
+      { label: 'Data source', value: 'Inflectiv', status: 'Connected', ok: true, icon: 'datasets' },
+      { label: 'Roles', value: 'Owner', status: 'Default', ok: false, icon: 'admin' }
+    ].map(o => Object.assign({}, o, { icon: h('span', { style: { display: 'flex' } }, this.icon(o.icon, 15)), statusStyle: ctlStatus(o.ok), dot: o.ok ? 'var(--emerald)' : 'var(--ink-400)' }));
+    const govPlain = 'font-family:\'IBM Plex Mono\',monospace;font-size:12px;font-weight:600;color:var(--ink-900);';
+    const govBadgeS = 'display:inline-flex;align-items:center;gap:5px;font-size:11px;font-weight:600;color:var(--emerald-ink);background:var(--emerald-bg);padding:3px 9px;border-radius:99px;';
+    const governance = [
+      { label: 'AI model', value: 'Claude (OpenRouter)', valStyle: govPlain },
+      { label: 'Retrieval', value: 'Inflectiv RAG', valStyle: govPlain },
+      { label: 'Min. confidence threshold', value: (st.anomaly || 70) + '%', valStyle: govPlain },
+      { label: 'Provenance', value: 'On every component', valStyle: govBadgeS }
+    ];
+    const deptColors = ['var(--violet)', 'var(--blue)', 'var(--teal)', 'var(--amber)'];
+    const deptUsage = (s.dsData || []).slice(0, 4).map((d, i, arr) => { const mx = Math.max.apply(null, arr.map(x => x.knowledge_source_count || 0)) || 1; return { dept: d.name, pct: Math.round((d.knowledge_source_count || 0) / mx * 100), credits: String(d.knowledge_source_count || 0) + ' src', width: Math.round((d.knowledge_source_count || 0) / mx * 100) + '%', color: deptColors[i % deptColors.length] }; });
+
+    return {
+      theme: s.theme, themeIcon, toggleTheme: () => this.toggleTheme(),
+      isAdmin: s.page === 'admin', adminStats, secEvents, adminCompliance, orgControls, govIcon: this.icon('brain', 15), governance, deptUsage,
+      orgLabel: (s.me && s.me.company) || 'Your workspace', hasCompliance: adminCompliance.length > 0,
+      adminCreditsLabel: (sd ? sd.credits_used : 0) + ' credits used',
+      ghostHover: { background: 'var(--bg-inset)', color: 'var(--ink-900)' },
+      wsHover: { background: 'var(--bg-inset)' }, navHover: { background: 'var(--bg-inset)' },
+      navMain, navOrg,
+      goProfile: () => this.go('profile'), goSettings: () => this.go('settings'),
+      settingsRowStyle: this.navRow(settingsActive), settingsIcon: this.icon('settings', 16), settingsIconColor: settingsActive ? 'var(--violet)' : 'var(--ink-500)', settingsWeight: settingsActive ? 600 : 500,
+      userRowStyle: 'display:flex;align-items:center;gap:10px;width:100%;padding:7px 8px;border-radius:10px;border:1px solid ' + (profileActive ? 'var(--violet-border)' : 'transparent') + ';background:' + (profileActive ? 'var(--violet-bg)' : 'transparent') + ';cursor:pointer;transition:all .12s;',
+
+      isProfile: s.page === 'profile',
+      isComponents: s.page === 'components', compCount: compShown.length, compFlow, compFilters, comps,
+      compCardHover: { boxShadow: 'var(--shadow-md)', borderColor: 'var(--violet-border)', transform: 'translateY(-2px)' },
+      iconBtnHover: { background: 'var(--bg-inset)', color: 'var(--ink-900)' },
+      isTeam: s.page === 'team', teamStats, teamCols, members, sharedRes, permRoles, permRows,
+      memberCountLabel: members.length + (members.length === 1 ? ' member' : ' members'),
+      isBilling: s.page === 'billing', tiers, usageStats, invoices, noInvoices: !invoices.length,
+      billCredits: sd ? (sd.credits_used + ' used') : '0 used',
+      billCreditsPct: Math.min(100, sd ? sd.credits_used * 2 : 0) + '%',
+      billAnalyses: sd ? String(sd.analyses) : '0', billDashboards: sd ? String(sd.dashboards) : '0', billComponents: sd ? String(sd.components) : '0',
+      isSettings: inSettings, settingsNav, cardStyle, labelStyle,
+      aiSensSegEl, kpiSegEl, verbositySegEl, densitySegEl, themeCardsEl, compFiltersEl, insightStyleSegEl, toneSegEl,
+      isSecGeneral: sec === 'general', isSecAI: sec === 'ai', isSecSecurity: sec === 'security', isSecNotif: sec === 'notifications', isSecAppearance: sec === 'appearance',
+      isSecOther: ['workspace', 'api', 'audit', 'integrations'].includes(sec),
+      otherTitle: om[0], otherDesc: om[1], otherRow1: om[2],
+      aiSettingsIcon: this.icon('brain', 16),
+      st_wsName: st.wsName, st_dateFormat: st.dateFormat, st_region: st.region, st_anomaly: st.anomaly, st_forecastConf: st.forecastConf, st_retention: st.retention,
+      onWsName: (e) => this.setS('wsName', e.target.value), onDateFormat: (e) => this.setS('dateFormat', e.target.value), onRegion: (e) => this.setS('region', e.target.value),
+      onAnomaly: (e) => this.setS('anomaly', e.target.value), onForecastConf: (e) => this.setS('forecastConf', e.target.value), onRetention: (e) => this.setS('retention', e.target.value),
+      dateFormats: ['MMM D, YYYY', 'DD/MM/YYYY', 'YYYY-MM-DD'].map(v => ({ v })),
+      regions: ['United States', 'United Kingdom', 'European Union', 'Asia Pacific'].map(v => ({ v })),
+      retentions: ['30 days', '90 days', '1 year', 'Forever'].map(v => ({ v })),
+      aiSensSeg: ['Low', 'Medium', 'High'].map(v => this.seg(v, st.aiSensitivity, (x) => this.setS('aiSensitivity', x))),
+      kpiSeg: ['Cautious', 'Balanced', 'Bold'].map(v => this.seg(v, st.kpiAggr, (x) => this.setS('kpiAggr', x))),
+      verbositySeg: ['Concise', 'Standard', 'Detailed'].map(v => this.seg(v, st.verbosity, (x) => this.setS('verbosity', x))),
+      densitySeg: ['Compact', 'Comfortable'].map(v => this.seg(v, st.density, (x) => this.setS('density', x))),
+      themeCards, notifRows, compliance: ['Encrypted in transit', 'Token-based auth', 'Keys server-side'],
+      twofaToggle: twofa.toggle, twofaThumb: twofa.thumb, on2fa: () => this.toggleS('twofa'),
+      ssoToggle: sso.toggle, ssoThumb: sso.thumb, onSso: () => this.toggleS('sso'),
+      autoCatToggle: autoCat.toggle, autoCatThumb: autoCat.thumb, onAutoCat: () => this.toggleS('autoCat'),
+      isDatasets: s.page === 'datasets',
+      healthIcon: this.icon('admin', 15), health, dsCols, datasets, recommendations,
+      dsScanned: '· scanned across ' + datasets.length + ' connected dataset' + (datasets.length === 1 ? '' : 's'),
+      dsCountLabel: datasets.length + ' dataset' + (datasets.length === 1 ? '' : 's'),
+      recForLabel: (datasets[0] && datasets[0].name) || 'your data',
+      rowHover: { background: 'var(--bg-sub)' }, recHover: { borderColor: 'var(--violet-border)', background: 'var(--violet-bg)' },
+      primaryHover: { filter: 'brightness(1.08)' },
+      isInsights: s.page === 'insights',
+      hasInsights: !!(s.insightData && s.insightData.length),
+      noInsights: !(s.insightData && s.insightData.length),
+      insightItems: (s.insightData || []).map(it => { const sp = it.spec || {}; const ty = sp.type || 'insight'; const tg2 = ty === 'risk' ? { c: 'var(--amber-ink)', b: 'var(--amber-bg)', l: 'Risk' } : ty === 'summary' ? { c: 'var(--blue)', b: 'color-mix(in srgb,var(--blue) 14%,transparent)', l: 'Summary' } : { c: 'var(--emerald-ink)', b: 'var(--emerald-bg)', l: 'Insight' }; return { headline: it.headline || sp.title || 'Insight', body: sp.body || '', typeLabel: tg2.l, tagColor: tg2.c, tagBg: tg2.b, time: timeAgo(it.created_at) }; }),
+      placeholderIcon: this.icon('bookmark', 26),
+
+      userName: p.name || 'You',
+      userInitials: (p.name || 'You').split(' ').filter(Boolean).map(w => w[0]).join('').slice(0, 2).toUpperCase() || 'YO',
+      workspaceName: (s.me && s.me.company) || p.company || 'Workspace',
+      userRoleText: (s.me && s.me.role ? (s.me.role[0].toUpperCase() + s.me.role.slice(1)) : 'Member'),
+      userSubtitle: p.email || '',
+      onLogout: () => this.logout(),
+      goBuilder: () => this.goBuilder(), contactSales: () => this.contactSales(),
+      exportReport: () => this.exportReport(), inviteMember: () => this.inviteMember(),
+      profileNav, profileMeta, stats, activity,
+      aiPrefIcon: this.icon('brain', 16),
+      inputStyle, selectStyle, inputFocus,
+      p_name: p.name, p_dept: p.dept, p_tz: p.tz, p_lang: p.lang, p_ws: p.ws, p_conf: p.conf, p_forecast: p.forecast, forecastLabel,
+      onPName: (e) => this.setP('name', e.target.value), onPDept: (e) => this.setP('dept', e.target.value),
+      onPTz: (e) => this.setP('tz', e.target.value), onPLang: (e) => this.setP('lang', e.target.value), onPWs: (e) => this.setP('ws', e.target.value),
+      onPConf: (e) => this.setP('conf', e.target.value), onPForecast: (e) => this.setP('forecast', e.target.value),
+      tzOptions: ['(GMT-08:00) Pacific Time', '(GMT-05:00) Eastern Time', '(GMT+00:00) UTC', '(GMT+01:00) Central European'].map(v => ({ v })),
+      langOptions: ['English (US)', 'English (UK)', 'Deutsch', 'Français', '日本語'].map(v => ({ v })),
+      wsOptions: [((s.me && s.me.company) || 'Your workspace')].map(v => ({ v })),
+      insightStyleSeg: ['Concise', 'Balanced', 'Detailed'].map(v => this.seg(v, p.insightStyle, (x) => this.setP('insightStyle', x))),
+      toneSeg: ['Casual', 'Executive', 'Technical'].map(v => this.seg(v, p.tone, (x) => this.setP('tone', x)))
+    };
+  }
+}
+</script>
+</body>
+</html>

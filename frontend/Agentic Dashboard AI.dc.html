@@ -1,0 +1,1193 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Newsreader:opsz,wght@6..72,400;6..72,500;6..72,600&family=Hanken+Grotesk:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;}
+html,body{margin:0;padding:0;height:100%;}
+body{font-family:'Hanken Grotesk',system-ui,sans-serif;-webkit-font-smoothing:antialiased;}
+:root{
+ --bg-app:#F4F3EF; --bg-panel:#FFFFFF; --bg-sub:#FAF9F6; --bg-inset:#F2F1EC;
+ --border:#E7E5DE; --border-strong:#D9D6CD;
+ --ink-900:#1B1A17; --ink-700:#46443D; --ink-500:#78766C; --ink-400:#A4A299;
+ --violet:#6E56CF; --violet-bg:#F1EEFB; --violet-border:#DDD6F5;
+ --emerald:#0E9F6E; --emerald-ink:#067A52; --emerald-bg:#E8FAF1;
+ --amber:#D97706; --amber-ink:#B45309; --amber-bg:#FCF4E5;
+ --rose:#E0455C; --rose-bg:#FCEDEE;
+ --teal:#0E9F9A; --blue:#3B6FE0;
+ --shadow-sm:0 1px 2px rgba(28,27,24,.05);
+ --shadow-md:0 6px 20px -6px rgba(28,27,24,.12);
+ --shadow-lg:0 18px 44px -12px rgba(28,27,24,.20);
+ --grid-dot:rgba(120,118,108,.16);
+}
+[data-theme="dark"]{
+ --bg-app:#0D0D10; --bg-panel:#16161A; --bg-sub:#121215; --bg-inset:#1D1D22;
+ --border:#26262D; --border-strong:#34343C;
+ --ink-900:#ECECEF; --ink-700:#B6B6C0; --ink-500:#83838E; --ink-400:#5F5F69;
+ --violet:#9A8BF2; --violet-bg:#201D33; --violet-border:#332C52;
+ --emerald:#34D399; --emerald-ink:#34D399; --emerald-bg:#0F2620;
+ --amber:#FBBF24; --amber-ink:#FBBF24; --amber-bg:#2A2012;
+ --rose:#F4707F; --rose-bg:#2C171B;
+ --teal:#2DD4CE; --blue:#6E9BFF;
+ --shadow-sm:0 1px 2px rgba(0,0,0,.4);
+ --shadow-md:0 8px 24px -8px rgba(0,0,0,.6);
+ --shadow-lg:0 22px 50px -14px rgba(0,0,0,.7);
+ --grid-dot:rgba(200,200,210,.10);
+}
+@keyframes spin{to{transform:rotate(360deg)}}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.35}}
+@keyframes fadeUp{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+@keyframes glowPulse{0%,100%{box-shadow:0 0 0 0 rgba(110,86,207,.28)}50%{box-shadow:0 0 0 5px rgba(110,86,207,0)}}
+@keyframes barGrow{from{transform:scaleY(0)}to{transform:scaleY(1)}}
+::-webkit-scrollbar{width:10px;height:10px}
+::-webkit-scrollbar-thumb{background:rgba(130,128,118,.30);border-radius:9px;border:3px solid transparent;background-clip:content-box}
+::-webkit-scrollbar-thumb:hover{background:rgba(130,128,118,.5);background-clip:content-box}
+::-webkit-scrollbar-track{background:transparent}
+</style>
+</helmet>
+
+<div data-theme="{{ theme }}" style="height:100vh;width:100%;overflow:auto;background:var(--bg-app);color:var(--ink-900);font-family:'Hanken Grotesk',system-ui,sans-serif;">
+<div style="height:100%;min-width:1280px;display:flex;flex-direction:column;background:var(--bg-app);overflow:hidden;">
+
+  <!-- ============ CONNECT OVERLAY ============ -->
+  <sc-if value="{{ needsConnect }}" hint-placeholder-val="{{ false }}">
+    <div style="position:fixed;inset:0;z-index:200;background:rgba(13,13,16,.55);backdrop-filter:blur(6px);display:flex;align-items:center;justify-content:center;padding:24px;">
+      <div style="width:100%;max-width:440px;background:var(--bg-panel);border:1px solid var(--border);border-radius:18px;box-shadow:var(--shadow-lg);padding:28px;animation:fadeUp .25s ease;">
+        <div style="display:flex;align-items:center;gap:11px;margin-bottom:8px;">
+          <div style="width:34px;height:34px;border-radius:10px;background:linear-gradient(150deg,var(--violet),#4D38B0);display:flex;align-items:center;justify-content:center;box-shadow:var(--shadow-sm);">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M12 2.5l2.2 5.6L20 10.3l-5.8 2.2L12 18l-2.2-5.5L4 10.3l5.8-2.2z" fill="#fff"/></svg>
+          </div>
+          <div style="font-family:'Newsreader',serif;font-weight:600;font-size:19px;color:var(--ink-900);flex:1;">Connect your data</div>
+          <sc-if value="{{ canCloseConnect }}" hint-placeholder-val="{{ false }}">
+            <button onMouseDown="{{ closeConnect }}" title="Close" style="width:30px;height:30px;border:1px solid var(--border);border-radius:9px;background:var(--bg-panel);color:var(--ink-500);cursor:pointer;display:flex;align-items:center;justify-content:center;flex:0 0 auto;"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg></button>
+          </sc-if>
+        </div>
+        <p style="margin:0 0 18px;font-size:13px;line-height:1.5;color:var(--ink-500);">Paste your Inflectiv global key, then pick a dataset. Your key stays on the server — the agent queries that dataset to build real, sourced components.</p>
+
+        <!-- stage 1: key -->
+        <sc-if value="{{ connStageKey }}" hint-placeholder-val="{{ false }}">
+          <div>
+            <label style="display:block;font-size:12px;font-weight:600;color:var(--ink-700);margin-bottom:6px;">Global API key</label>
+            <input value="{{ connKey }}" onInput="{{ onConnKey }}" type="password" placeholder="inf_global_…" style="width:100%;height:42px;padding:0 13px;border:1px solid var(--border);border-radius:10px;background:var(--bg-sub);font-family:'IBM Plex Mono',monospace;font-size:12.5px;color:var(--ink-900);outline:none;margin-bottom:14px;" />
+            <sc-if value="{{ hasConnectErr }}" hint-placeholder-val="{{ false }}">
+              <div style="margin-bottom:12px;font-size:12px;line-height:1.45;color:var(--rose);background:var(--rose-bg);border-radius:8px;padding:9px 11px;">{{ connectErr }}</div>
+            </sc-if>
+            <button onMouseDown="{{ loadDatasets }}" style-hover="{{ primaryHover }}" style="width:100%;height:46px;border:none;border-radius:11px;background:var(--violet);color:#fff;font-family:'Hanken Grotesk',sans-serif;font-weight:600;font-size:14px;cursor:pointer;box-shadow:var(--shadow-md);">{{ loadBtnLabel }}</button>
+          </div>
+        </sc-if>
+
+        <!-- stage 2: dataset picker -->
+        <sc-if value="{{ connStageSelect }}" hint-placeholder-val="{{ false }}">
+          <div>
+            <label style="display:block;font-size:12px;font-weight:600;color:var(--ink-700);margin-bottom:6px;">Choose a dataset</label>
+            <select value="{{ connDatasetId }}" onChange="{{ onConnDataset }}" style="width:100%;height:42px;padding:0 13px;border:1px solid var(--border);border-radius:10px;background:var(--bg-sub);font-family:'Hanken Grotesk',sans-serif;font-size:14px;color:var(--ink-900);outline:none;margin-bottom:14px;cursor:pointer;">
+              <sc-for list="{{ connDatasetOptions }}" as="opt" hint-placeholder-count="3">
+                <option value="{{ opt.value }}">{{ opt.label }}</option>
+              </sc-for>
+            </select>
+            <sc-if value="{{ hasConnectErr }}" hint-placeholder-val="{{ false }}">
+              <div style="margin-bottom:12px;font-size:12px;line-height:1.45;color:var(--rose);background:var(--rose-bg);border-radius:8px;padding:9px 11px;">{{ connectErr }}</div>
+            </sc-if>
+            <button onMouseDown="{{ doConnect }}" style-hover="{{ primaryHover }}" style="width:100%;height:46px;border:none;border-radius:11px;background:var(--violet);color:#fff;font-family:'Hanken Grotesk',sans-serif;font-weight:600;font-size:14px;cursor:pointer;box-shadow:var(--shadow-md);">{{ connectBtnLabel }}</button>
+            <button onMouseDown="{{ connBack }}" style="width:100%;height:38px;margin-top:8px;border:none;border-radius:10px;background:transparent;color:var(--ink-500);font-family:'Hanken Grotesk',sans-serif;font-weight:600;font-size:12.5px;cursor:pointer;">← Use a different key</button>
+          </div>
+        </sc-if>
+      </div>
+    </div>
+  </sc-if>
+
+  <!-- ============ TOP BAR ============ -->
+  <div style="height:56px;flex:0 0 auto;display:flex;align-items:center;gap:16px;padding:0 16px;background:var(--bg-panel);border-bottom:1px solid var(--border);position:relative;z-index:40;">
+
+    <!-- brand -->
+    <div style="display:flex;align-items:center;gap:11px;flex:0 0 auto;">
+      <div style="width:30px;height:30px;border-radius:9px;background:linear-gradient(150deg,var(--violet),#4D38B0);display:flex;align-items:center;justify-content:center;box-shadow:var(--shadow-sm);">
+        <svg width="17" height="17" viewBox="0 0 24 24" fill="none"><path d="M12 2.5l2.2 5.6L20 10.3l-5.8 2.2L12 18l-2.2-5.5L4 10.3l5.8-2.2z" fill="#fff"/><circle cx="18.5" cy="5.5" r="1.7" fill="#fff" opacity=".85"/></svg>
+      </div>
+      <div style="display:flex;flex-direction:column;line-height:1;">
+        <span style="font-family:'Newsreader',serif;font-weight:600;font-size:16px;letter-spacing:-.01em;">Agentic</span>
+        <span style="font-family:'IBM Plex Mono',monospace;font-size:8.5px;letter-spacing:.18em;color:var(--ink-400);text-transform:uppercase;margin-top:2px;">Dashboard AI</span>
+      </div>
+      <button onClick="{{ toggleSidebar }}" style-hover="{{ ghostHover }}" style="margin-left:6px;width:28px;height:28px;border-radius:8px;border:1px solid transparent;background:transparent;color:var(--ink-500);display:flex;align-items:center;justify-content:center;cursor:pointer;">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M3.5 6h17M3.5 12h17M3.5 18h17"/></svg>
+      </button>
+    </div>
+
+    <!-- COMMAND BAR -->
+    <div style="flex:1;display:flex;justify-content:center;min-width:0;position:relative;">
+      <div style="width:100%;max-width:720px;position:relative;">
+        <div style="display:flex;align-items:center;gap:10px;height:38px;padding:0 8px 0 13px;background:var(--bg-sub);border:1px solid {{ cmdBorder }};border-radius:11px;box-shadow:{{ cmdShadow }};transition:border-color .18s,box-shadow .18s;">
+          <svg width="17" height="17" viewBox="0 0 24 24" fill="none" style="flex:0 0 auto;color:var(--violet);"><path d="M12 3l1.7 4.3L18 9l-4.3 1.7L12 15l-1.7-4.3L6 9l4.3-1.7z" fill="currentColor"/></svg>
+          <input value="{{ goal }}" onInput="{{ onGoalInput }}" onKeyDown="{{ onGoalKey }}" onFocus="{{ onGoalFocus }}" onBlur="{{ onGoalBlur }}" placeholder="Describe what you want to analyze…" style="flex:1;border:none;outline:none;background:transparent;font-family:'Hanken Grotesk',sans-serif;font-size:14px;color:var(--ink-900);min-width:0;" />
+          <kbd style="font-family:'IBM Plex Mono',monospace;font-size:10px;color:var(--ink-400);border:1px solid var(--border);border-radius:5px;padding:2px 5px;background:var(--bg-panel);flex:0 0 auto;">⌘K</kbd>
+          <button onMouseDown="{{ onGenerate }}" style-hover="{{ primaryHover }}" style="flex:0 0 auto;display:flex;align-items:center;gap:6px;height:28px;padding:0 12px;border:none;border-radius:8px;background:var(--violet);color:#fff;font-family:'Hanken Grotesk',sans-serif;font-weight:600;font-size:12.5px;cursor:pointer;box-shadow:var(--shadow-sm);">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2L4.5 13H11l-1 9 8.5-11H12z" fill="currentColor" stroke="none"/></svg>
+            Generate
+          </button>
+        </div>
+
+        <!-- examples popover -->
+        <sc-if value="{{ showExamples }}" hint-placeholder-val="{{ false }}">
+          <div style="position:absolute;top:46px;left:0;right:0;background:var(--bg-panel);border:1px solid var(--border);border-radius:13px;box-shadow:var(--shadow-lg);padding:8px;z-index:60;animation:fadeUp .16s ease;">
+            <div style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--ink-400);padding:6px 8px 8px;">{{ exampleHeading }}</div>
+            <sc-for list="{{ examples }}" as="ex" hint-placeholder-count="5">
+              <button onMouseDown="{{ ex.onPick }}" style-hover="{{ exHover }}" style="display:flex;align-items:center;gap:11px;width:100%;text-align:left;padding:9px 10px;border:none;border-radius:9px;background:transparent;cursor:pointer;color:var(--ink-700);">
+                <span style="width:26px;height:26px;border-radius:7px;background:var(--violet-bg);color:var(--violet);display:flex;align-items:center;justify-content:center;flex:0 0 auto;">{{ ex.icon }}</span>
+                <span style="font-size:13.5px;color:var(--ink-900);font-weight:500;">{{ ex.text }}</span>
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-left:auto;color:var(--ink-400);"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+              </button>
+            </sc-for>
+          </div>
+        </sc-if>
+      </div>
+    </div>
+
+    <!-- right controls -->
+    <div style="display:flex;align-items:center;gap:6px;flex:0 0 auto;">
+      <button onMouseDown="{{ onLogout }}" title="Log out" style-hover="{{ ghostHover }}" style="width:32px;height:32px;border-radius:9px;border:1px solid transparent;background:transparent;color:var(--ink-500);display:flex;align-items:center;justify-content:center;cursor:pointer;">
+        <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"/><path d="M16 17l5-5-5-5M21 12H9"/></svg>
+      </button>
+      <button onClick="{{ toggleTheme }}" style-hover="{{ ghostHover }}" style="width:32px;height:32px;border-radius:9px;border:1px solid transparent;background:transparent;color:var(--ink-500);display:flex;align-items:center;justify-content:center;cursor:pointer;">
+        {{ themeIcon }}
+      </button>
+      <div style="width:1px;height:22px;background:var(--border);margin:0 4px;"></div>
+      <button onMouseDown="{{ saveDashboard }}" style-hover="{{ primaryHover }}" style="display:flex;align-items:center;gap:7px;height:32px;padding:0 13px;border:none;border-radius:9px;background:var(--ink-900);color:var(--bg-panel);font-family:'Hanken Grotesk',sans-serif;font-weight:600;font-size:12.5px;cursor:pointer;">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21H5a2 2 0 01-2-2V5a2 2 0 012-2h11l5 5v11a2 2 0 01-2 2z"/><path d="M17 21v-8H7v8M7 3v5h8"/></svg>
+        {{ saveLabel }}
+      </button>
+      <div style="width:30px;height:30px;border-radius:99px;background:linear-gradient(135deg,#E8A87C,#C17B5B);display:flex;align-items:center;justify-content:center;color:#fff;font-weight:600;font-size:12px;margin-left:2px;box-shadow:var(--shadow-sm);">AI</div>
+    </div>
+  </div>
+
+  <!-- ============ BODY ============ -->
+  <div style="flex:1;display:flex;min-height:0;">
+
+    <!-- ===== LEFT SIDEBAR ===== -->
+    <sc-if value="{{ sidebarOpen }}" hint-placeholder-val="{{ true }}">
+      <aside style="width:244px;flex:0 0 auto;background:var(--bg-sub);border-right:1px solid var(--border);display:flex;flex-direction:column;min-height:0;">
+        <!-- workspace switcher -->
+        <div style="padding:12px 12px 10px;">
+          <button onMouseDown="{{ openConnect }}" title="Change data source" style-hover="{{ wsHover }}" style="width:100%;display:flex;align-items:center;gap:10px;padding:8px 10px;border:1px solid var(--border);border-radius:10px;background:var(--bg-panel);cursor:pointer;box-shadow:var(--shadow-sm);">
+            <span style="width:26px;height:26px;border-radius:7px;background:linear-gradient(135deg,#1B1A17,#46443D);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:12px;flex:0 0 auto;">N</span>
+            <span style="display:flex;flex-direction:column;line-height:1.15;text-align:left;flex:1;min-width:0;">
+              <span style="font-weight:600;font-size:13px;color:var(--ink-900);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">{{ workspaceName }}</span>
+              <span style="font-size:10.5px;color:var(--ink-500);">Data workspace</span>
+            </span>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color:var(--ink-400);"><path d="M8 9l4-4 4 4M8 15l4 4 4-4"/></svg>
+          </button>
+        </div>
+
+        <div style="flex:1;overflow-y:auto;padding:2px 10px 10px;">
+          <div style="font-family:'IBM Plex Mono',monospace;font-size:9px;letter-spacing:.16em;text-transform:uppercase;color:var(--ink-400);padding:8px 8px 6px;">Workspace</div>
+          <sc-for list="{{ navMain }}" as="n" hint-placeholder-count="4">
+            <button onClick="{{ n.onClick }}" style-hover="{{ n.hoverStyle }}" style="{{ n.rowStyle }}">
+              <span style="display:flex;color:{{ n.iconColor }};flex:0 0 auto;">{{ n.icon }}</span>
+              <span style="flex:1;text-align:left;font-size:13px;font-weight:{{ n.weight }};">{{ n.label }}</span>
+              <sc-if value="{{ n.count }}" hint-placeholder-val="{{ true }}"><span style="{{ n.badgeStyle }}">{{ n.count }}</span></sc-if>
+            </button>
+          </sc-for>
+
+          <div style="font-family:'IBM Plex Mono',monospace;font-size:9px;letter-spacing:.16em;text-transform:uppercase;color:var(--ink-400);padding:16px 8px 6px;">Organization</div>
+          <sc-for list="{{ navOrg }}" as="n" hint-placeholder-count="3">
+            <button onClick="{{ n.onClick }}" style-hover="{{ n.hoverStyle }}" style="{{ n.rowStyle }}">
+              <span style="display:flex;color:{{ n.iconColor }};flex:0 0 auto;">{{ n.icon }}</span>
+              <span style="flex:1;text-align:left;font-size:13px;font-weight:{{ n.weight }};">{{ n.label }}</span>
+              <sc-if value="{{ n.count }}" hint-placeholder-val="{{ false }}"><span style="{{ n.badgeStyle }}">{{ n.count }}</span></sc-if>
+            </button>
+          </sc-for>
+        </div>
+
+        <div style="padding:10px;border-top:1px solid var(--border);display:flex;flex-direction:column;gap:4px;">
+          <button onClick="{{ goSettings }}" style-hover="{{ wsHover }}" style="display:flex;align-items:center;gap:11px;width:100%;padding:8px 10px;border-radius:9px;border:1px solid transparent;background:transparent;color:var(--ink-700);cursor:pointer;">
+            <span style="display:flex;color:var(--ink-500);flex:0 0 auto;">{{ settingsIcon }}</span>
+            <span style="flex:1;text-align:left;font-size:13px;font-weight:500;">Settings</span>
+          </button>
+          <button onClick="{{ goProfile }}" style-hover="{{ wsHover }}" style="display:flex;align-items:center;gap:10px;width:100%;padding:7px 8px;border-radius:10px;border:1px solid transparent;background:transparent;cursor:pointer;">
+            <span style="width:28px;height:28px;border-radius:99px;background:linear-gradient(135deg,#E8A87C,#C17B5B);display:flex;align-items:center;justify-content:center;color:#fff;font-weight:600;font-size:11px;flex:0 0 auto;">AI</span>
+            <span style="display:flex;flex-direction:column;line-height:1.2;text-align:left;flex:1;min-width:0;"><span style="font-size:12.5px;font-weight:600;color:var(--ink-900);">Your workspace</span><span style="font-size:10.5px;color:var(--ink-500);">Connected</span></span>
+          </button>
+        </div>
+      </aside>
+    </sc-if>
+
+    <!-- ===== CENTER WORKSPACE ===== -->
+    <main style="flex:1;display:flex;flex-direction:column;min-width:0;min-height:0;">
+      <!-- toolbar -->
+      <div style="flex:0 0 auto;background:var(--bg-app);border-bottom:1px solid var(--border);padding:12px 20px 0;">
+        <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:16px;">
+          <div style="min-width:0;">
+            <div style="display:flex;align-items:center;gap:10px;">
+              <h1 style="margin:0;font-family:'Newsreader',serif;font-weight:600;font-size:22px;letter-spacing:-.015em;color:var(--ink-900);white-space:nowrap;">{{ boardTitle }}</h1>
+              <span style="display:inline-flex;align-items:center;gap:5px;font-size:11px;font-weight:600;color:var(--emerald-ink);background:var(--emerald-bg);padding:3px 8px;border-radius:99px;"><span style="width:6px;height:6px;border-radius:99px;background:var(--emerald);animation:pulse 1.8s infinite;"></span>Live</span>
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="color:var(--ink-400);"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 013 3L7 19l-4 1 1-4z"/></svg>
+            </div>
+            <div style="display:flex;align-items:center;gap:8px;margin-top:6px;font-size:11.5px;color:var(--ink-500);">
+              <span>{{ boardMeta }}</span>
+            </div>
+          </div>
+          <div style="display:flex;align-items:center;gap:7px;flex:0 0 auto;">
+            <sc-if value="{{ hasSelection }}" hint-placeholder-val="{{ false }}">
+              <div style="display:flex;align-items:center;gap:8px;height:32px;padding:0 6px 0 12px;border-radius:9px;background:var(--violet-bg);border:1px solid var(--violet-border);">
+                <span style="font-size:12px;font-weight:600;color:var(--violet);">{{ selCount }} selected</span>
+                <button onClick="{{ clearSel }}" style="width:22px;height:22px;border:none;border-radius:6px;background:transparent;color:var(--violet);cursor:pointer;display:flex;align-items:center;justify-content:center;"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg></button>
+              </div>
+            </sc-if>
+          </div>
+        </div>
+        <!-- tabs -->
+        <div style="display:flex;gap:2px;margin-top:12px;">
+          <sc-for list="{{ tabs }}" as="t" hint-placeholder-count="4">
+            <button onClick="{{ t.onClick }}" style="{{ t.style }}">{{ t.label }}</button>
+          </sc-for>
+        </div>
+      </div>
+
+      <!-- canvas -->
+      <div onDragOver="{{ onCanvasOver }}" onDrop="{{ onCanvasDrop }}" style="flex:1;overflow-y:auto;position:relative;background-color:var(--bg-app);background-image:radial-gradient(var(--grid-dot) 1.1px,transparent 1.1px);background-size:22px 22px;background-position:-1px -1px;">
+        <div style="padding:18px 20px 80px;display:grid;grid-template-columns:repeat(12,1fr);grid-auto-rows:minmax(10px,auto);gap:14px;">
+          <sc-for list="{{ widgets }}" as="w" hint-placeholder-count="10">
+            <div style="{{ w.spanStyle }}">
+              <div draggable="true" onDragStart="{{ w.onDragStart }}" onClick="{{ w.onSelect }}" style-hover="{{ cardHover }}" style="position:relative;height:100%;background:var(--bg-panel);border:1px solid {{ w.borderColor }};border-radius:14px;padding:15px 16px;box-shadow:{{ w.shadow }};transition:box-shadow .16s,border-color .16s,transform .12s;cursor:pointer;overflow:hidden;display:flex;flex-direction:column;">
+                <div style="flex:1;min-height:0;display:flex;flex-direction:column;">{{ w.preview }}</div>
+                {{ w.cite }}
+                <div style="position:absolute;top:9px;right:9px;display:flex;gap:3px;opacity:.4;transition:opacity .15s;" style-hover="{{ toolbarHover }}">
+                  <button onClick="{{ w.onDup }}" title="Duplicate" style="width:24px;height:24px;border-radius:7px;border:1px solid var(--border);background:var(--bg-panel);color:var(--ink-500);display:flex;align-items:center;justify-content:center;cursor:pointer;box-shadow:var(--shadow-sm);"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15V5a2 2 0 012-2h10"/></svg></button>
+                  <button onClick="{{ w.onRemove }}" title="Remove" style="width:24px;height:24px;border-radius:7px;border:1px solid var(--border);background:var(--bg-panel);color:var(--rose);display:flex;align-items:center;justify-content:center;cursor:pointer;box-shadow:var(--shadow-sm);"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg></button>
+                </div>
+                <sc-if value="{{ w.selected }}" hint-placeholder-val="{{ false }}">
+                  <div style="position:absolute;inset:0;border:2px solid var(--violet);border-radius:14px;pointer-events:none;box-shadow:0 0 0 4px var(--violet-bg);"></div>
+                </sc-if>
+              </div>
+            </div>
+          </sc-for>
+        </div>
+
+        <!-- drop overlay -->
+        <sc-if value="{{ noWidgets }}" hint-placeholder-val="{{ false }}">
+          <div style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;pointer-events:none;color:var(--ink-400);text-align:center;padding:24px;">
+            <div style="width:52px;height:52px;border-radius:14px;background:var(--bg-panel);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;box-shadow:var(--shadow-sm);">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--violet)" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h6v6H4zM14 4h6v6h-6zM14 14h6v6h-6zM4 14h6v6H4z"/></svg>
+            </div>
+            <div style="font-family:'Newsreader',serif;font-size:17px;color:var(--ink-700);">Your dashboard is empty</div>
+            <div style="font-size:12.5px;max-width:340px;line-height:1.5;">Describe what you want to analyze in the command bar, then drag the AI-generated components here.</div>
+            <sc-if value="{{ hasSuggestions }}" hint-placeholder-val="{{ false }}">
+              <div style="margin-top:6px;display:flex;flex-direction:column;align-items:center;gap:9px;pointer-events:auto;">
+                <div style="font-family:'IBM Plex Mono',monospace;font-size:8.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--ink-400);">Recommended for this dataset</div>
+                <div style="display:flex;flex-wrap:wrap;gap:8px;justify-content:center;max-width:480px;">
+                  <sc-for list="{{ examples }}" as="ex" hint-placeholder-count="5">
+                    <button onMouseDown="{{ ex.onPick }}" style-hover="{{ recChipHover }}" style="display:inline-flex;align-items:center;gap:7px;padding:8px 13px;border-radius:99px;border:1px solid var(--border);background:var(--bg-panel);color:var(--ink-700);font-family:'Hanken Grotesk',sans-serif;font-weight:600;font-size:12.5px;cursor:pointer;box-shadow:var(--shadow-sm);">
+                      <span style="display:inline-flex;color:var(--violet);">{{ ex.icon }}</span>{{ ex.text }}
+                    </button>
+                  </sc-for>
+                </div>
+              </div>
+            </sc-if>
+          </div>
+        </sc-if>
+        <sc-if value="{{ dragging }}" hint-placeholder-val="{{ false }}">
+          <div style="position:absolute;inset:12px;border:2px dashed var(--violet);border-radius:18px;background:color-mix(in srgb,var(--violet) 7%,transparent);display:flex;align-items:center;justify-content:center;pointer-events:none;z-index:20;">
+            <div style="display:flex;align-items:center;gap:10px;padding:12px 20px;background:var(--bg-panel);border:1px solid var(--violet-border);border-radius:12px;box-shadow:var(--shadow-lg);">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--violet)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12h14"/></svg>
+              <span style="font-weight:600;font-size:14px;color:var(--ink-900);">Drop to add to dashboard</span>
+            </div>
+          </div>
+        </sc-if>
+      </div>
+    </main>
+
+    <!-- ===== AI AGENT PANEL ===== -->
+    <sc-if value="{{ aiOpen }}" hint-placeholder-val="{{ true }}">
+      <aside style="width:372px;flex:0 0 auto;background:var(--bg-panel);border-left:1px solid var(--border);display:flex;flex-direction:column;min-height:0;">
+        <!-- header -->
+        <div style="padding:14px 16px 12px;border-bottom:1px solid var(--border);">
+          <div style="display:flex;align-items:center;gap:11px;">
+            <div style="position:relative;width:34px;height:34px;border-radius:10px;background:linear-gradient(150deg,var(--violet),#4D38B0);display:flex;align-items:center;justify-content:center;flex:0 0 auto;animation:glowPulse 2.6s infinite;">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3a3 3 0 00-3 3 3 3 0 00-2 5.2A3 3 0 009 17h6a3 3 0 002-5.8A3 3 0 0015 6a3 3 0 00-3-3z"/><path d="M12 8v9M9 12h6"/></svg>
+              <span style="position:absolute;bottom:-2px;right:-2px;width:11px;height:11px;border-radius:99px;background:var(--emerald);border:2px solid var(--bg-panel);"></span>
+            </div>
+            <div style="flex:1;min-width:0;">
+              <div style="display:flex;align-items:center;gap:7px;">
+                <span style="font-family:'Newsreader',serif;font-weight:600;font-size:15.5px;color:var(--ink-900);">AI Agent</span>
+                <span style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;color:var(--violet);background:var(--violet-bg);padding:2px 6px;border-radius:5px;">live</span>
+              </div>
+              <div style="font-size:11px;color:var(--ink-500);margin-top:1px;">{{ agentStatus }}</div>
+            </div>
+            <button onMouseDown="{{ goSettings }}" title="AI agent settings" style-hover="{{ ghostHover }}" style="width:28px;height:28px;border-radius:8px;border:1px solid transparent;background:transparent;color:var(--ink-500);display:flex;align-items:center;justify-content:center;cursor:pointer;"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="2.5"/><path d="M19 12a7 7 0 00-.1-1.2l2-1.6-2-3.4-2.4 1a7 7 0 00-2-1.2l-.4-2.6H8.9l-.4 2.6a7 7 0 00-2 1.2l-2.4-1-2 3.4 2 1.6A7 7 0 004 12a7 7 0 00.1 1.2l-2 1.6 2 3.4 2.4-1a7 7 0 002 1.2l.4 2.6h4.2l.4-2.6a7 7 0 002-1.2l2.4 1 2-3.4-2-1.6c.1-.4.1-.8.1-1.2z" stroke-linejoin="round"/></svg></button>
+          </div>
+
+          <!-- workflow stepper -->
+          <div style="display:flex;align-items:center;gap:0;margin-top:14px;">
+            <sc-for list="{{ workflow }}" as="step" hint-placeholder-count="6">
+              <div style="display:flex;align-items:center;flex:{{ step.flex }};min-width:0;">
+                <div title="{{ step.label }}" style="width:9px;height:9px;border-radius:99px;background:{{ step.dot }};flex:0 0 auto;box-shadow:{{ step.glow }};"></div>
+                <sc-if value="{{ step.line }}" hint-placeholder-val="{{ true }}"><div style="flex:1;height:2px;background:{{ step.lineColor }};margin:0 3px;border-radius:9px;"></div></sc-if>
+              </div>
+            </sc-for>
+          </div>
+          <div style="display:flex;justify-content:space-between;margin-top:6px;font-family:'IBM Plex Mono',monospace;font-size:8.5px;letter-spacing:.04em;color:var(--ink-400);text-transform:uppercase;">
+            <span>Raw data</span><span style="color:var(--violet);">Components</span><span>Dashboard</span>
+          </div>
+        </div>
+
+        <div style="flex:1;overflow-y:auto;padding:14px 16px 16px;">
+
+          <!-- data source -->
+          <div style="display:flex;align-items:center;gap:10px;padding:10px 12px;border:1px solid var(--border);border-radius:11px;background:var(--bg-sub);margin-bottom:14px;">
+            <span style="width:30px;height:30px;border-radius:8px;background:var(--violet-bg);color:var(--violet);display:flex;align-items:center;justify-content:center;flex:0 0 auto;"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><ellipse cx="12" cy="5" rx="8" ry="3"/><path d="M4 5v14c0 1.7 3.6 3 8 3s8-1.3 8-3V5"/><path d="M4 12c0 1.7 3.6 3 8 3s8-1.3 8-3"/></svg></span>
+            <div style="flex:1;min-width:0;">
+              <div style="font-family:'IBM Plex Mono',monospace;font-size:8.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-400);">Data source</div>
+              <div style="font-size:12.5px;font-weight:600;color:var(--ink-900);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">{{ dataSourceLabel }}</div>
+            </div>
+            <button onMouseDown="{{ openConnect }}" style-hover="{{ iconBtnHover }}" style="height:28px;padding:0 12px;border:1px solid var(--border);border-radius:8px;background:var(--bg-panel);color:var(--ink-700);font-family:'Hanken Grotesk',sans-serif;font-weight:600;font-size:11.5px;cursor:pointer;flex:0 0 auto;">Change</button>
+          </div>
+
+          <!-- goal echo / thinking -->
+          <sc-if value="{{ showActivity }}" hint-placeholder-val="{{ false }}">
+            <div style="border:1px solid var(--violet-border);border-radius:13px;background:linear-gradient(180deg,var(--violet-bg),transparent);padding:13px 14px;margin-bottom:16px;">
+              <div style="display:flex;align-items:flex-start;gap:9px;">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" style="color:var(--violet);flex:0 0 auto;margin-top:2px;"><path d="M12 3l1.5 4L18 8.5 14 10l-2 4-2-4-4-1.5L10 7z" fill="currentColor"/></svg>
+                <div style="flex:1;min-width:0;">
+                  <div style="font-size:10px;font-family:'IBM Plex Mono',monospace;letter-spacing:.1em;text-transform:uppercase;color:var(--violet);margin-bottom:3px;">Analyzing goal</div>
+                  <div style="font-family:'Newsreader',serif;font-size:14.5px;line-height:1.35;color:var(--ink-900);">{{ goal }}</div>
+                </div>
+              </div>
+              <div style="margin-top:12px;display:flex;flex-direction:column;gap:9px;">
+                <sc-for list="{{ thinkSteps }}" as="ts" hint-placeholder-count="3">
+                  <div style="display:flex;align-items:center;gap:9px;animation:fadeUp .25s ease;">
+                    <span style="flex:0 0 auto;width:16px;height:16px;display:flex;align-items:center;justify-content:center;">{{ ts.mark }}</span>
+                    <span style="font-size:12px;color:{{ ts.color }};font-family:'IBM Plex Mono',monospace;letter-spacing:-.01em;">{{ ts.t }}</span>
+                  </div>
+                </sc-for>
+              </div>
+            </div>
+          </sc-if>
+
+          <!-- drafts header -->
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:11px;">
+            <div style="display:flex;align-items:center;gap:8px;">
+              <span style="font-family:'Newsreader',serif;font-weight:600;font-size:15px;color:var(--ink-900);">Component Drafts</span>
+              <span style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--ink-500);background:var(--bg-inset);padding:2px 7px;border-radius:99px;">{{ draftCount }}</span>
+            </div>
+            <button onMouseDown="{{ goComponents }}" style-hover="{{ linkHover }}" style="border:none;background:transparent;color:var(--violet);font-weight:600;font-size:12px;cursor:pointer;padding:2px 4px;">Review all</button>
+          </div>
+          <div style="font-size:11.5px;color:var(--ink-500);line-height:1.5;margin-bottom:13px;display:flex;align-items:flex-start;gap:6px;">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex:0 0 auto;margin-top:2px;color:var(--ink-400);"><circle cx="12" cy="12" r="9"/><path d="M12 16v-4M12 8h.01"/></svg>
+            <span>Agent-generated assets stay here for review. Drag any draft onto the canvas — nothing is added automatically.</span>
+          </div>
+
+          <!-- draft cards -->
+          <div style="display:flex;flex-direction:column;gap:11px;">
+            <sc-for list="{{ drafts }}" as="d" hint-placeholder-count="4">
+              <div draggable="true" onDragStart="{{ d.onDragStart }}" onDragEnd="{{ d.onDragEnd }}" style-hover="{{ draftHover }}" style="border:1px solid var(--border);border-radius:13px;background:var(--bg-panel);box-shadow:var(--shadow-sm);overflow:hidden;cursor:grab;transition:box-shadow .16s,border-color .16s,transform .12s;animation:fadeUp .3s ease;{{ d.newStyle }}">
+                <!-- thumbnail -->
+                <div style="position:relative;height:96px;background:var(--bg-inset);border-bottom:1px solid var(--border);overflow:hidden;padding:11px 12px;">
+                  {{ d.thumb }}
+                  <div style="position:absolute;top:8px;right:8px;display:flex;align-items:center;gap:5px;background:var(--bg-panel);border:1px solid var(--border);border-radius:99px;padding:2px 4px 2px 7px;box-shadow:var(--shadow-sm);">
+                    <span style="font-family:'IBM Plex Mono',monospace;font-size:10px;font-weight:600;color:{{ d.confColor }};">{{ d.confLabel }}</span>
+                    {{ d.ring }}
+                  </div>
+                  <span style="position:absolute;top:8px;left:8px;display:flex;align-items:center;gap:5px;background:var(--bg-panel);border:1px solid var(--border);border-radius:7px;padding:2px 7px;font-family:'IBM Plex Mono',monospace;font-size:9.5px;color:var(--ink-500);text-transform:uppercase;letter-spacing:.04em;box-shadow:var(--shadow-sm);">{{ d.typeIcon }}{{ d.typeLabel }}</span>
+                </div>
+                <!-- meta -->
+                <div style="padding:11px 12px 12px;">
+                  <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:8px;">
+                    <span style="font-weight:600;font-size:13.5px;color:var(--ink-900);line-height:1.25;">{{ d.title }}</span>
+                    <button onClick="{{ d.onFav }}" style="flex:0 0 auto;width:24px;height:24px;border:none;border-radius:6px;background:transparent;cursor:pointer;display:flex;align-items:center;justify-content:center;color:{{ d.favColor }};">{{ d.favIcon }}</button>
+                  </div>
+                  <div style="display:flex;align-items:center;gap:6px;margin-top:5px;font-family:'IBM Plex Mono',monospace;font-size:10px;color:var(--ink-400);">
+                    <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><ellipse cx="12" cy="5" rx="8" ry="3"/><path d="M4 5v14c0 1.7 3.6 3 8 3s8-1.3 8-3V5"/></svg>
+                    <span>{{ d.source }}</span><span>·</span><span>{{ d.time }}</span>
+                    <span style="margin-left:auto;">{{ d.groundChip }}</span>
+                  </div>
+                  {{ d.provenance }}
+                  <div style="display:flex;align-items:center;gap:5px;margin-top:11px;">
+                    <button onClick="{{ d.onAdd }}" style-hover="{{ primaryHover }}" style="flex:1;display:flex;align-items:center;justify-content:center;gap:6px;height:30px;border:none;border-radius:8px;background:var(--violet);color:#fff;font-family:'Hanken Grotesk',sans-serif;font-weight:600;font-size:12px;cursor:pointer;">
+                      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>Add to dashboard
+                    </button>
+                    <button title="Edit" style-hover="{{ iconBtnHover }}" style="width:30px;height:30px;flex:0 0 auto;border:1px solid var(--border);border-radius:8px;background:var(--bg-panel);color:var(--ink-500);cursor:pointer;display:flex;align-items:center;justify-content:center;"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 013 3L7 19l-4 1 1-4z"/></svg></button>
+                    <button title="Duplicate" style-hover="{{ iconBtnHover }}" style="width:30px;height:30px;flex:0 0 auto;border:1px solid var(--border);border-radius:8px;background:var(--bg-panel);color:var(--ink-500);cursor:pointer;display:flex;align-items:center;justify-content:center;"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15V5a2 2 0 012-2h10"/></svg></button>
+                    <button onClick="{{ d.onDelete }}" title="Delete" style-hover="{{ iconBtnHover }}" style="width:30px;height:30px;flex:0 0 auto;border:1px solid var(--border);border-radius:8px;background:var(--bg-panel);color:var(--ink-500);cursor:pointer;display:flex;align-items:center;justify-content:center;"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18M8 6V4h8v2M19 6l-1 14H6L5 6"/></svg></button>
+                  </div>
+                </div>
+              </div>
+            </sc-for>
+          </div>
+        </div>
+
+        <!-- agent input -->
+        <div style="padding:12px 14px;border-top:1px solid var(--border);background:var(--bg-sub);">
+          <div style="display:flex;align-items:center;gap:9px;height:38px;padding:0 8px 0 12px;background:var(--bg-panel);border:1px solid var(--border);border-radius:10px;">
+            <input value="{{ followup }}" onInput="{{ onFollowInput }}" onKeyDown="{{ onFollowKey }}" placeholder="Refine, ask, or steer the agent…" style="flex:1;border:none;outline:none;background:transparent;font-family:'Hanken Grotesk',sans-serif;font-size:13px;color:var(--ink-900);min-width:0;" />
+            <button onMouseDown="{{ onFollowSend }}" style-hover="{{ primaryHover }}" style="width:28px;height:28px;border:none;border-radius:7px;background:var(--violet);color:#fff;cursor:pointer;display:flex;align-items:center;justify-content:center;flex:0 0 auto;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></button>
+          </div>
+        </div>
+      </aside>
+    </sc-if>
+
+    <!-- collapsed AI rail -->
+    <sc-if value="{{ aiClosed }}" hint-placeholder-val="{{ false }}">
+      <aside style="width:54px;flex:0 0 auto;background:var(--bg-panel);border-left:1px solid var(--border);display:flex;flex-direction:column;align-items:center;padding:12px 0;gap:10px;">
+        <button onClick="{{ toggleAi }}" style="position:relative;width:34px;height:34px;border-radius:10px;background:linear-gradient(150deg,var(--violet),#4D38B0);border:none;display:flex;align-items:center;justify-content:center;cursor:pointer;animation:glowPulse 2.6s infinite;">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3a3 3 0 00-3 3 3 3 0 00-2 5.2A3 3 0 009 17h6a3 3 0 002-5.8A3 3 0 0015 6a3 3 0 00-3-3z"/><path d="M12 8v9M9 12h6"/></svg>
+          <span style="position:absolute;top:-3px;right:-3px;min-width:16px;height:16px;border-radius:99px;background:var(--emerald);color:#fff;font-size:9px;font-weight:700;display:flex;align-items:center;justify-content:center;border:2px solid var(--bg-panel);">{{ draftCount }}</span>
+        </button>
+        <div style="font-family:'IBM Plex Mono',monospace;font-size:9px;color:var(--ink-400);writing-mode:vertical-rl;letter-spacing:.1em;margin-top:6px;">AGENT</div>
+      </aside>
+    </sc-if>
+  </div>
+</div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+const h = React.createElement;
+const BACKEND = '/api';
+function authHeaders() { const hd = { 'Content-Type': 'application/json' }; try { const t = localStorage.getItem('ada-token'); if (t) hd['Authorization'] = 'Bearer ' + t; } catch (x) {} return hd; }
+
+class Component extends DCLogic {
+  state = {
+    connected: false, connecting: false, connectErr: '', connKey: '', connName: '',
+    connStage: 'key', connDatasets: [], connDatasetId: '', connLoading: false, showConnect: false,
+    sessionId: null, datasetId: null, datasetName: '', usedBackend: false, suggestedQueries: [], savedFlash: false,
+    theme: 'light', goal: '', followup: '', focused: false,
+    phase: 'idle', thinkSteps: [], dragging: false, dragDraft: null,
+    sidebarOpen: true, aiOpen: true, activeNav: 'library', activeTab: 'overview',
+    selected: [], newIds: [],
+    drafts: [],
+    widgets: []
+  };
+  timers = [];
+  componentDidMount() { try { const t = localStorage.getItem('ada-theme'); if (t === 'dark' || t === 'light') this.setState({ theme: t }); } catch (x) {} this.restoreConnection(); }
+  componentWillUnmount() { this.timers.forEach(clearTimeout); }
+  async restoreConnection() {
+    // 1) logged-in user with a stored Inflectiv key → auto-connect, no overlay
+    let token = null; try { token = localStorage.getItem('ada-token'); } catch (x) {}
+    if (token) {
+      try {
+        const me = await fetch(BACKEND + '/me', { headers: authHeaders() }).then(r => r.ok ? r.json() : null);
+        if (me && me.user && me.user.inflectiv_dataset_id) {
+          this.setState({ connected: true, usedBackend: true, datasetName: me.user.inflectiv_dataset_name || '' });
+          const data = await fetch(BACKEND + '/session', { method: 'POST', headers: authHeaders(), body: '{}' }).then(r => r.json());
+          this.setState({ sessionId: data.session_id, datasetId: data.dataset_id, datasetName: data.dataset_name || '', suggestedQueries: data.suggested_queries || [] });
+          this.loadDashboardFromUrl();
+          return;
+        }
+      } catch (x) {}
+    }
+    // 2) fallback: per-tab Connect persisted to localStorage
+    let saved = null;
+    try { saved = JSON.parse(localStorage.getItem('ada-conn') || 'null'); } catch (x) {}
+    if (!saved || !saved.datasetId) return;
+    this.setState({ connected: true, usedBackend: true, connKey: saved.key || '', datasetId: saved.datasetId, datasetName: saved.datasetName || '' });
+    try {
+      const res = await fetch(BACKEND + '/session', { method: 'POST', headers: authHeaders(), body: JSON.stringify({ global_key: saved.key || '', dataset_id: saved.datasetId }) });
+      const data = await res.json();
+      if (res.ok) this.setState({ sessionId: data.session_id, datasetName: data.dataset_name || saved.datasetName || '', suggestedQueries: data.suggested_queries || [] });
+    } catch (x) {}
+    this.loadDashboardFromUrl();
+  }
+  async loadDashboardFromUrl() {
+    let id = null; try { id = new URLSearchParams(location.search).get('dash'); } catch (x) {}
+    if (!id) { this.restoreWorkspace(); return; }
+    try {
+      const d = await fetch(BACKEND + '/dashboards/' + id, { headers: authHeaders() }).then(r => r.ok ? r.json() : null);
+      if (d && d.widgets) this.setState({ widgets: d.widgets.map(w => Object.assign({}, w, { id: w.id || this.uid() })) });
+    } catch (x) {}
+  }
+  // ---- live workspace persistence (survives refresh / other tabs) ----
+  async restoreWorkspace() {
+    let token = null; try { token = localStorage.getItem('ada-token'); } catch (x) {}
+    let ws = null;
+    if (token) {
+      try { ws = await fetch(BACKEND + '/workspace', { headers: authHeaders() }).then(r => r.ok ? r.json() : null).then(d => d && d.workspace); } catch (x) {}
+    }
+    if (!ws || (!(ws.widgets || []).length && !(ws.drafts || []).length)) {
+      try { ws = JSON.parse(localStorage.getItem('ada-workspace') || 'null'); } catch (x) { ws = null; }
+    }
+    if (ws && ((ws.widgets || []).length || (ws.drafts || []).length)) {
+      this.setState({
+        widgets: (ws.widgets || []).map(w => Object.assign({}, w, { id: w.id || this.uid() })),
+        drafts: (ws.drafts || []),
+        phase: (ws.drafts || []).length ? 'ready' : this.state.phase
+      });
+    }
+  }
+  scheduleSave() {
+    clearTimeout(this._saveT);
+    this._saveT = setTimeout(() => this.persistWorkspace(), 700);
+    this.timers.push(this._saveT);
+  }
+  persistWorkspace() {
+    const body = { widgets: this.state.widgets, drafts: this.state.drafts };
+    try { localStorage.setItem('ada-workspace', JSON.stringify(body)); } catch (x) {}
+    let token = null; try { token = localStorage.getItem('ada-token'); } catch (x) {}
+    if (token) { try { fetch(BACKEND + '/workspace', { method: 'PUT', headers: authHeaders(), body: JSON.stringify(body) }); } catch (x) {} }
+  }
+  async saveDashboard() {
+    if (!this.state.widgets.length) { this.pushStep('Nothing to save — add components first', 'done'); return; }
+    const name = (this.state.datasetName ? this.state.datasetName + ' — dashboard' : 'My dashboard');
+    try {
+      const res = await fetch(BACKEND + '/dashboards', { method: 'POST', headers: authHeaders(), body: JSON.stringify({ name: name, widgets: this.state.widgets, dataset_id: this.state.datasetId, dataset_name: this.state.datasetName }) });
+      if (res.ok) { this.setState({ savedFlash: true }); this.timers.push(setTimeout(() => this.setState({ savedFlash: false }), 1800)); }
+    } catch (x) {}
+  }
+  uid() { return 'x' + Math.random().toString(36).slice(2, 8); }
+
+  // ---------------- math / geometry ----------------
+  rng(seed) { let s = (Math.abs(seed) * 2654435761) % 2147483647; if (s <= 0) s += 2147483646; return () => (s = s * 16807 % 2147483647) / 2147483647; }
+  hash(str) { let hsh = 0; str = String(str); for (let i = 0; i < str.length; i++) hsh = (hsh * 31 + str.charCodeAt(i)) | 0; return hsh; }
+  series(n, seed, opt) {
+    opt = opt || {}; const r = this.rng(seed); const base = opt.base || 50, trend = opt.trend == null ? 0.7 : opt.trend, vol = opt.vol == null ? 0.22 : opt.vol;
+    let v = base * 0.65; const out = [];
+    for (let i = 0; i < n; i++) { v += (trend * base / n) + (r() - 0.5) * vol * base; v = Math.max(base * 0.18, v); out.push(v); }
+    return out;
+  }
+  pts(data, w, hh, pad) {
+    const max = Math.max.apply(null, data), min = Math.min.apply(null, data), span = (max - min) || 1;
+    const X = i => pad + i * (w - 2 * pad) / (data.length - 1), Y = v => hh - pad - (v - min) / span * (hh - 2 * pad);
+    return data.map((v, i) => [X(i), Y(v)]);
+  }
+  smooth(p) {
+    if (!p.length) return ''; if (p.length < 3) return 'M' + p.map(q => q.join(',')).join(' L');
+    let d = 'M' + p[0][0] + ',' + p[0][1];
+    for (let i = 0; i < p.length - 1; i++) {
+      const p0 = p[i - 1] || p[i], p1 = p[i], p2 = p[i + 1], p3 = p[i + 2] || p2;
+      const c1x = p1[0] + (p2[0] - p0[0]) / 6, c1y = p1[1] + (p2[1] - p0[1]) / 6, c2x = p2[0] - (p3[0] - p1[0]) / 6, c2y = p2[1] - (p3[1] - p1[1]) / 6;
+      d += ' C' + c1x + ',' + c1y + ' ' + c2x + ',' + c2y + ' ' + p2[0] + ',' + p2[1];
+    }
+    return d;
+  }
+  fonts() { return { serif: "'Newsreader',Georgia,serif", sans: "'Hanken Grotesk',system-ui,sans-serif", mono: "'IBM Plex Mono',monospace" }; }
+  noData(o, mini) {
+    const f = this.fonts();
+    const icon = h('svg', { width: mini ? 18 : 22, height: mini ? 18 : 22, viewBox: '0 0 24 24', fill: 'none', stroke: 'currentColor', strokeWidth: 1.6, strokeLinecap: 'round', strokeLinejoin: 'round' }, h('path', { d: 'M4 19V5M4 19h16M8 16v-4M12 16V8M16 16v-6' }));
+    const inner = h('div', { style: { display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 6, height: '100%', minHeight: mini ? 0 : 70, color: 'var(--ink-400)', textAlign: 'center' } },
+      icon, !mini ? h('span', { style: { font: '500 11.5px ' + f.sans } }, o.body || o.headline || 'No data retrieved for this view') : null);
+    if (mini) return inner;
+    return h('div', { style: { display: 'flex', flexDirection: 'column', height: '100%' } }, o.title ? this.chead(o.title, o.source) : null, h('div', { style: { flex: 1, minHeight: 0, display: 'flex' } }, inner));
+  }
+
+  // ---------------- icons ----------------
+  ic(d, size, sw) { return h('svg', { width: size || 17, height: size || 17, viewBox: '0 0 24 24', fill: 'none', stroke: 'currentColor', strokeWidth: sw || 1.8, strokeLinecap: 'round', strokeLinejoin: 'round' }, d.map((p, i) => h('path', { key: i, d: p }))); }
+  icon(name, size) {
+    const M = {
+      library: ['M4 4h6v6H4zM14 4h6v6h-6zM14 14h6v6h-6zM4 14h6v6H4z'],
+      datasets: ['M4 6c0 1.7 3.6 3 8 3s8-1.3 8-3-3.6-3-8-3-8 1.3-8 3z', 'M4 6v6c0 1.7 3.6 3 8 3s8-1.3 8-3V6', 'M4 12v6c0 1.7 3.6 3 8 3s8-1.3 8-3v-6'],
+      components: ['M12 3l1.7 4.3L18 9l-4.3 1.7L12 15l-1.7-4.3L6 9l4.3-1.7z', 'M6 18.5h.01', 'M18.5 17h.01'],
+      insights: ['M6 3h12v18l-6-4-6 4z'],
+      templates: ['M4 4h16v5H4z', 'M4 12h7v8H4z', 'M14 12h6v8h-6z'],
+      teams: ['M16 19v-2a4 4 0 00-4-4H6a4 4 0 00-4 4v2', 'M9 9a3.5 3.5 0 100-7 3.5 3.5 0 000 7z', 'M22 19v-2a4 4 0 00-3-3.8', 'M16 2.2A3.5 3.5 0 0116 9'],
+      bar: ['M5 21V10', 'M12 21V4', 'M19 21v-7'],
+      trend: ['M3 17l6-6 4 4 7-8', 'M17 7h4v4'],
+      table: ['M4 5h16v14H4z', 'M4 10h16', 'M10 5v14'],
+      alert: ['M12 4l9 16H3z', 'M12 10v4', 'M12 17.5h.01'],
+      file: ['M14 3H7a2 2 0 00-2 2v14a2 2 0 002 2h10a2 2 0 002-2V8z', 'M14 3v5h5'],
+      forecast: ['M3 12c4-6 6-6 9 0s5 6 9 0', 'M3 18h18'],
+      star: ['M12 3l2.6 5.6 6 .7-4.4 4.1 1.2 6L12 16.8 6.6 19.4l1.2-6L3.4 9.3l6-.7z'],
+      billing: ['M3 6h18v12H3z', 'M3 10h18'],
+      admin: ['M12 3l7 3v5c0 5-3.5 8.5-7 10-3.5-1.5-7-5-7-10V6z', 'M9 12l2 2 4-4'],
+      settings: ['M12 9.5a2.5 2.5 0 100 5 2.5 2.5 0 000-5z', 'M19 12a7 7 0 00-.1-1.2l2-1.6-2-3.4-2.4 1a7 7 0 00-2-1.2l-.4-2.6H8.9l-.4 2.6a7 7 0 00-2 1.2l-2.4-1-2 3.4 2 1.6A7 7 0 004 12a7 7 0 00.1 1.2l-2 1.6 2 3.4 2.4-1a7 7 0 002 1.2l.4 2.6h4.2l.4-2.6a7 7 0 002-1.2l2.4 1 2-3.4-2-1.6c.1-.4.1-.8.1-1.2z']
+    };
+    return this.ic(M[name] || M.library, size || 17, 1.8);
+  }
+  typeMeta(t) {
+    const m = {
+      kpi: { l: 'KPI', i: 'trend' }, line: { l: 'Line', i: 'trend' }, area: { l: 'Area', i: 'trend' },
+      bar: { l: 'Bar', i: 'bar' }, donut: { l: 'Donut', i: 'components' }, funnel: { l: 'Funnel', i: 'bar' },
+      heatmap: { l: 'Heatmap', i: 'table' }, forecast: { l: 'Forecast', i: 'forecast' }, insight: { l: 'Insight', i: 'insights' },
+      risk: { l: 'Risk', i: 'alert' }, summary: { l: 'Summary', i: 'file' }, table: { l: 'Table', i: 'table' }
+    };
+    return m[t] || { l: 'Widget', i: 'components' };
+  }
+
+  // ---------------- chart pieces ----------------
+  deltaBadge(text, tone) {
+    const col = tone === 'warn' ? 'var(--amber-ink)' : tone === 'neg' ? 'var(--rose)' : 'var(--emerald-ink)';
+    const bg = tone === 'warn' ? 'var(--amber-bg)' : tone === 'neg' ? 'var(--rose-bg)' : 'var(--emerald-bg)';
+    const up = !(tone === 'warn' || tone === 'neg');
+    const f = this.fonts();
+    return h('span', { style: { display: 'inline-flex', alignItems: 'center', gap: 3, font: '600 11px ' + f.mono, color: col, background: bg, padding: '2px 7px', borderRadius: 6 } }, (up ? '▲ ' : '▼ ') + text);
+  }
+  chead(title, source, right) {
+    const f = this.fonts();
+    return h('div', { style: { display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 10, gap: 8 } },
+      h('div', { style: { minWidth: 0 } },
+        h('div', { style: { font: '500 14px/1.2 ' + f.serif, color: 'var(--ink-900)' } }, title),
+        source ? h('div', { style: { display: 'flex', alignItems: 'center', gap: 5, marginTop: 3 } },
+          h('span', { style: { width: 5, height: 5, borderRadius: 99, background: 'var(--ink-400)' } }),
+          h('span', { style: { font: '500 10.5px ' + f.mono, color: 'var(--ink-500)' } }, source)) : null),
+      right || null);
+  }
+  ringEl(pct) {
+    const r = 7, C = 2 * Math.PI * r, col = pct >= 90 ? 'var(--emerald)' : pct >= 80 ? 'var(--violet)' : 'var(--amber)';
+    return h('svg', { width: 18, height: 18, viewBox: '0 0 18 18' },
+      h('circle', { cx: 9, cy: 9, r: r, fill: 'none', stroke: 'var(--border)', strokeWidth: 2.5 }),
+      h('circle', { cx: 9, cy: 9, r: r, fill: 'none', stroke: col, strokeWidth: 2.5, strokeLinecap: 'round', strokeDasharray: (pct / 100 * C) + ' ' + C, transform: 'rotate(-90 9 9)' }));
+  }
+
+  kpi(o, mini) {
+    const f = this.fonts();
+    if (o.value == null && !(o.series && o.series.length > 1)) return this.noData(o, mini);
+    const warn = o.tone === 'warn', neg = o.tone === 'neg';
+    const col = warn ? 'var(--amber)' : neg ? 'var(--rose)' : 'var(--emerald)';
+    const cbg = warn ? 'var(--amber-bg)' : neg ? 'var(--rose-bg)' : 'var(--emerald-bg)';
+    const hasSpark = o.series && o.series.length > 1;
+    let sparkEl = null;
+    if (hasSpark) {
+      const W = mini ? 130 : 170, Hh = mini ? 30 : 40, P = this.pts(o.series, W, Hh, 3), gid = 'kg' + (o.id || this.hash(o.label || 'k'));
+      sparkEl = h('svg', { viewBox: '0 0 ' + W + ' ' + Hh, preserveAspectRatio: 'none', style: { width: '100%', height: mini ? 26 : 40, display: 'block' } },
+        h('defs', null, h('linearGradient', { id: gid, x1: 0, y1: 0, x2: 0, y2: 1 }, h('stop', { offset: '0%', stopColor: col, stopOpacity: 0.2 }), h('stop', { offset: '100%', stopColor: col, stopOpacity: 0 }))),
+        h('path', { d: this.smooth(P) + ' L' + P[P.length - 1][0] + ',' + Hh + ' L' + P[0][0] + ',' + Hh + ' Z', fill: 'url(#' + gid + ')' }),
+        h('path', { d: this.smooth(P), fill: 'none', stroke: col, strokeWidth: 2, strokeLinecap: 'round' }));
+    }
+    return h('div', { style: { display: 'flex', flexDirection: 'column', height: '100%', gap: mini ? 3 : 9, justifyContent: 'space-between', minHeight: mini ? 0 : 96 } },
+      h('div', { style: { display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 6 } },
+        h('span', { style: { font: '600 ' + (mini ? 9.5 : 11) + 'px/1.1 ' + f.sans, letterSpacing: '.03em', color: 'var(--ink-500)', textTransform: 'uppercase' } }, o.label || o.title),
+        h('span', { style: { width: mini ? 6 : 7, height: mini ? 6 : 7, borderRadius: 99, background: col, boxShadow: '0 0 0 3px ' + cbg, flex: '0 0 auto' } })),
+      h('div', { style: { display: 'flex', alignItems: 'baseline', gap: 8, flexWrap: 'wrap' } },
+        h('span', { style: { font: '500 ' + (mini ? 21 : 31) + 'px/0.9 ' + f.serif, color: 'var(--ink-900)', letterSpacing: '-.01em' } }, o.value == null ? '—' : o.value),
+        o.delta ? this.deltaBadge(o.delta, o.tone) : null),
+      sparkEl);
+  }
+
+  areaChart(o, mini) {
+    const f = this.fonts(); const seed = this.hash(o.id || o.title || 'a');
+    if (!(o.series && o.series.length > 1)) return this.noData(o, mini);
+    const data = o.series;
+    const target = data.map((v, i) => Math.max.apply(null, data) * 0.55 + i * (Math.max.apply(null, data) * 0.018));
+    const W = mini ? 200 : 560, Hh = mini ? 58 : 168, pad = mini ? 6 : 10;
+    const all = data.concat(target); const P = this.pts2(data, all, W, Hh, pad), T = this.pts2(target, all, W, Hh, pad);
+    const gid = 'ar' + (o.id || seed);
+    const body = h('svg', { viewBox: '0 0 ' + W + ' ' + Hh, preserveAspectRatio: 'none', style: { width: '100%', height: mini ? 58 : 168, display: 'block' } },
+      h('defs', null, h('linearGradient', { id: gid, x1: 0, y1: 0, x2: 0, y2: 1 }, h('stop', { offset: '0%', stopColor: 'var(--violet)', stopOpacity: 0.24 }), h('stop', { offset: '100%', stopColor: 'var(--violet)', stopOpacity: 0 }))),
+      !mini ? [0, 1, 2, 3].map(i => h('line', { key: i, x1: pad, x2: W - pad, y1: pad + i * (Hh - 2 * pad) / 3, y2: pad + i * (Hh - 2 * pad) / 3, stroke: 'var(--border)', strokeWidth: 1, strokeDasharray: '2 5' })) : null,
+      h('path', { d: this.smooth(P) + ' L' + P[P.length - 1][0] + ',' + (Hh - pad) + ' L' + P[0][0] + ',' + (Hh - pad) + ' Z', fill: 'url(#' + gid + ')' }),
+      h('path', { d: this.smooth(T), fill: 'none', stroke: 'var(--ink-400)', strokeWidth: 1.5, strokeDasharray: '4 4', opacity: 0.7 }),
+      h('path', { d: this.smooth(P), fill: 'none', stroke: 'var(--violet)', strokeWidth: 2.4, strokeLinecap: 'round' }),
+      !mini ? h('circle', { cx: P[P.length - 1][0], cy: P[P.length - 1][1], r: 4, fill: 'var(--violet)', stroke: 'var(--bg-panel)', strokeWidth: 2 }) : null);
+    if (mini) return body;
+    const legend = h('div', { style: { display: 'flex', gap: 16, marginTop: 10 } },
+      h('span', { style: { display: 'flex', alignItems: 'center', gap: 6, font: '500 11px ' + f.sans, color: 'var(--ink-500)' } }, h('span', { style: { width: 14, height: 3, borderRadius: 9, background: 'var(--violet)' } }), 'Actual'),
+      h('span', { style: { display: 'flex', alignItems: 'center', gap: 6, font: '500 11px ' + f.sans, color: 'var(--ink-500)' } }, h('span', { style: { width: 14, borderTop: '1.5px dashed var(--ink-400)' } }), 'Target'));
+    return h('div', { style: { display: 'flex', flexDirection: 'column', height: '100%' } }, this.chead(o.title, o.source, o.delta ? this.deltaBadge(o.delta, o.tone || 'pos') : null), h('div', { style: { flex: 1, minHeight: 0, display: 'flex', alignItems: 'stretch' } }, body), legend);
+  }
+  pts2(data, all, w, hh, pad) {
+    const max = Math.max.apply(null, all), min = Math.min.apply(null, all), span = (max - min) || 1;
+    const X = i => pad + i * (w - 2 * pad) / (data.length - 1), Y = v => hh - pad - (v - min) / span * (hh - 2 * pad);
+    return data.map((v, i) => [X(i), Y(v)]);
+  }
+
+  barChart(o, mini) {
+    const f = this.fonts();
+    if (!(o.data && o.data.length)) return this.noData(o, mini);
+    const labels = o.data.map(d => d.label);
+    const data = o.data.map(d => Number(d.value) || 0);
+    const max = Math.max.apply(null, data) || 1;
+    const cols = ['var(--violet)', 'var(--blue)', 'var(--teal)', 'var(--emerald)', 'var(--amber)', 'var(--rose)'];
+    const bars = h('div', { style: { display: 'flex', alignItems: 'flex-end', gap: mini ? 5 : 10, height: mini ? 50 : '100%', flex: 1, minHeight: 0 } },
+      data.map((v, i) => h('div', { key: i, style: { flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 5, height: '100%', justifyContent: 'flex-end' } },
+        !mini ? h('span', { style: { font: '600 10px ' + f.mono, color: 'var(--ink-700)' } }, Math.round(v)) : null,
+        h('div', { style: { width: '100%', maxWidth: mini ? 18 : 34, height: (v / max * 100) + '%', minHeight: 4, background: cols[i % cols.length], borderRadius: '5px 5px 2px 2px', transformOrigin: 'bottom', animation: 'barGrow .5s ' + (i * 0.05) + 's both ease-out' } }),
+        !mini ? h('span', { style: { font: '500 10px ' + f.sans, color: 'var(--ink-500)' } }, labels[i]) : null)));
+    if (mini) return bars;
+    return h('div', { style: { display: 'flex', flexDirection: 'column', height: '100%' } }, this.chead(o.title, o.source), bars);
+  }
+
+  donut(o, mini) {
+    const f = this.fonts();
+    if (!(o.data && o.data.length)) return this.noData(o, mini);
+    const PAL = ['var(--violet)', 'var(--blue)', 'var(--teal)', 'var(--amber)', 'var(--emerald)', 'var(--rose)'];
+    const segs = o.data.map((d, i) => ({ l: d.label, v: Number(d.value) || 0, c: PAL[i % PAL.length] }));
+    const total = segs.reduce((a, b) => a + b.v, 0);
+    const sz = mini ? 50 : 116, cc = sz / 2, r = mini ? 18 : 44, sw = mini ? 8 : 16, C = 2 * Math.PI * r; let acc = 0;
+    const ring = h('svg', { width: sz, height: sz, viewBox: '0 0 ' + sz + ' ' + sz, style: { flex: '0 0 auto' } },
+      h('circle', { cx: cc, cy: cc, r: r, fill: 'none', stroke: 'var(--bg-inset)', strokeWidth: sw }),
+      segs.map((s, i) => { const frac = s.v / total; const el = h('circle', { key: i, cx: cc, cy: cc, r: r, fill: 'none', stroke: s.c, strokeWidth: sw, strokeDasharray: (frac * C - 2) + ' ' + C, strokeDashoffset: -acc * C, strokeLinecap: 'round', transform: 'rotate(-90 ' + cc + ' ' + cc + ')' }); acc += frac; return el; }),
+      (!mini && o.value) ? h('text', { x: cc, y: cc - 1, textAnchor: 'middle', style: { font: '500 19px ' + f.serif, fill: 'var(--ink-900)' } }, o.value) : null,
+      (!mini && o.value) ? h('text', { x: cc, y: cc + 13, textAnchor: 'middle', style: { font: '500 9px ' + f.mono, fill: 'var(--ink-500)' } }, 'TOTAL') : null);
+    if (mini) return h('div', { style: { display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100%' } }, ring);
+    const legend = h('div', { style: { display: 'flex', flexDirection: 'column', gap: 7, flex: 1, justifyContent: 'center' } },
+      segs.map((s, i) => h('div', { key: i, style: { display: 'flex', alignItems: 'center', gap: 8 } },
+        h('span', { style: { width: 9, height: 9, borderRadius: 3, background: s.c, flex: '0 0 auto' } }),
+        h('span', { style: { font: '500 12px ' + f.sans, color: 'var(--ink-700)', flex: 1 } }, s.l),
+        h('span', { style: { font: '600 11.5px ' + f.mono, color: 'var(--ink-900)' } }, (total ? Math.round(s.v / total * 100) : s.v) + '%'))));
+    return h('div', { style: { display: 'flex', flexDirection: 'column', height: '100%' } }, this.chead(o.title, o.source),
+      h('div', { style: { display: 'flex', alignItems: 'center', gap: 14, flex: 1, minHeight: 0 } }, ring, legend));
+  }
+
+  funnel(o, mini) {
+    const f = this.fonts();
+    if (!(o.data && o.data.length)) return this.noData(o, mini);
+    const FPAL = ['var(--violet)', 'var(--blue)', 'var(--teal)', 'var(--emerald)', 'var(--amber)'];
+    const mx = Math.max.apply(null, o.data.map(d => Number(d.value) || 0)) || 1;
+    const steps = o.data.map((d, i) => ({ l: d.label, v: Math.round((Number(d.value) || 0) / mx * 100), c: FPAL[i % FPAL.length] }));
+    const rows = h('div', { style: { display: 'flex', flexDirection: 'column', gap: mini ? 4 : 9, flex: 1, justifyContent: 'center' } },
+      steps.map((s, i) => h('div', { key: i, style: { display: 'flex', alignItems: 'center', gap: 9 } },
+        !mini ? h('span', { style: { font: '500 11px ' + f.sans, color: 'var(--ink-500)', width: 62, flex: '0 0 auto' } }, s.l) : null,
+        h('div', { style: { flex: 1, height: mini ? 10 : 22, borderRadius: 6, background: 'var(--bg-inset)', overflow: 'hidden', position: 'relative' } },
+          h('div', { style: { height: '100%', width: s.v + '%', background: s.c, borderRadius: 6, display: 'flex', alignItems: 'center', justifyContent: 'flex-end', paddingRight: 7, transition: 'width .5s', animation: 'barGrow .5s both' } },
+            !mini ? h('span', { style: { font: '600 10px ' + f.mono, color: '#fff' } }, s.v + '%') : null)))));
+    if (mini) return rows;
+    return h('div', { style: { display: 'flex', flexDirection: 'column', height: '100%' } }, this.chead(o.title, o.source), rows);
+  }
+
+  heatmap(o, mini) {
+    if (!(o.grid && o.grid.length && Array.isArray(o.grid[0]))) return this.noData(o, mini);
+    const G = o.grid;
+    let mx = 0; G.forEach(row => row.forEach(v => { const n = Number(v) || 0; if (n > mx) mx = n; })); mx = mx || 1;
+    const grid = h('div', { style: { display: 'flex', flexDirection: 'column', gap: 3, flex: 1, justifyContent: 'center' } },
+      G.map((row, ri) => h('div', { key: ri, style: { display: 'flex', gap: 3 } },
+        row.map((v, ci) => { const n = Number(v) || 0; const op = 0.12 + (n / mx) * 0.88; return h('div', { key: ci, title: String(n), style: { flex: 1, aspectRatio: mini ? '1.6' : '1.4', borderRadius: 4, background: 'color-mix(in srgb, var(--violet) ' + Math.round(op * 100) + '%, var(--bg-inset))' } }); }))));
+    if (mini) return grid;
+    return h('div', { style: { display: 'flex', flexDirection: 'column', height: '100%' } }, this.chead(o.title, o.source), grid);
+  }
+
+  forecast(o, mini) {
+    const f = this.fonts();
+    if (!(o.series && o.series.length > 1)) return this.noData(o, mini);
+    const hist = o.series;
+    const last = hist[hist.length - 1];
+    let fc;
+    if (o.forecastSeries && o.forecastSeries.length) { fc = o.forecastSeries; }
+    else { fc = []; let v = last; for (let i = 0; i < (mini ? 5 : 9); i++) { v += last * 0.05; fc.push(v); } }
+    const full = hist.concat(fc); const W = mini ? 200 : 560, Hh = mini ? 58 : 168, pad = mini ? 6 : 10;
+    const PH = this.pts2(hist, full, W, Hh, pad);
+    const splitX = PH[PH.length - 1][0];
+    const PF = this.pts2(fc, full, W, Hh, pad).map(p => [p[0] + (W - 2 * pad) * hist.length / full.length, p[1]]);
+    // build forecast points along remaining width
+    const fcPts = fc.map((val, i) => { const X = splitX + (i + 1) * (W - pad - splitX) / fc.length; const max = Math.max.apply(null, full), min = Math.min.apply(null, full), span = (max - min) || 1; const Y = Hh - pad - (val - min) / span * (Hh - 2 * pad); return [X, Y]; });
+    const band = fcPts.map((p, i) => [p[0], p[1] - 6 - i * 1.5]).concat(fcPts.map((p, i) => [p[0], p[1] + 6 + i * 1.5]).reverse());
+    const gid = 'fcg' + (o.id || this.hash(o.title || 'fc'));
+    const body = h('svg', { viewBox: '0 0 ' + W + ' ' + Hh, preserveAspectRatio: 'none', style: { width: '100%', height: mini ? 58 : 168, display: 'block' } },
+      !mini ? [0, 1, 2, 3].map(i => h('line', { key: i, x1: pad, x2: W - pad, y1: pad + i * (Hh - 2 * pad) / 3, y2: pad + i * (Hh - 2 * pad) / 3, stroke: 'var(--border)', strokeWidth: 1, strokeDasharray: '2 5' })) : null,
+      h('path', { d: 'M' + band.map(p => p.join(',')).join(' L') + ' Z', fill: 'color-mix(in srgb, var(--violet) 14%, transparent)' }),
+      h('path', { d: this.smooth(PH), fill: 'none', stroke: 'var(--violet)', strokeWidth: 2.4, strokeLinecap: 'round' }),
+      h('path', { d: 'M' + splitX + ',' + PH[PH.length - 1][1] + ' ' + this.smooth(fcPts).slice(1), fill: 'none', stroke: 'var(--violet)', strokeWidth: 2.2, strokeDasharray: '5 4', strokeLinecap: 'round', opacity: 0.85 }),
+      h('line', { x1: splitX, x2: splitX, y1: pad, y2: Hh - pad, stroke: 'var(--ink-400)', strokeWidth: 1, strokeDasharray: '2 3' }));
+    if (mini) return body;
+    return h('div', { style: { display: 'flex', flexDirection: 'column', height: '100%' } },
+      this.chead(o.title, o.source, h('span', { style: { font: '600 11px ' + f.mono, color: 'var(--violet)', background: 'var(--violet-bg)', padding: '2px 7px', borderRadius: 6 } }, 'forecast')),
+      h('div', { style: { flex: 1, minHeight: 0, display: 'flex' } }, body));
+  }
+
+  insight(o, mini) {
+    const f = this.fonts();
+    if (mini) return h('div', { style: { display: 'flex', flexDirection: 'column', gap: 6, justifyContent: 'center', height: '100%' } },
+      h('div', { style: { display: 'flex', alignItems: 'center', gap: 6 } }, h('span', { style: { width: 22, height: 22, borderRadius: 6, background: 'var(--emerald-bg)', color: 'var(--emerald)', display: 'flex', alignItems: 'center', justifyContent: 'center' } }, this.icon('insights', 13)), h('span', { style: { font: '500 11px ' + f.mono, color: 'var(--emerald-ink)' } }, 'OPPORTUNITY')),
+      h('div', { style: { height: 6, borderRadius: 9, background: 'var(--bg-panel)', width: '90%' } }), h('div', { style: { height: 6, borderRadius: 9, background: 'var(--bg-panel)', width: '70%' } }));
+    return h('div', { style: { display: 'flex', flexDirection: 'column', gap: 10, height: '100%', background: 'linear-gradient(180deg, var(--emerald-bg), transparent 70%)', margin: -15, padding: 15, borderRadius: 14 } },
+      h('div', { style: { display: 'flex', alignItems: 'center', gap: 9 } },
+        h('span', { style: { width: 28, height: 28, borderRadius: 8, background: 'var(--emerald-bg)', color: 'var(--emerald)', display: 'flex', alignItems: 'center', justifyContent: 'center', flex: '0 0 auto' } }, this.icon('insights', 16)),
+        h('div', { style: { flex: 1 } }, h('div', { style: { font: '600 10px ' + f.mono, letterSpacing: '.1em', color: 'var(--emerald-ink)' } }, 'AI INSIGHT · OPPORTUNITY'),
+          h('div', { style: { font: '500 16px ' + f.serif, color: 'var(--ink-900)', marginTop: 1 } }, o.headline || o.title || 'AI Insight')),
+        h('span', { style: { font: '600 11px ' + f.mono, color: 'var(--emerald-ink)', background: 'var(--emerald-bg)', padding: '3px 8px', borderRadius: 6 } }, (o.confidence != null ? o.confidence : '—') + '% conf')),
+      h('p', { style: { margin: 0, font: '400 13.5px/1.5 ' + f.sans, color: 'var(--ink-700)' } }, o.body || ''),
+      h('div', { style: { display: 'flex', gap: 8, marginTop: 'auto', flexWrap: 'wrap' } },
+        (o.chips || []).map((cp, i) =>
+          h('span', { key: i, style: { font: '500 12px ' + f.sans, color: 'var(--ink-700)', background: 'var(--bg-panel)', border: '1px solid var(--border)', padding: '5px 10px', borderRadius: 8 } }, cp))));
+  }
+
+  risk(o, mini) {
+    const f = this.fonts();
+    if (mini) return h('div', { style: { display: 'flex', flexDirection: 'column', gap: 6, justifyContent: 'center', height: '100%' } },
+      h('div', { style: { display: 'flex', alignItems: 'center', gap: 6 } }, h('span', { style: { width: 22, height: 22, borderRadius: 6, background: 'var(--amber-bg)', color: 'var(--amber)', display: 'flex', alignItems: 'center', justifyContent: 'center' } }, this.icon('alert', 13)), h('span', { style: { font: '500 11px ' + f.mono, color: 'var(--amber-ink)' } }, 'RISK ALERT')),
+      h('div', { style: { height: 6, borderRadius: 9, background: 'var(--bg-panel)', width: '85%' } }), h('div', { style: { height: 6, borderRadius: 9, background: 'var(--bg-panel)', width: '65%' } }));
+    return h('div', { style: { display: 'flex', flexDirection: 'column', gap: 10, height: '100%', background: 'linear-gradient(180deg, var(--amber-bg), transparent 70%)', margin: -15, padding: 15, borderRadius: 14 } },
+      h('div', { style: { display: 'flex', alignItems: 'center', gap: 9 } },
+        h('span', { style: { width: 28, height: 28, borderRadius: 8, background: 'var(--amber-bg)', color: 'var(--amber)', display: 'flex', alignItems: 'center', justifyContent: 'center', flex: '0 0 auto' } }, this.icon('alert', 16)),
+        h('div', { style: { flex: 1 } }, h('div', { style: { font: '600 10px ' + f.mono, letterSpacing: '.1em', color: 'var(--amber-ink)' } }, 'AI DETECTED · RISK'),
+          h('div', { style: { font: '500 16px ' + f.serif, color: 'var(--ink-900)', marginTop: 1 } }, o.headline || o.title || 'Risk detected')),
+        h('span', { style: { font: '600 11px ' + f.mono, color: 'var(--amber-ink)', background: 'var(--amber-bg)', padding: '3px 8px', borderRadius: 6 } }, (o.confidence != null ? o.confidence : '—') + '% conf')),
+      h('p', { style: { margin: 0, font: '400 13.5px/1.5 ' + f.sans, color: 'var(--ink-700)' } }, o.body || ''),
+      (o.chips && o.chips.length) ? h('div', { style: { display: 'flex', gap: 8, marginTop: 'auto', alignItems: 'center' } },
+        h('span', { style: { font: '500 12px ' + f.sans, color: 'var(--amber-ink)', background: 'var(--bg-panel)', border: '1px solid var(--amber-bg)', padding: '5px 10px', borderRadius: 8 } }, o.chips[0])) : null);
+  }
+
+  summary(o, mini) {
+    const f = this.fonts();
+    if (mini) return h('div', { style: { display: 'flex', flexDirection: 'column', gap: 5, justifyContent: 'center', height: '100%' } },
+      [90, 75, 82, 60].map((w, i) => h('div', { key: i, style: { height: 5, borderRadius: 9, background: 'var(--bg-panel)', width: w + '%' } })));
+    const metrics = (o.metrics && o.metrics.length) ? o.metrics.slice(0, 4).map(m => [m.label, m.value]) : [];
+    return h('div', { style: { display: 'flex', flexDirection: 'column', height: '100%' } }, this.chead(o.title || 'Summary', o.source),
+      h('p', { style: { margin: '0 0 12px', font: '400 14px/1.55 ' + f.serif, color: 'var(--ink-700)' } }, o.body || ''),
+      metrics.length ? h('div', { style: { display: 'flex', gap: 10, marginTop: 'auto' } },
+        metrics.map((m, i) => h('div', { key: i, style: { flex: 1, padding: '8px 10px', borderRadius: 9, background: 'var(--bg-inset)' } },
+          h('div', { style: { font: '500 10px ' + f.mono, color: 'var(--ink-500)', textTransform: 'uppercase' } }, m[0]),
+          h('div', { style: { font: '500 17px ' + f.serif, color: 'var(--ink-900)' } }, m[1])))) : null);
+  }
+
+  table(o, mini) {
+    if (!(o.rows && o.rows.length)) return this.noData(o, mini);
+    if (mini) return h('div', { style: { display: 'flex', flexDirection: 'column', gap: 5, justifyContent: 'center', height: '100%' } },
+      o.rows.slice(0, 4).map((r, i) => h('div', { key: i, style: { display: 'flex', gap: 6, alignItems: 'center' } },
+        h('div', { style: { height: 6, borderRadius: 9, background: 'var(--bg-panel)', flex: 1 } }),
+        h('div', { style: { height: 6, width: 22, borderRadius: 9, background: 'var(--violet)', opacity: 0.5 } }))));
+    return this.genericTable(o);
+  }
+
+  genericTable(o) {
+    const f = this.fonts();
+    const cols = (o.columns && o.columns.length) ? o.columns : (o.rows[0] ? o.rows[0].cells.map((_, i) => 'Col ' + (i + 1)) : []);
+    const tmpl = cols.map((_, i) => i === 0 ? '2fr' : '1fr').join(' ');
+    const head = h('div', { style: { display: 'grid', gridTemplateColumns: tmpl, gap: 10, padding: '0 6px 8px', borderBottom: '1px solid var(--border)' } },
+      cols.map((c, i) => h('span', { key: i, style: { font: '600 10px ' + f.mono, letterSpacing: '.06em', color: 'var(--ink-400)', textTransform: 'uppercase', textAlign: i === 0 ? 'left' : 'right' } }, c)));
+    const body = o.rows.slice(0, 12).map((r, ri) => h('div', { key: ri, style: { display: 'grid', gridTemplateColumns: tmpl, gap: 10, padding: '9px 6px', borderBottom: ri < o.rows.length - 1 ? '1px solid var(--border)' : 'none', alignItems: 'center' } },
+      (r.cells || []).map((cell, ci) => h('span', { key: ci, style: { font: (ci === 0 ? '600 13px ' : '500 12px ') + (ci === 0 ? f.sans : f.mono), color: ci === 0 ? 'var(--ink-900)' : (r.tone === 'neg' ? 'var(--rose)' : r.tone === 'pos' ? 'var(--emerald-ink)' : 'var(--ink-700)'), textAlign: ci === 0 ? 'left' : 'right', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' } }, cell))));
+    return h('div', { style: { display: 'flex', flexDirection: 'column', height: '100%' } }, this.chead(o.title, o.source), head, h('div', { style: { overflowY: 'auto' } }, body));
+  }
+
+  widgetCite(w) {
+    const srcs = w.sources || [];
+    if (!srcs.length) return null;
+    const grounded = w.grounded !== false;
+    const tip = 'Sources behind this chart:\n\n' + srcs.map(s => '[' + (s.score || 0).toFixed(2) + '] ' + (s.text || '').slice(0, 220)).join('\n\n');
+    return h('div', { title: tip, style: { flex: '0 0 auto', display: 'flex', alignItems: 'center', gap: 7, marginTop: 10, paddingTop: 9, borderTop: '1px solid var(--border)', cursor: 'help' } },
+      h('span', { style: { display: 'inline-flex', alignItems: 'center', gap: 4, font: "600 9px 'IBM Plex Mono',monospace", letterSpacing: '.04em', textTransform: 'uppercase', color: grounded ? 'var(--emerald-ink)' : 'var(--amber-ink)', background: grounded ? 'var(--emerald-bg)' : 'var(--amber-bg)', padding: '2px 7px', borderRadius: 6 } }, grounded ? 'Grounded' : 'Estimated'),
+      h('span', { style: { display: 'inline-flex', alignItems: 'center', gap: 5, font: "500 10.5px 'Hanken Grotesk',sans-serif", color: 'var(--ink-500)' } },
+        h('svg', { width: 11, height: 11, viewBox: '0 0 24 24', fill: 'none', stroke: 'currentColor', strokeWidth: 2, strokeLinecap: 'round', strokeLinejoin: 'round' }, h('path', { d: 'M14 3H7a2 2 0 00-2 2v14a2 2 0 002 2h10a2 2 0 002-2V8z' }), h('path', { d: 'M14 3v5h5' })),
+        srcs.length + ' source' + (srcs.length === 1 ? '' : 's')),
+      h('span', { style: { marginLeft: 'auto', font: "500 10px 'Hanken Grotesk',sans-serif", color: 'var(--violet)' } }, 'hover to cite'));
+  }
+
+  buildPreview(o, mini) {
+    switch (o.type) {
+      case 'kpi': return this.kpi(o, mini);
+      case 'area': case 'line': return this.areaChart(o, mini);
+      case 'bar': return this.barChart(o, mini);
+      case 'donut': return this.donut(o, mini);
+      case 'funnel': return this.funnel(o, mini);
+      case 'heatmap': return this.heatmap(o, mini);
+      case 'forecast': return this.forecast(o, mini);
+      case 'insight': return this.insight(o, mini);
+      case 'risk': return this.risk(o, mini);
+      case 'summary': return this.summary(o, mini);
+      case 'table': return this.table(o, mini);
+      default: return this.kpi(o, mini);
+    }
+  }
+  defSpan(t) { return ({ kpi: 3, area: 8, line: 8, bar: 4, donut: 4, funnel: 4, heatmap: 4, forecast: 8, insight: 6, risk: 6, summary: 12, table: 12 })[t] || 4; }
+
+  // ---------------- interactions ----------------
+  onGoalInput(e) { this.setState({ goal: e.target.value }); }
+  onGoalKey(e) { if (e.key === 'Enter') this.generate(); }
+  onGoalFocus() { this.setState({ focused: true }); }
+  onGoalBlur() { this.timers.push(setTimeout(() => this.setState({ focused: false }), 160)); }
+  toggleTheme() { this.setState(s => { const t = s.theme === 'light' ? 'dark' : 'light'; try { localStorage.setItem('ada-theme', t); } catch (x) {} return { theme: t }; }); }
+  logout() { try { localStorage.removeItem('ada-token'); } catch (x) {} window.location.href = 'Agentic Auth.dc.html'; }
+  goComponents() { window.location.href = 'Agentic App.dc.html#components'; }
+  toggleSidebar() { this.setState(s => ({ sidebarOpen: !s.sidebarOpen })); }
+  toggleAi() { this.setState(s => ({ aiOpen: !s.aiOpen })); }
+  clearSel() { this.setState({ selected: [] }); }
+  pickExample(text) { this.setState({ goal: text, focused: false }); this.timers.push(setTimeout(() => this.generate(), 60)); }
+  onFollowInput(e) { this.setState({ followup: e.target.value }); }
+  onFollowKey(e) { if (e.key === 'Enter') this.sendFollow(); }
+  async sendFollow() {
+    const g = this.state.followup.trim(); if (!g) return;
+    this.setState({ followup: '' });
+    if (!this.state.sessionId) { this.setState({ goal: g }); this.generate(g); return; }
+    const jobId = 'job_' + this.uid();
+    this.setState({ phase: 'thinking', goal: g, thinkSteps: [] });
+    const es = this.openStream(jobId);
+    try {
+      const res = await fetch(BACKEND + '/refine', { method: 'POST', headers: authHeaders(), body: JSON.stringify({ session_id: this.state.sessionId, message: g, job_id: jobId }) });
+      if (!res.ok) { const ed = await res.json().catch(() => ({})); throw new Error(ed.detail || ('HTTP ' + res.status)); }
+      const data = await res.json();
+      const d = this.specToDraft(data.draft);
+      this.setState(s => ({ thinkSteps: s.thinkSteps.map(x => Object.assign({}, x, { status: 'done' })), phase: 'ready', drafts: [d].concat(s.drafts) }));
+      this.scheduleSave();
+      this.timers.push(setTimeout(() => this.setState(s => ({ drafts: s.drafts.map(dd => Object.assign({}, dd, { fresh: false })) })), 1400));
+    } catch (e) { try { if (es) es.close(); } catch (x) {} this.pushStep('Backend error (' + (e.message || e) + ')', 'done'); this.setState({ phase: 'ready' }); }
+  }
+
+  selectWidget(id, e) {
+    if (e && e.shiftKey) this.setState(s => ({ selected: s.selected.includes(id) ? s.selected.filter(x => x !== id) : s.selected.concat(id) }));
+    else this.setState(s => ({ selected: s.selected.length === 1 && s.selected[0] === id ? [] : [id] }));
+  }
+  removeWidget(id) { this.setState(s => ({ widgets: s.widgets.filter(w => w.id !== id), selected: s.selected.filter(x => x !== id) })); this.scheduleSave(); }
+  dupWidget(id) { this.setState(s => { const w = s.widgets.find(x => x.id === id); if (!w) return {}; const nw = Object.assign({}, w, { id: this.uid() }); const i = s.widgets.findIndex(x => x.id === id); const arr = s.widgets.slice(); arr.splice(i + 1, 0, nw); return { widgets: arr }; }); this.scheduleSave(); }
+
+  widgetDragStart(id, e) { try { e.dataTransfer.setData('text/plain', 'w:' + id); } catch (x) {} }
+  draftDragStart(id, e) { try { e.dataTransfer.setData('text/plain', 'd:' + id); e.dataTransfer.effectAllowed = 'copy'; } catch (x) {} this.setState({ dragging: true, dragDraft: id }); }
+  onCanvasOver(e) { if (this.state.dragDraft) { e.preventDefault(); try { e.dataTransfer.dropEffect = 'copy'; } catch (x) {} } }
+  onCanvasDrop(e) { e.preventDefault(); if (this.state.dragDraft) this.addFromDraft(this.state.dragDraft); this.setState({ dragging: false, dragDraft: null }); }
+
+  addFromDraft(id) {
+    const d = this.state.drafts.find(x => x.id === id); if (!d) return;
+    const nid = this.uid();
+    const w = Object.assign({}, d, { id: nid, span: this.defSpan(d.type) });
+    this.setState(s => ({ widgets: s.widgets.concat(w), selected: [nid], newIds: s.newIds.concat(nid), dragging: false, dragDraft: null }));
+    this.scheduleSave();
+  }
+  toggleFav(id) { this.setState(s => ({ drafts: s.drafts.map(d => d.id === id ? Object.assign({}, d, { fav: !d.fav }) : d) })); this.scheduleSave(); }
+  deleteDraft(id) { this.setState(s => ({ drafts: s.drafts.filter(d => d.id !== id) })); this.scheduleSave(); }
+
+  // ---------------- connect (Connect screen) ----------------
+  onConnKey(e) { this.setState({ connKey: e.target.value, connectErr: '' }); }
+  onConnDataset(e) { this.setState({ connDatasetId: e.target.value, connectErr: '' }); }
+  connBack() { this.setState({ connStage: 'key', connectErr: '' }); }
+  openConnect() { this.setState({ showConnect: true, connStage: 'key', connectErr: '' }); }
+  closeConnect() { if (this.state.connected) this.setState({ showConnect: false, connectErr: '' }); }
+  async loadDatasets() {
+    const key = (this.state.connKey || '').trim();
+    this.setState({ connLoading: true, connectErr: '' });
+    try {
+      const res = await fetch(BACKEND + '/datasets', { method: 'POST', headers: authHeaders(), body: JSON.stringify({ global_key: key }) });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.detail || ('HTTP ' + res.status));
+      const list = (data.datasets || []).filter(d => d.id != null);
+      if (!list.length) throw new Error('No datasets found for this key.');
+      this.setState({ connLoading: false, connStage: 'select', connDatasets: list, connDatasetId: String(list[0].id) });
+    } catch (e) {
+      this.setState({ connLoading: false, connectErr: 'Could not load datasets: ' + (e.message || e) });
+    }
+  }
+  async doConnect() {
+    const key = (this.state.connKey || '').trim();
+    const id = parseInt(this.state.connDatasetId, 10);
+    if (!id) { this.setState({ connectErr: 'Select a dataset.' }); return; }
+    this.setState({ connecting: true, connectErr: '' });
+    try {
+      const res = await fetch(BACKEND + '/session', { method: 'POST', headers: authHeaders(), body: JSON.stringify({ global_key: key, dataset_id: id }) });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.detail || ('HTTP ' + res.status));
+      try { localStorage.setItem('ada-conn', JSON.stringify({ key: key, datasetId: data.dataset_id, datasetName: data.dataset_name || '' })); } catch (x) {}
+      this.setState({ connected: true, connecting: false, showConnect: false, usedBackend: true, sessionId: data.session_id, datasetId: data.dataset_id, datasetName: data.dataset_name || '', suggestedQueries: data.suggested_queries || [], drafts: [], widgets: [], phase: 'idle', thinkSteps: [] });
+    } catch (e) {
+      this.setState({ connecting: false, connectErr: 'Could not connect: ' + (e.message || e) });
+    }
+  }
+  // ---------------- streaming helpers ----------------
+  pushStep(t, status) { this.setState(s => { const ts = s.thinkSteps.map(x => Object.assign({}, x, { status: 'done' })); ts.push({ id: 's' + s.thinkSteps.length, t: t, status: status === 'done' ? 'done' : 'run' }); return { thinkSteps: ts }; }); }
+  specToDraft(spec) { return Object.assign({ id: this.uid(), time: 'just now', fav: false, fresh: true, confidence: 80 }, spec); }
+  openStream(jobId) {
+    let es = null;
+    try {
+      es = new EventSource(BACKEND + '/agent/stream?job_id=' + encodeURIComponent(jobId));
+      es.addEventListener('step', (ev) => { try { const d = JSON.parse(ev.data); this.pushStep(d.t, d.status); } catch (x) {} });
+      es.addEventListener('done', () => { try { es.close(); } catch (x) {} });
+    } catch (x) {}
+    return es;
+  }
+
+  // ---------------- generate (real backend) ----------------
+  async generate(forced) {
+    const g = (forced || this.state.goal || '').trim();
+    if (!g) return;
+    this.timers.forEach(clearTimeout); this.timers = [];
+    if (!this.state.sessionId) { this.setState({ phase: 'thinking', goal: g, thinkSteps: [{ id: 's0', t: 'Connect a dataset first', status: 'done' }] }); return; }
+    const jobId = 'job_' + this.uid();
+    this.setState({ phase: 'thinking', focused: false, goal: g, thinkSteps: [] });
+    const es = this.openStream(jobId);
+    try {
+      const res = await fetch(BACKEND + '/generate', { method: 'POST', headers: authHeaders(), body: JSON.stringify({ session_id: this.state.sessionId, goal: g, job_id: jobId }) });
+      if (!res.ok) { const ed = await res.json().catch(() => ({})); throw new Error(ed.detail || ('HTTP ' + res.status)); }
+      const data = await res.json();
+      const fresh = (data.drafts || []).map(spec => this.specToDraft(spec));
+      this.setState(s => ({ thinkSteps: s.thinkSteps.map(x => Object.assign({}, x, { status: 'done' })), phase: 'ready', drafts: fresh.concat(s.drafts) }));
+      this.scheduleSave();
+      this.timers.push(setTimeout(() => this.setState(s => ({ drafts: s.drafts.map(d => Object.assign({}, d, { fresh: false })) })), 1400));
+    } catch (e) {
+      try { if (es) es.close(); } catch (x) {}
+      this.pushStep('Generation failed: ' + (e.message || e), 'done');
+      this.setState({ phase: 'ready' });
+    }
+  }
+
+  // ---------------- nav helpers ----------------
+  navRow(active) {
+    const base = 'display:flex;align-items:center;gap:11px;width:100%;padding:8px 10px;border-radius:9px;border:1px solid transparent;cursor:pointer;margin-bottom:1px;transition:background .12s;';
+    if (active) return base + 'background:var(--violet-bg);border-color:var(--violet-border);color:var(--violet);';
+    return base + 'background:transparent;color:var(--ink-700);';
+  }
+  mkNav(id, label, iconName, count) {
+    const active = this.state.activeNav === id;
+    return {
+      id, label, count: count || '', weight: active ? 600 : 500,
+      icon: this.icon(iconName, 16),
+      iconColor: active ? 'var(--violet)' : 'var(--ink-500)',
+      rowStyle: this.navRow(active),
+      hoverStyle: { background: active ? 'var(--violet-bg)' : 'var(--bg-inset)' },
+      badgeStyle: 'font-family:\'IBM Plex Mono\',monospace;font-size:10.5px;font-weight:500;color:' + (active ? 'var(--violet)' : 'var(--ink-400)') + ';background:' + (active ? 'var(--bg-panel)' : 'var(--bg-inset)') + ';padding:1px 7px;border-radius:99px;',
+      onClick: ({ datasets: 'datasets', components: 'components', insights: 'insights', teams: 'team', billing: 'billing', admin: 'admin', settings: 'settings' })[id] ? () => { window.location.href = 'Agentic App.dc.html#' + ({ datasets: 'datasets', components: 'components', insights: 'insights', teams: 'team', billing: 'billing', admin: 'admin', settings: 'settings' })[id]; } : () => this.setState({ activeNav: id })
+    };
+  }
+  mkTab(id, label) {
+    const active = this.state.activeTab === id;
+    const base = 'padding:7px 13px;border:none;border-radius:8px 8px 0 0;background:transparent;font-family:\'Hanken Grotesk\',sans-serif;font-size:13px;cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-1px;';
+    const style = active ? base + 'color:var(--ink-900);font-weight:600;border-bottom-color:var(--violet);' : base + 'color:var(--ink-500);font-weight:500;';
+    return { id, label, style, onClick: () => this.setState({ activeTab: id }) };
+  }
+
+  stepMark(status) {
+    if (status === 'done') return h('svg', { width: 15, height: 15, viewBox: '0 0 24 24', fill: 'none' }, h('circle', { cx: 12, cy: 12, r: 10, fill: 'var(--emerald)' }), h('path', { d: 'M8 12.5l2.5 2.5 5-6', stroke: '#fff', strokeWidth: 2.4, strokeLinecap: 'round', strokeLinejoin: 'round', fill: 'none' }));
+    return h('svg', { width: 15, height: 15, viewBox: '0 0 24 24', fill: 'none', style: { animation: 'spin 0.8s linear infinite' } }, h('circle', { cx: 12, cy: 12, r: 9, stroke: 'var(--violet-border)', strokeWidth: 2.5, fill: 'none' }), h('path', { d: 'M12 3a9 9 0 019 9', stroke: 'var(--violet)', strokeWidth: 2.5, strokeLinecap: 'round', fill: 'none' }));
+  }
+
+  renderVals() {
+    const s = this.state; const f = this.fonts();
+    const widgets = s.widgets.map(w => ({
+      id: w.id, type: w.type,
+      spanStyle: { gridColumn: 'span ' + (w.span || this.defSpan(w.type)), minHeight: (w.type === 'kpi') ? '0' : '0' },
+      preview: this.buildPreview(w, false),
+      cite: this.widgetCite(w),
+      selected: s.selected.includes(w.id),
+      borderColor: s.selected.includes(w.id) ? 'var(--violet)' : 'var(--border)',
+      shadow: s.newIds.includes(w.id) ? 'var(--shadow-md)' : 'var(--shadow-sm)',
+      onSelect: (e) => this.selectWidget(w.id, e),
+      onDragStart: (e) => this.widgetDragStart(w.id, e),
+      onRemove: (e) => { e.stopPropagation(); this.removeWidget(w.id); },
+      onDup: (e) => { e.stopPropagation(); this.dupWidget(w.id); }
+    }));
+
+    const drafts = s.drafts.map(d => {
+      const tm = this.typeMeta(d.type);
+      const confColor = d.confidence >= 90 ? 'var(--emerald-ink)' : d.confidence >= 80 ? 'var(--violet)' : 'var(--amber-ink)';
+      const srcs = d.sources || [];
+      const grounded = d.grounded !== false;
+      const groundChip = srcs.length ? h('span', { style: { display: 'inline-flex', alignItems: 'center', gap: 4, font: "600 9.5px 'IBM Plex Mono',monospace", letterSpacing: '.04em', textTransform: 'uppercase', color: grounded ? 'var(--emerald-ink)' : 'var(--amber-ink)', background: grounded ? 'var(--emerald-bg)' : 'var(--amber-bg)', padding: '2px 7px', borderRadius: 6 } }, grounded ? 'Grounded' : 'Estimated') : null;
+      const provenance = srcs.length ? h('details', { style: { marginTop: 10, borderTop: '1px solid var(--border)', paddingTop: 9 } },
+        h('summary', { style: { cursor: 'pointer', listStyle: 'none', display: 'flex', alignItems: 'center', gap: 6, font: "600 11px 'IBM Plex Mono',monospace", color: 'var(--violet)' } },
+          h('svg', { width: 12, height: 12, viewBox: '0 0 24 24', fill: 'none', stroke: 'currentColor', strokeWidth: 2, strokeLinecap: 'round', strokeLinejoin: 'round' }, h('path', { d: 'M9 6l6 6-6 6' })),
+          'See ' + srcs.length + ' source' + (srcs.length === 1 ? '' : 's')),
+        h('div', { style: { marginTop: 8, display: 'flex', flexDirection: 'column', gap: 7 } }, srcs.map((sc, i) =>
+          h('div', { key: i, style: { display: 'flex', gap: 7, alignItems: 'flex-start' } },
+            h('span', { style: { flex: '0 0 auto', font: "600 9.5px 'IBM Plex Mono',monospace", color: 'var(--violet)', background: 'var(--violet-bg)', padding: '2px 5px', borderRadius: 5 } }, (sc.score || 0).toFixed(2)),
+            h('span', { style: { font: "400 11px/1.45 'Hanken Grotesk',sans-serif", color: 'var(--ink-500)' } }, (sc.text || '').slice(0, 180) + ((sc.text || '').length > 180 ? '…' : '')))))) : null;
+      return {
+        id: d.id, title: d.title, source: d.source, time: d.time,
+        thumb: this.buildPreview(d, true),
+        confLabel: d.confidence + '%', confColor, groundChip, provenance,
+        ring: this.ringEl(d.confidence),
+        typeLabel: tm.l, typeIcon: h('span', { style: { display: 'inline-flex', marginRight: 4, color: 'var(--ink-400)' } }, this.icon(tm.i, 11)),
+        favColor: d.fav ? 'var(--amber)' : 'var(--ink-400)',
+        favIcon: d.fav ? h('svg', { width: 15, height: 15, viewBox: '0 0 24 24', fill: 'var(--amber)' }, h('path', { d: 'M12 3l2.6 5.6 6 .7-4.4 4.1 1.2 6L12 16.8 6.6 19.4l1.2-6L3.4 9.3l6-.7z' })) : this.icon('star', 15),
+        newStyle: d.fresh ? 'border-color:var(--violet-border);box-shadow:0 0 0 3px var(--violet-bg);' : '',
+        onDragStart: (e) => this.draftDragStart(d.id, e),
+        onDragEnd: () => this.setState({ dragging: false, dragDraft: null }),
+        onAdd: () => this.addFromDraft(d.id),
+        onFav: () => this.toggleFav(d.id),
+        onDelete: () => this.deleteDraft(d.id)
+      };
+    });
+
+    const exIcons = ['trend', 'bar', 'forecast', 'components', 'alert', 'file'];
+    const baseExamples = (s.suggestedQueries && s.suggestedQueries.length)
+      ? s.suggestedQueries.map((t, i) => ({ text: t, icon: this.icon(exIcons[i % exIcons.length], 14) }))
+      : [
+          { text: 'Analyze our sales performance', icon: this.icon('trend', 14) },
+          { text: 'Build an executive dashboard', icon: this.icon('file', 14) },
+          { text: 'Find anomalies in the data', icon: this.icon('alert', 14) },
+          { text: 'Generate KPIs from this dataset', icon: this.icon('bar', 14) },
+          { text: 'Create a forecast dashboard', icon: this.icon('forecast', 14) }
+        ];
+    const examples = baseExamples.map(e => Object.assign({}, e, { onPick: () => this.pickExample(e.text) }));
+
+    const thinkSteps = s.thinkSteps.map(t => ({
+      t: t.t, mark: this.stepMark(t.status),
+      color: t.status === 'done' ? 'var(--ink-700)' : 'var(--ink-900)'
+    }));
+
+    // workflow stepper: stages 0..5, current based on phase
+    const stageNames = ['Raw Data', 'AI Analysis', 'Components', 'History', 'Selection', 'Dashboard'];
+    const cur = s.phase === 'thinking' ? 1 : s.phase === 'ready' ? 2 : 2;
+    const workflow = stageNames.map((label, i) => {
+      const done = i < cur, here = i === cur;
+      return {
+        label, flex: i === stageNames.length - 1 ? '0 0 auto' : 1, line: i < stageNames.length - 1,
+        dot: here ? 'var(--violet)' : done ? 'var(--emerald)' : 'var(--border-strong)',
+        glow: here ? '0 0 0 4px var(--violet-bg)' : 'none',
+        lineColor: i < cur ? 'var(--emerald)' : 'var(--border-strong)'
+      };
+    });
+
+    const agentStatus = s.phase === 'thinking' ? 'Analyzing data…' : s.phase === 'ready' ? 'Generated ' + this.newDraftsCount() + ' components · ready for review' : (s.datasetName ? 'Connected · ' + s.datasetName : 'Connect a dataset to begin');
+
+    const themeIcon = s.theme === 'light'
+      ? h('svg', { width: 17, height: 17, viewBox: '0 0 24 24', fill: 'none', stroke: 'currentColor', strokeWidth: 1.8, strokeLinecap: 'round', strokeLinejoin: 'round' }, h('path', { d: 'M21 12.8A9 9 0 1111.2 3 7 7 0 0021 12.8z' }))
+      : h('svg', { width: 17, height: 17, viewBox: '0 0 24 24', fill: 'none', stroke: 'currentColor', strokeWidth: 1.8, strokeLinecap: 'round', strokeLinejoin: 'round' }, h('circle', { cx: 12, cy: 12, r: 4.5 }), h('path', { d: 'M12 2v2M12 20v2M4 12H2M22 12h-2M5 5l1.5 1.5M17.5 17.5L19 19M19 5l-1.5 1.5M6.5 17.5L5 19' }));
+
+
+    return {
+      theme: s.theme,
+      needsConnect: !s.connected || s.showConnect,
+      canCloseConnect: s.connected,
+      connStageKey: s.connStage === 'key',
+      connStageSelect: s.connStage === 'select',
+      connecting: s.connecting,
+      connLoading: s.connLoading,
+      connectErr: s.connectErr,
+      hasConnectErr: !!s.connectErr,
+      connKey: s.connKey,
+      connDatasetId: s.connDatasetId,
+      connDatasetOptions: s.connDatasets.map(d => ({ value: String(d.id), label: d.name + (d.knowledge_source_count ? ' · ' + d.knowledge_source_count + ' sources' : '') })),
+      loadBtnLabel: s.connLoading ? 'Loading…' : 'Load my datasets',
+      connectBtnLabel: s.connecting ? 'Connecting…' : 'Connect dataset',
+      onConnKey: (e) => this.onConnKey(e),
+      onConnDataset: (e) => this.onConnDataset(e),
+      loadDatasets: () => this.loadDatasets(),
+      doConnect: () => this.doConnect(),
+      connBack: () => this.connBack(),
+      openConnect: () => this.openConnect(),
+      closeConnect: () => this.closeConnect(),
+      goal: s.goal,
+      followup: s.followup,
+      sidebarOpen: s.sidebarOpen,
+      aiOpen: s.aiOpen,
+      aiClosed: !s.aiOpen,
+      dragging: s.dragging,
+      showExamples: s.focused && s.phase !== 'thinking',
+      showActivity: s.phase !== 'idle',
+      hasSelection: s.selected.length > 0,
+      selCount: s.selected.length,
+      draftCount: s.drafts.length,
+      noWidgets: !s.widgets.length,
+      widgets, drafts, examples, thinkSteps, workflow,
+      agentStatus, themeIcon,
+      boardTitle: s.datasetName || 'New dashboard',
+      workspaceName: s.datasetName || 'Workspace',
+      dataSourceLabel: s.datasetName || 'Not connected',
+      hasSuggestions: !!(s.suggestedQueries && s.suggestedQueries.length),
+      exampleHeading: (s.suggestedQueries && s.suggestedQueries.length) ? 'Recommended for this dataset' : 'Try asking the agent',
+      recChipHover: { borderColor: 'var(--violet-border)', background: 'var(--violet-bg)', color: 'var(--violet)' },
+      boardMeta: (s.widgets.length ? s.widgets.length + (s.widgets.length === 1 ? ' widget' : ' widgets') : 'Drag AI drafts here to build your dashboard') + (s.datasetName ? ' · ' + s.datasetName : ''),
+      navMain: [this.mkNav('library', 'Dashboards', 'library', ''), this.mkNav('datasets', 'Datasets', 'datasets', ''), this.mkNav('components', 'Generated Components', 'components', String(s.drafts.length || '')), this.mkNav('insights', 'Saved Insights', 'insights', '')],
+      navOrg: [this.mkNav('teams', 'Team Workspaces', 'teams', ''), this.mkNav('billing', 'Billing & Plans', 'billing', ''), this.mkNav('admin', 'Admin Console', 'admin', '')],
+      goSettings: () => { window.location.href = 'Agentic App.dc.html#settings'; },
+      goProfile: () => { window.location.href = 'Agentic App.dc.html#profile'; },
+      settingsIcon: this.icon('settings', 16),
+      tabs: [this.mkTab('overview', 'Overview'), this.mkTab('sales', 'Sales'), this.mkTab('customers', 'Customers'), this.mkTab('forecast', 'Forecast')],
+      onGoalInput: (e) => this.onGoalInput(e), onGoalKey: (e) => this.onGoalKey(e),
+      onGoalFocus: () => this.onGoalFocus(), onGoalBlur: () => this.onGoalBlur(),
+      onGenerate: () => this.generate(), toggleTheme: () => this.toggleTheme(),
+      saveDashboard: () => this.saveDashboard(), saveLabel: s.savedFlash ? 'Saved ✓' : 'Save',
+      onLogout: () => this.logout(), goComponents: () => this.goComponents(),
+      toggleSidebar: () => this.toggleSidebar(), toggleAi: () => this.toggleAi(),
+      clearSel: () => this.clearSel(),
+      onCanvasOver: (e) => this.onCanvasOver(e), onCanvasDrop: (e) => this.onCanvasDrop(e),
+      onFollowInput: (e) => this.onFollowInput(e), onFollowKey: (e) => this.onFollowKey(e), onFollowSend: () => this.sendFollow(),
+      cmdBorder: s.focused ? 'var(--violet)' : 'var(--border)',
+      cmdShadow: s.focused ? '0 0 0 3px var(--violet-bg)' : 'none',
+      ghostHover: { background: 'var(--bg-inset)', color: 'var(--ink-900)' },
+      primaryHover: { filter: 'brightness(1.08)' },
+      cardHover: { boxShadow: 'var(--shadow-md)', borderColor: 'var(--border-strong)' },
+      toolbarHover: { opacity: 1 },
+      draftHover: { boxShadow: 'var(--shadow-md)', borderColor: 'var(--violet-border)', transform: 'translateY(-1px)' },
+      exHover: { background: 'var(--bg-inset)' },
+      wsHover: { background: 'var(--bg-inset)' },
+      linkHover: { textDecoration: 'underline' },
+      iconBtnHover: { background: 'var(--bg-inset)', color: 'var(--ink-900)' }
+    };
+  }
+  newDraftsCount() { return this.state.drafts.filter(d => d.fresh).length || this.state.drafts.length; }
+}
+</script>
+</body>
+</html>

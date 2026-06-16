@@ -1,0 +1,107 @@
+Design a premium AI-native SaaS platform called Agentic Dashboard AI that transforms raw text, documents, spreadsheets, CSVs, databases, and unstructured business data into intelligent dashboards automatically.
+
+The core experience is simple: users describe what they want in plain English, upload data, or paste raw information, and the AI agent independently analyzes the data, identifies key metrics, detects patterns, selects the most suitable visualizations, generates insights, creates dashboard components, and presents them as reusable blocks.
+
+The interface consists of:
+
+Left Sidebar
+
+* Dashboard Library
+* Datasets
+* Generated Components History
+* Saved Insights
+* Templates
+* Team Workspaces
+* Settings
+
+Center Workspace
+A large drag-and-drop dashboard builder with:
+
+* Grid-based layout
+* Resizable widgets
+* Snap-to-grid behavior
+* Real-time editing
+* Dashboard sections
+* Widget grouping
+* Multi-select controls
+
+Right AI Agent Panel
+A dedicated autonomous AI workspace that:
+
+* Understands business goals
+* Analyzes uploaded data
+* Suggests KPIs
+* Detects trends and anomalies
+* Generates executive summaries
+* Creates forecasts
+* Recommends dashboard structures
+* Automatically generates dashboard components
+
+At the top of the interface, place a prominent AI command bar:
+
+“Describe what you want to analyze…”
+
+Examples:
+
+* Analyze our sales performance
+* Build an executive dashboard from this CSV
+* Find anomalies in customer behavior
+* Generate KPIs from this dataset
+* Create a revenue forecast dashboard
+
+AI-generated outputs should appear first as Component Drafts, not directly on the dashboard.
+
+Examples:
+
+* KPI Cards
+* Line Charts
+* Bar Charts
+* Heatmaps
+* Funnel Charts
+* Tables
+* Forecast Widgets
+* Executive Summaries
+* AI Insight Cards
+* Opportunity Detection Cards
+* Risk Alerts
+
+Each generated component is automatically stored in a Generated Components History panel with:
+
+* Thumbnail preview
+* Creation timestamp
+* Source dataset reference
+* AI confidence score
+* Favorite option
+* Edit option
+* Duplicate option
+* Delete option
+* Drag-to-dashboard functionality
+
+The dashboard itself remains user-controlled. AI never permanently adds components automatically. Users review generated components, refine them if needed, and then drag or add selected components into the main dashboard.
+
+Show a visual workflow:
+
+Raw Data → AI Analysis → Generated Components → History Library → User Selection → Dashboard
+
+The design should emphasize AI autonomy while maintaining user control.
+
+Visual Style:
+
+* Premium enterprise SaaS
+* Emerald positive indicators
+* Amber warning indicators
+* Minimalist professional layouts
+* High information density
+* Beautiful data visualizations
+* Modern typography
+* Smooth micro-interactions
+* Elegant loading states
+* Clean spacing and hierarchy
+
+Inspired by Notion, Linear, Airtable, Retool, Tableau, Power BI, Vercel Dashboard, and next-generation AI agent products.
+
+The final UI should communicate:
+
+“Upload data, describe your goal, let AI generate insights and dashboard components automatically, then curate the perfect dashboard from AI-created visual assets.”
+
+Ultra-detailed, enterprise-grade, high-fidelity SaaS product design, realistic business analytics data, modern dashboard builder, AI-first workflow, 4K product mockup quality.

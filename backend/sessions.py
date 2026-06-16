@@ -1,0 +1,42 @@
+"""In-memory session store: session_id -> {global_key, dataset, profile}.
+
+Keeps the user's Inflectiv global key server-side after the Connect screen. The
+browser only ever holds the opaque session_id.
+"""
+from __future__ import annotations
+
+import secrets
+from dataclasses import dataclass
+from typing import Optional
+
+from schemas import DatasetProfile
+
+
+@dataclass
+class Session:
+    session_id: str
+    global_key: str
+    dataset_id: int
+    dataset_name: str
+    profile: Optional[DatasetProfile] = None
+    knowledge_source_count: int = 0
+
+
+_sessions: dict[str, Session] = {}
+
+
+def create(global_key: str, dataset: dict) -> Session:
+    sid = "sess_" + secrets.token_urlsafe(16)
+    s = Session(
+        session_id=sid,
+        global_key=global_key,
+        dataset_id=dataset["id"],
+        dataset_name=dataset.get("name", ""),
+        knowledge_source_count=dataset.get("knowledge_source_count", 0),
+    )
+    _sessions[sid] = s
+    return s
+
+
+def get(session_id: str) -> Optional[Session]:
+    return _sessions.get(session_id)
