@@ -55,7 +55,8 @@ dashboard components — **every number carries a citation back to its source pa
 └── .gitignore
 ```
 
-See [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) for the data flow and API reference.
+See [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) for the data flow and API reference, and
+[docs/STATUS.md](docs/STATUS.md) for the feature/test status (what's done, partial, and left).
 
 ---
 
