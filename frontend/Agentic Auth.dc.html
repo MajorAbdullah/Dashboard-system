@@ -242,29 +242,55 @@ body{font-family:'Hanken Grotesk',system-ui,sans-serif;-webkit-font-smoothing:an
         <!-- STEP 2: Data sources -->
         <sc-if value="{{ isStep2 }}" hint-placeholder-val="{{ false }}">
           <div>
-            <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:11px;">
-              <sc-for list="{{ integrations }}" as="g" hint-placeholder-count="11">
-                <button onClick="{{ g.onToggle }}" style="{{ g.style }}">
-                  <span style="width:34px;height:34px;border-radius:9px;background:{{ g.tint }};color:{{ g.color }};display:flex;align-items:center;justify-content:center;font-family:'Newsreader',serif;font-weight:600;font-size:16px;flex:0 0 auto;">{{ g.letter }}</span>
-                  <span style="display:flex;flex-direction:column;text-align:left;flex:1;min-width:0;"><span style="font-size:13px;font-weight:600;color:var(--ink-900);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">{{ g.name }}</span><span style="font-size:10.5px;color:var(--ink-400);">{{ g.kind }}</span></span>
-                  <sc-if value="{{ g.selected }}" hint-placeholder-val="{{ false }}"><span style="position:absolute;top:8px;right:8px;width:17px;height:17px;border-radius:99px;background:var(--violet);display:flex;align-items:center;justify-content:center;"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l4 4L19 7"/></svg></span></sc-if>
-                </button>
-              </sc-for>
+            <div style="display:flex;gap:4px;background:var(--bg-inset);padding:4px;border-radius:11px;margin-bottom:16px;">
+              <button onMouseDown="{{ pickInflectiv }}" style="flex:1;height:36px;border:none;border-radius:8px;background:{{ inflectivBtnBg }};color:{{ inflectivBtnFg }};font:600 13px 'Hanken Grotesk',sans-serif;cursor:pointer;box-shadow:{{ inflectivBtnShadow }};transition:all .12s;">Inflectiv Platform</button>
+              <button onMouseDown="{{ pickDatabase }}" style="flex:1;height:36px;border:none;border-radius:8px;background:{{ dbBtnBg }};color:{{ dbBtnFg }};font:600 13px 'Hanken Grotesk',sans-serif;cursor:pointer;box-shadow:{{ dbBtnShadow }};transition:all .12s;">PostgreSQL Database</button>
             </div>
-            <div style="margin-top:18px;padding:16px;border:1px solid var(--violet-border);border-radius:14px;background:var(--violet-bg);">
-              <div style="font-size:13px;font-weight:700;color:var(--ink-900);margin-bottom:3px;">Connect your live data (Inflectiv)</div>
-              <div style="font-size:11.5px;color:var(--ink-500);line-height:1.5;margin-bottom:12px;">Paste your Inflectiv global key and pick the dataset the agent should analyze. This powers your real dashboard.</div>
-              <div style="display:flex;gap:8px;">
-                <input value="{{ su_inflectivKey }}" onInput="{{ onSuKey }}" type="password" placeholder="inf_global_…" style="flex:1;height:42px;padding:0 13px;border:1px solid var(--border);border-radius:10px;background:var(--bg-panel);font-family:'IBM Plex Mono',monospace;font-size:12.5px;color:var(--ink-900);outline:none;" />
-                <button onMouseDown="{{ loadSuDatasets }}" style="height:42px;padding:0 16px;border:none;border-radius:10px;background:var(--violet);color:#fff;font-family:'Hanken Grotesk',sans-serif;font-weight:600;font-size:13px;cursor:pointer;flex:0 0 auto;">{{ dsLoadLabel }}</button>
+            <sc-if value="{{ isSuSourceInflectiv }}" hint-placeholder-val="{{ true }}">
+              <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:11px;">
+                <sc-for list="{{ integrations }}" as="g" hint-placeholder-count="11">
+                  <button onClick="{{ g.onToggle }}" style="{{ g.style }}">
+                    <span style="width:34px;height:34px;border-radius:9px;background:{{ g.tint }};color:{{ g.color }};display:flex;align-items:center;justify-content:center;font-family:'Newsreader',serif;font-weight:600;font-size:16px;flex:0 0 auto;">{{ g.letter }}</span>
+                    <span style="display:flex;flex-direction:column;text-align:left;flex:1;min-width:0;"><span style="font-size:13px;font-weight:600;color:var(--ink-900);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">{{ g.name }}</span><span style="font-size:10.5px;color:var(--ink-400);">{{ g.kind }}</span></span>
+                    <sc-if value="{{ g.selected }}" hint-placeholder-val="{{ false }}"><span style="position:absolute;top:8px;right:8px;width:17px;height:17px;border-radius:99px;background:var(--violet);display:flex;align-items:center;justify-content:center;"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l4 4L19 7"/></svg></span></sc-if>
+                  </button>
+                </sc-for>
               </div>
-              <sc-if value="{{ hasDatasets }}" hint-placeholder-val="{{ false }}">
-                <select value="{{ su_datasetId }}" onChange="{{ onDsSelect }}" style="width:100%;height:42px;margin-top:10px;padding:0 13px;border:1px solid var(--border);border-radius:10px;background:var(--bg-panel);font-family:'Hanken Grotesk',sans-serif;font-size:14px;color:var(--ink-900);outline:none;cursor:pointer;">
-                  <sc-for list="{{ suDatasetOptions }}" as="opt" hint-placeholder-count="3"><option value="{{ opt.value }}">{{ opt.label }}</option></sc-for>
-                </select>
-              </sc-if>
-              <sc-if value="{{ dsError }}" hint-placeholder-val="{{ false }}"><div style="margin-top:10px;font-size:12px;color:var(--rose);">{{ dsError }}</div></sc-if>
-            </div>
+              <div style="margin-top:18px;padding:16px;border:1px solid var(--violet-border);border-radius:14px;background:var(--violet-bg);">
+                <div style="font-size:13px;font-weight:700;color:var(--ink-900);margin-bottom:3px;">Connect your live data (Inflectiv)</div>
+                <div style="font-size:11.5px;color:var(--ink-500);line-height:1.5;margin-bottom:12px;">Paste your Inflectiv global key and pick the dataset the agent should analyze. This powers your real dashboard.</div>
+                <div style="display:flex;gap:8px;">
+                  <input value="{{ su_inflectivKey }}" onInput="{{ onSuKey }}" type="password" placeholder="inf_global_…" style="flex:1;height:42px;padding:0 13px;border:1px solid var(--border);border-radius:10px;background:var(--bg-panel);font-family:'IBM Plex Mono',monospace;font-size:12.5px;color:var(--ink-900);outline:none;" />
+                  <button onMouseDown="{{ loadSuDatasets }}" style="height:42px;padding:0 16px;border:none;border-radius:10px;background:var(--violet);color:#fff;font-family:'Hanken Grotesk',sans-serif;font-weight:600;font-size:13px;cursor:pointer;flex:0 0 auto;">{{ dsLoadLabel }}</button>
+                </div>
+                <sc-if value="{{ hasDatasets }}" hint-placeholder-val="{{ false }}">
+                  <select value="{{ su_datasetId }}" onChange="{{ onDsSelect }}" style="width:100%;height:42px;margin-top:10px;padding:0 13px;border:1px solid var(--border);border-radius:10px;background:var(--bg-panel);font-family:'Hanken Grotesk',sans-serif;font-size:14px;color:var(--ink-900);outline:none;cursor:pointer;">
+                    <sc-for list="{{ suDatasetOptions }}" as="opt" hint-placeholder-count="3"><option value="{{ opt.value }}">{{ opt.label }}</option></sc-for>
+                  </select>
+                </sc-if>
+                <sc-if value="{{ dsError }}" hint-placeholder-val="{{ false }}"><div style="margin-top:10px;font-size:12px;color:var(--rose);">{{ dsError }}</div></sc-if>
+              </div>
+            </sc-if>
+            <sc-if value="{{ isSuSourceDatabase }}" hint-placeholder-val="{{ false }}">
+              <div style="padding:16px;border:1px solid var(--violet-border);border-radius:14px;background:var(--violet-bg);">
+                <div style="font-size:13px;font-weight:700;color:var(--ink-900);margin-bottom:3px;">Connect PostgreSQL database</div>
+                <div style="font-size:11.5px;color:var(--ink-500);line-height:1.5;margin-bottom:12px;">Enter your PostgreSQL connection string. The agent will introspect the schema and query tables directly.</div>
+                <div style="display:flex;gap:8px;margin-bottom:10px;">
+                  <input value="{{ su_connString }}" onInput="{{ onSuConnString }}" type="password" placeholder="postgresql://user:pass@host:5432/dbname" style="flex:1;height:42px;padding:0 13px;border:1px solid var(--border);border-radius:10px;background:var(--bg-panel);font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--ink-900);outline:none;" />
+                  <sc-if value="{{ suDbTested }}" hint-placeholder-val="{{ false }}"><span style="display:inline-flex;align-items:center;gap:4px;font-size:11px;font-weight:600;color:var(--emerald-ink);background:var(--emerald-bg);padding:4px 10px;border-radius:8px;"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>Connected</span></sc-if>
+                </div>
+                <div style="display:flex;gap:8px;">
+                  <button onMouseDown="{{ loadSuTables }}" style="height:42px;padding:0 16px;border:none;border-radius:10px;background:var(--violet);color:#fff;font-family:'Hanken Grotesk',sans-serif;font-weight:600;font-size:13px;cursor:pointer;flex:0 0 auto;">{{ tablesLoadLabel }}</button>
+                  <input value="{{ su_tableName }}" onInput="{{ onSuTableName }}" placeholder="table_name" style="flex:1;height:42px;padding:0 13px;border:1px solid var(--border);border-radius:10px;background:var(--bg-panel);font-family:'IBM Plex Mono',monospace;font-size:12.5px;color:var(--ink-900);outline:none;" />
+                </div>
+                <sc-if value="{{ hasSuTables }}" hint-placeholder-val="{{ false }}">
+                  <select value="{{ su_tableName }}" onChange="{{ onSuTableSelect }}" style="width:100%;height:42px;margin-top:10px;padding:0 13px;border:1px solid var(--border);border-radius:10px;background:var(--bg-panel);font-family:'Hanken Grotesk',sans-serif;font-size:14px;color:var(--ink-900);outline:none;cursor:pointer;">
+                    <sc-for list="{{ suTableOptions }}" as="opt" hint-placeholder-count="3"><option value="{{ opt.value }}">{{ opt.label }}</option></sc-for>
+                  </select>
+                </sc-if>
+                <sc-if value="{{ dsError }}" hint-placeholder-val="{{ false }}"><div style="margin-top:10px;font-size:12px;color:var(--rose);">{{ dsError }}</div></sc-if>
+              </div>
+            </sc-if>
             <div style="margin-top:14px;font-size:12px;color:var(--ink-400);display:flex;align-items:center;gap:7px;"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 16v-4M12 8h.01"/></svg>{{ sourcesNote }}</div>
           </div>
         </sc-if>
@@ -379,7 +405,9 @@ class Component extends DCLogic {
       name: '', email: '', company: '', password: '', terms: false,
       industry: 'SaaS / Software', size: '', useCase: '', team: '',
       sources: ['csv'], goal: '', goals: [],
+      sourceType: 'inflectiv',
       inflectivKey: '', datasetId: '', datasetName: '', datasets: [], dsLoading: false, dsError: '',
+      connString: '', tableName: '', tables: [], tablesLoading: false, dbTested: false,
       style: 'Balanced', sensitivity: 'Medium', depth: 'Standard', autoSummary: true, forecast: 'Balanced'
     },
     suError: '',
@@ -406,7 +434,10 @@ class Component extends DCLogic {
     const s = this.state.su, st = this.state.step;
     if (st === 0) return !!(s.name && this.emailOk(s.email) && s.company && s.password.length >= 8 && s.terms);
     if (st === 1) return !!(s.industry && s.size && s.useCase && s.team);
-    if (st === 2) return !!(s.inflectivKey.trim() && s.datasetId);
+    if (st === 2) {
+      if (s.sourceType === 'database') return !!(s.connString.trim() && s.tableName.trim());
+      return !!(s.inflectivKey.trim() && s.datasetId);
+    }
     if (st === 3) return !!(s.goal.trim() || s.goals.length >= 1);
     return true;
   }
@@ -432,6 +463,22 @@ class Component extends DCLogic {
       this.setState(s => ({ su: Object.assign({}, s.su, { dsLoading: false, dsError: String(e.message || e) }) }));
     }
   }
+  async loadSuTables() {
+    const cs = this.state.su.connString.trim();
+    if (!cs) { this.setSu('dsError', 'Enter a connection string first.'); return; }
+    this.setSu('tablesLoading', true); this.setSu('dsError', '');
+    try {
+      const res = await fetch(BACKEND + '/db/tables', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ conn_string: cs }) });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.detail || ('HTTP ' + res.status));
+      const list = (data.tables || []).filter(t => t.table_name);
+      if (!list.length) throw new Error('No tables found.');
+      this.setState(s => ({ su: Object.assign({}, s.su, { tables: list, tableName: list[0].table_name, tablesLoading: false, dbTested: true, dsError: '' }) }));
+    } catch (e) {
+      this.setState(s => ({ su: Object.assign({}, s.su, { tablesLoading: false, dsError: String(e.message || e), dbTested: false }) }));
+    }
+  }
+  pickSuSource(type) { this.setSu('sourceType', type); }
   onDsSelect(e) { const id = e.target.value; const ds = this.state.su.datasets.find(d => String(d.id) === id); this.setState(s => ({ su: Object.assign({}, s.su, { datasetId: id, datasetName: ds ? ds.name : '' }) })); }
 
   async signinSubmit() {
@@ -452,6 +499,9 @@ class Component extends DCLogic {
     const payload = {
       name: su.name, email: su.email, company: su.company, password: su.password,
       inflectiv_key: su.inflectivKey.trim(), inflectiv_dataset_id: parseInt(su.datasetId, 10), inflectiv_dataset_name: su.datasetName,
+      db_type: su.sourceType === 'database' ? 'postgresql' : null,
+      db_connection_string: su.sourceType === 'database' ? su.connString.trim() : null,
+      db_table_name: su.sourceType === 'database' ? su.tableName.trim() : null,
       onboarding: { industry: su.industry, size: su.size, useCase: su.useCase, team: su.team, sources: su.sources, goals: su.goals, goal: su.goal },
       ai_prefs: { style: su.style, sensitivity: su.sensitivity, depth: su.depth, autoSummary: su.autoSummary, forecast: su.forecast }
     };
@@ -643,6 +693,21 @@ class Component extends DCLogic {
       hasDatasets: su.datasets.length > 0, su_datasetId: su.datasetId, onDsSelect: (e) => this.onDsSelect(e),
       suDatasetOptions: su.datasets.map(d => ({ value: String(d.id), label: d.name + (d.knowledge_source_count ? ' · ' + d.knowledge_source_count + ' sources' : '') })),
       dsError: su.dsError, suError: s.suError,
+      isSuSourceInflectiv: su.sourceType === 'inflectiv', isSuSourceDatabase: su.sourceType === 'database',
+      pickInflectiv: () => this.pickSuSource('inflectiv'), pickDatabase: () => this.pickSuSource('database'),
+      inflectivBtnBg: su.sourceType === 'inflectiv' ? 'var(--bg-panel)' : 'transparent',
+      inflectivBtnFg: su.sourceType === 'inflectiv' ? 'var(--violet)' : 'var(--ink-500)',
+      inflectivBtnShadow: su.sourceType === 'inflectiv' ? 'var(--shadow-sm)' : 'none',
+      dbBtnBg: su.sourceType === 'database' ? 'var(--bg-panel)' : 'transparent',
+      dbBtnFg: su.sourceType === 'database' ? 'var(--violet)' : 'var(--ink-500)',
+      dbBtnShadow: su.sourceType === 'database' ? 'var(--shadow-sm)' : 'none',
+      su_connString: su.connString, onSuConnString: (e) => this.setSu('connString', e.target.value),
+      su_tableName: su.tableName, onSuTableName: (e) => this.setSu('tableName', e.target.value),
+      onSuTableSelect: (e) => this.setSu('tableName', e.target.value),
+      suDbTested: su.dbTested,
+      loadSuTables: () => this.loadSuTables(), tablesLoadLabel: su.tablesLoading ? 'Loading…' : 'Load tables',
+      hasSuTables: su.tables.length > 0,
+      suTableOptions: su.tables.map(t => ({ value: t.table_name, label: t.table_name + (t.row_estimate ? ' · ~' + t.row_estimate + ' rows' : '') })),
       suPwShow: su.password.length > 0, suPwPct: su_pw.pct, suPwColor: su_pw.color, suPwLabel: su_pw.label,
       toggleTerms: () => this.setSu('terms', !su.terms),
       termsBorder: su.terms ? 'var(--violet)' : 'var(--border-strong)', termsBg: su.terms ? 'var(--violet)' : 'transparent', termsCheck: su.terms ? this.check(12) : '',

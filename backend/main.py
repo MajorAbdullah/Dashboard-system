@@ -1,7 +1,8 @@
 """Agentic Dashboard AI — backend.
 
-Holds the Inflectiv + OpenRouter keys and runs the plan -> retrieve -> structure
-pipeline that turns a natural-language goal into real chart components.
+Holds the Inflectiv data key and LLM provider config (Fireworks / OpenRouter),
+and runs the plan -> retrieve -> structure pipeline that turns a natural-language
+goal into real chart components.
 
 Run:  cd backend && uvicorn main:app --reload --port 8000
 """
@@ -19,11 +20,14 @@ from sse_starlette.sse import EventSourceResponse
 import agentbus
 import cache
 import config
+import datasource
 import db
+import db_connector
 import pipeline
 import routes_app
 import sessions
 from auth import optional_user
+from datasource import make_datasource
 from inflectiv import InflectivClient, InflectivError
 from profiler import profile_dataset
 from schemas import DatasetsRequest, GenerateRequest, RefineRequest, SessionRequest
@@ -66,7 +70,8 @@ def _startup():
 
 @app.get("/api/health")
 async def health():
-    return {"ok": True, "openrouter": config.have_openrouter(), "db": _DB_READY, "cache": cache.backend()}
+    return {"ok": True, "llm": config.have_llm(), "provider": config.active_provider(),
+            "db": _DB_READY, "cache": cache.backend()}
 
 
 @app.get("/api/datasets")
@@ -103,9 +108,42 @@ async def list_datasets_for_key(req: DatasetsRequest):
 
 @app.post("/api/session")
 async def create_session(req: SessionRequest, user: Optional[dict] = Depends(optional_user)):
-    """Connect screen / auto-connect: resolve the dataset, profile it. The key is stored
-    server-side; the browser gets back an opaque session_id. If the request omits a key
-    and the caller is a logged-in user with a stored Inflectiv key, use that."""
+    """Connect screen / auto-connect: resolve the dataset, profile it. Supports both
+    Inflectiv semantic mode and direct PostgreSQL database mode."""
+    source_type = req.source_type or "inflectiv"
+
+    if source_type == "database":
+        conn_string = (req.conn_string or "").strip()
+        table_name = (req.table_name or "").strip()
+        if not conn_string:
+            raise HTTPException(400, "Database connection string is required.")
+        if not table_name:
+            raise HTTPException(400, "Table name is required.")
+
+        test_result = db_connector.test_connection(conn_string)
+        if not test_result.get("ok"):
+            raise HTTPException(400, f"Database connection failed: {test_result.get('error')}")
+
+        key = (req.global_key or "").strip() or config.INFLECTIV_FALLBACK_KEY
+        sess = sessions.create(global_key=key, source_type="database",
+                               conn_string=conn_string, table_name=table_name)
+        ds = datasource.DatabaseDataSource(conn_string, table_name)
+        profile = None
+        if config.have_llm():
+            try:
+                profile = await ds.get_profile(emit=None)
+                sess.profile = profile
+            except Exception:
+                pass
+        return {
+            "session_id": sess.session_id,
+            "source_type": "database",
+            "dataset_name": table_name,
+            "profile": profile.model_dump() if profile else None,
+            "suggested": [c.model_dump() for c in (profile.suggested_charts if profile else [])],
+            "suggested_queries": (profile.suggested_queries if profile else []),
+        }
+
     key = (req.global_key or "").strip()
     ds_id, ds_name = req.dataset_id, (req.dataset_name or "").strip() or None
     if not key and user and user.get("inflectiv_key"):
@@ -129,7 +167,7 @@ async def create_session(req: SessionRequest, user: Optional[dict] = Depends(opt
 
     sess = sessions.create(key, dataset)
     profile = None
-    if config.have_openrouter():
+    if config.have_llm():
         try:
             profile = await profile_dataset(client, dataset)
             sess.profile = profile
@@ -137,6 +175,7 @@ async def create_session(req: SessionRequest, user: Optional[dict] = Depends(opt
             pass
     return {
         "session_id": sess.session_id,
+        "source_type": "inflectiv",
         "dataset_id": sess.dataset_id,
         "dataset_name": sess.dataset_name,
         "knowledge_source_count": sess.knowledge_source_count,
@@ -146,24 +185,48 @@ async def create_session(req: SessionRequest, user: Optional[dict] = Depends(opt
     }
 
 
+@app.post("/api/db/test")
+async def db_test(req: SessionRequest):
+    """Test a database connection."""
+    conn_string = (req.conn_string or "").strip()
+    if not conn_string:
+        raise HTTPException(400, "Connection string is required.")
+    result = db_connector.test_connection(conn_string)
+    if not result.get("ok"):
+        raise HTTPException(400, result.get("error", "Connection failed"))
+    return result
+
+
+@app.post("/api/db/tables")
+async def db_tables(req: SessionRequest):
+    """List tables for a database connection."""
+    conn_string = (req.conn_string or "").strip()
+    if not conn_string:
+        raise HTTPException(400, "Connection string is required.")
+    try:
+        tables = db_connector.list_tables(conn_string)
+        return {"tables": tables}
+    except db_connector.DbConnectorError as e:
+        raise HTTPException(400, str(e))
+
+
 def _require_session(session_id: str) -> sessions.Session:
     sess = sessions.get(session_id)
     if not sess:
         raise HTTPException(401, "Unknown or expired session. Reconnect on the Connect screen.")
-    if not config.have_openrouter():
-        raise HTTPException(503, "OPENROUTER_API_KEY is not set in backend/.env.")
+    if not config.have_llm():
+        raise HTTPException(503, "No LLM provider configured. Set FIREWORKS_API_KEY "
+                                 "(preferred) or OPENROUTER_API_KEY in backend/.env.")
     return sess
 
 
 @app.post("/api/generate")
 async def generate(req: GenerateRequest, user: Optional[dict] = Depends(optional_user)):
     sess = _require_session(req.session_id)
-    client = InflectivClient(sess.global_key)
+    ds = make_datasource(sess)
     emit = agentbus.make_emit(req.job_id)
     try:
-        result = await pipeline.generate(
-            client, sess.dataset_id, sess.dataset_name, req.goal, sess.profile, emit
-        )
+        result = await pipeline.generate(ds, req.goal, sess.profile, emit)
     except Exception as e:
         await agentbus.finish(req.job_id, 0)
         raise HTTPException(502, f"generate failed: {e}")
@@ -194,10 +257,10 @@ def _persist_drafts(user_id: int, goal: str, drafts: list) -> None:
 @app.post("/api/refine")
 async def refine(req: RefineRequest):
     sess = _require_session(req.session_id)
-    client = InflectivClient(sess.global_key)
+    ds = make_datasource(sess)
     emit = agentbus.make_emit(req.job_id)
     try:
-        result = await pipeline.refine(client, sess.dataset_id, sess.dataset_name, req.message, emit)
+        result = await pipeline.refine(ds, req.message, emit)
     except Exception as e:
         await agentbus.finish(req.job_id, 0)
         raise HTTPException(502, f"refine failed: {e}")

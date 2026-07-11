@@ -10,7 +10,7 @@ import cache
 import config
 import prompts
 from inflectiv import InflectivClient
-from openrouter import chat_json
+from llm import chat_json
 from schemas import DatasetProfile
 
 PROBES = [
@@ -62,8 +62,12 @@ async def profile_dataset(client: InflectivClient, dataset: dict, emit=None) -> 
     except Exception:
         profile = DatasetProfile(summary=dataset.get("description") or "")
 
-    # size heuristic: few sources => we can pull broadly and aggregate exactly
     profile.size_estimate = "small" if ks and ks <= 3 else "large"
     cache.set_profile(dataset_id, profile)
     await _emit("Profile ready", "done")
     return profile
+
+
+async def profile_db_table(datasource, emit=None) -> DatasetProfile:
+    """Profile a database table using the DatabaseDataSource directly."""
+    return await datasource.get_profile(emit=emit)

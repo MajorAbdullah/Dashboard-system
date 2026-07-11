@@ -29,6 +29,9 @@ class SignupRequest(BaseModel):
     inflectiv_key: Optional[str] = None
     inflectiv_dataset_id: Optional[int] = None
     inflectiv_dataset_name: Optional[str] = None
+    db_type: Optional[str] = None
+    db_connection_string: Optional[str] = None
+    db_table_name: Optional[str] = None
     onboarding: Optional[dict] = None
     ai_prefs: Optional[dict] = None
 
@@ -54,6 +57,9 @@ class ProfileUpdate(BaseModel):
     ai_prefs: Optional[dict] = None
     inflectiv_dataset_id: Optional[int] = None
     inflectiv_dataset_name: Optional[str] = None
+    db_type: Optional[str] = None
+    db_connection_string: Optional[str] = None
+    db_table_name: Optional[str] = None
 
 
 class SettingsUpdate(BaseModel):
@@ -89,6 +95,9 @@ class SessionRequest(BaseModel):
     global_key: Optional[str] = None
     dataset_name: Optional[str] = None
     dataset_id: Optional[int] = None
+    source_type: str = "inflectiv"
+    conn_string: Optional[str] = None
+    table_name: Optional[str] = None
 
 
 class GenerateRequest(BaseModel):

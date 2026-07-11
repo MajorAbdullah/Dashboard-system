@@ -61,6 +61,10 @@ def public_user(user: dict) -> dict:
         "inflectiv_dataset_id": user.get("inflectiv_dataset_id"),
         "inflectiv_dataset_name": user.get("inflectiv_dataset_name"),
         "has_key": bool(user.get("inflectiv_key")),
+        "db_type": user.get("db_type"),
+        "db_connection_string": user.get("db_connection_string"),
+        "db_table_name": user.get("db_table_name"),
+        "has_db": bool(user.get("db_connection_string")),
         "ai_prefs": user.get("ai_prefs"), "onboarding": user.get("onboarding"),
         "created_at": str(user.get("created_at") or ""),
     }

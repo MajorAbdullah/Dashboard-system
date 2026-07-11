@@ -12,7 +12,23 @@ INFLECTIV_BASE = os.getenv("INFLECTIV_BASE", "https://app.inflectiv.ai/api/platf
 # via the Connect screen, so this is only a convenience default.
 INFLECTIV_FALLBACK_KEY = os.getenv("INFLECTIV_API_KEY", "")
 
-# --- OpenRouter (LLM) ---
+# --- LLM providers (OpenAI-compatible) ---
+# Priority provider: "fireworks" (AMD-hardware-hosted, e.g. Gemma) or "openrouter".
+# The other is used as an automatic fallback. See backend/llm.py for routing.
+LLM_PROVIDER = os.getenv("LLM_PROVIDER", "fireworks").strip().lower()
+
+# Fireworks AI (primary) — models served on AMD hardware. Model IDs are
+# account-scoped: "accounts/fireworks/models/<slug>". Override the two model
+# vars to match whatever Gemma model the hackathon officially announces; the
+# serverless catalog rotates, so a retired slug will 404 (and we fall back).
+FIREWORKS_BASE = os.getenv("FIREWORKS_BASE", "https://api.fireworks.ai/inference/v1")
+FIREWORKS_API_KEY = os.getenv("FIREWORKS_API_KEY", "")
+FIREWORKS_MODEL_FAST = os.getenv(
+    "FIREWORKS_MODEL_FAST", "accounts/fireworks/models/gemma-3-12b-it")
+FIREWORKS_MODEL_STRONG = os.getenv(
+    "FIREWORKS_MODEL_STRONG", "accounts/fireworks/models/gemma-3-12b-it")
+
+# OpenRouter (fallback) — kept so the app still works without Fireworks credits.
 OPENROUTER_BASE = os.getenv("OPENROUTER_BASE", "https://openrouter.ai/api/v1")
 OPENROUTER_API_KEY = os.getenv("OPENROUTER_API_KEY", "")
 # Fast model for planning/structuring (many small calls); strong model for summaries.
@@ -33,5 +49,21 @@ DATABASE_URL = os.getenv("DATABASE_URL", "")
 REDIS_URL = os.getenv("REDIS_URL", "")
 
 
-def have_openrouter() -> bool:
+def have_llm() -> bool:
+    """True if any LLM provider (Fireworks or OpenRouter) is configured."""
+    return bool(FIREWORKS_API_KEY or OPENROUTER_API_KEY)
+
+
+def active_provider() -> str | None:
+    """Name of the highest-priority provider that has a key, or None."""
+    order = [("fireworks", FIREWORKS_API_KEY), ("openrouter", OPENROUTER_API_KEY)]
+    if LLM_PROVIDER == "openrouter":
+        order.reverse()
+    for name, key in order:
+        if key:
+            return name
+    return None
+
+
+def have_openrouter() -> bool:  # kept for backward compatibility
     return bool(OPENROUTER_API_KEY)

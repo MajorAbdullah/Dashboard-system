@@ -137,6 +137,9 @@ def init_db() -> None:
         c.execute(SCHEMA)
         # additive columns for existing DBs
         c.execute("ALTER TABLE users ADD COLUMN IF NOT EXISTS workspace JSONB;")
+        c.execute("ALTER TABLE users ADD COLUMN IF NOT EXISTS db_type TEXT;")
+        c.execute("ALTER TABLE users ADD COLUMN IF NOT EXISTS db_connection_string TEXT;")
+        c.execute("ALTER TABLE users ADD COLUMN IF NOT EXISTS db_table_name TEXT;")
 
 
 def reset_db() -> None:

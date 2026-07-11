@@ -71,34 +71,66 @@ body{font-family:'Hanken Grotesk',system-ui,sans-serif;-webkit-font-smoothing:an
             <button onMouseDown="{{ closeConnect }}" title="Close" style="width:30px;height:30px;border:1px solid var(--border);border-radius:9px;background:var(--bg-panel);color:var(--ink-500);cursor:pointer;display:flex;align-items:center;justify-content:center;flex:0 0 auto;"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg></button>
           </sc-if>
         </div>
-        <p style="margin:0 0 18px;font-size:13px;line-height:1.5;color:var(--ink-500);">Paste your Inflectiv global key, then pick a dataset. Your key stays on the server — the agent queries that dataset to build real, sourced components.</p>
+        <p style="margin:0 0 18px;font-size:13px;line-height:1.5;color:var(--ink-500);">Choose your data source. Keys stay on the server — the agent queries your data to build real, sourced components.</p>
 
-        <!-- stage 1: key -->
-        <sc-if value="{{ connStageKey }}" hint-placeholder-val="{{ false }}">
-          <div>
-            <label style="display:block;font-size:12px;font-weight:600;color:var(--ink-700);margin-bottom:6px;">Global API key</label>
-            <input value="{{ connKey }}" onInput="{{ onConnKey }}" type="password" placeholder="inf_global_…" style="width:100%;height:42px;padding:0 13px;border:1px solid var(--border);border-radius:10px;background:var(--bg-sub);font-family:'IBM Plex Mono',monospace;font-size:12.5px;color:var(--ink-900);outline:none;margin-bottom:14px;" />
-            <sc-if value="{{ hasConnectErr }}" hint-placeholder-val="{{ false }}">
-              <div style="margin-bottom:12px;font-size:12px;line-height:1.45;color:var(--rose);background:var(--rose-bg);border-radius:8px;padding:9px 11px;">{{ connectErr }}</div>
-            </sc-if>
-            <button onMouseDown="{{ loadDatasets }}" style-hover="{{ primaryHover }}" style="width:100%;height:46px;border:none;border-radius:11px;background:var(--violet);color:#fff;font-family:'Hanken Grotesk',sans-serif;font-weight:600;font-size:14px;cursor:pointer;box-shadow:var(--shadow-md);">{{ loadBtnLabel }}</button>
-          </div>
+        <!-- source type toggle -->
+        <div style="display:flex;gap:4px;background:var(--bg-inset);padding:4px;border-radius:11px;margin-bottom:16px;">
+          <button onMouseDown="{{ setSrcInflectiv }}" style="flex:1;height:36px;border:none;border-radius:8px;background:{{ srcInflectivBg }};color:{{ srcInflectivFg }};font:600 13px 'Hanken Grotesk',sans-serif;cursor:pointer;box-shadow:{{ srcInflectivShadow }};transition:all .12s;">Inflectiv</button>
+          <button onMouseDown="{{ setSrcDatabase }}" style="flex:1;height:36px;border:none;border-radius:8px;background:{{ srcDatabaseBg }};color:{{ srcDatabaseFg }};font:600 13px 'Hanken Grotesk',sans-serif;cursor:pointer;box-shadow:{{ srcDatabaseShadow }};transition:all .12s;">PostgreSQL</button>
+        </div>
+
+        <!-- Inflectiv mode -->
+        <sc-if value="{{ isSrcInflectiv }}" hint-placeholder-val="{{ true }}">
+          <!-- stage 1: key -->
+          <sc-if value="{{ connStageKey }}" hint-placeholder-val="{{ false }}">
+            <div>
+              <label style="display:block;font-size:12px;font-weight:600;color:var(--ink-700);margin-bottom:6px;">Global API key</label>
+              <input value="{{ connKey }}" onInput="{{ onConnKey }}" type="password" placeholder="inf_global_…" style="width:100%;height:42px;padding:0 13px;border:1px solid var(--border);border-radius:10px;background:var(--bg-sub);font-family:'IBM Plex Mono',monospace;font-size:12.5px;color:var(--ink-900);outline:none;margin-bottom:14px;" />
+              <sc-if value="{{ hasConnectErr }}" hint-placeholder-val="{{ false }}">
+                <div style="margin-bottom:12px;font-size:12px;line-height:1.45;color:var(--rose);background:var(--rose-bg);border-radius:8px;padding:9px 11px;">{{ connectErr }}</div>
+              </sc-if>
+              <button onMouseDown="{{ loadDatasets }}" style-hover="{{ primaryHover }}" style="width:100%;height:46px;border:none;border-radius:11px;background:var(--violet);color:#fff;font-family:'Hanken Grotesk',sans-serif;font-weight:600;font-size:14px;cursor:pointer;box-shadow:var(--shadow-md);">{{ loadBtnLabel }}</button>
+            </div>
+          </sc-if>
+
+          <!-- stage 2: dataset picker -->
+          <sc-if value="{{ connStageSelect }}" hint-placeholder-val="{{ false }}">
+            <div>
+              <label style="display:block;font-size:12px;font-weight:600;color:var(--ink-700);margin-bottom:6px;">Choose a dataset</label>
+              <select value="{{ connDatasetId }}" onChange="{{ onConnDataset }}" style="width:100%;height:42px;padding:0 13px;border:1px solid var(--border);border-radius:10px;background:var(--bg-sub);font-family:'Hanken Grotesk',sans-serif;font-size:14px;color:var(--ink-900);outline:none;margin-bottom:14px;cursor:pointer;">
+                <sc-for list="{{ connDatasetOptions }}" as="opt" hint-placeholder-count="3">
+                  <option value="{{ opt.value }}">{{ opt.label }}</option>
+                </sc-for>
+              </select>
+              <sc-if value="{{ hasConnectErr }}" hint-placeholder-val="{{ false }}">
+                <div style="margin-bottom:12px;font-size:12px;line-height:1.45;color:var(--rose);background:var(--rose-bg);border-radius:8px;padding:9px 11px;">{{ connectErr }}</div>
+              </sc-if>
+              <button onMouseDown="{{ doConnect }}" style-hover="{{ primaryHover }}" style="width:100%;height:46px;border:none;border-radius:11px;background:var(--violet);color:#fff;font-family:'Hanken Grotesk',sans-serif;font-weight:600;font-size:14px;cursor:pointer;box-shadow:var(--shadow-md);">{{ connectBtnLabel }}</button>
+              <button onMouseDown="{{ connBack }}" style="width:100%;height:38px;margin-top:8px;border:none;border-radius:10px;background:transparent;color:var(--ink-500);font-family:'Hanken Grotesk',sans-serif;font-weight:600;font-size:12.5px;cursor:pointer;">← Use a different key</button>
+            </div>
+          </sc-if>
         </sc-if>
 
-        <!-- stage 2: dataset picker -->
-        <sc-if value="{{ connStageSelect }}" hint-placeholder-val="{{ false }}">
+        <!-- Database mode -->
+        <sc-if value="{{ isSrcDatabase }}" hint-placeholder-val="{{ false }}">
           <div>
-            <label style="display:block;font-size:12px;font-weight:600;color:var(--ink-700);margin-bottom:6px;">Choose a dataset</label>
-            <select value="{{ connDatasetId }}" onChange="{{ onConnDataset }}" style="width:100%;height:42px;padding:0 13px;border:1px solid var(--border);border-radius:10px;background:var(--bg-sub);font-family:'Hanken Grotesk',sans-serif;font-size:14px;color:var(--ink-900);outline:none;margin-bottom:14px;cursor:pointer;">
-              <sc-for list="{{ connDatasetOptions }}" as="opt" hint-placeholder-count="3">
-                <option value="{{ opt.value }}">{{ opt.label }}</option>
-              </sc-for>
-            </select>
+            <label style="display:block;font-size:12px;font-weight:600;color:var(--ink-700);margin-bottom:6px;">PostgreSQL connection string</label>
+            <input value="{{ connDbString }}" onInput="{{ onConnDbString }}" type="password" placeholder="postgresql://user:pass@host:5432/dbname" style="width:100%;height:42px;padding:0 13px;border:1px solid var(--border);border-radius:10px;background:var(--bg-sub);font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--ink-900);outline:none;margin-bottom:14px;" />
             <sc-if value="{{ hasConnectErr }}" hint-placeholder-val="{{ false }}">
               <div style="margin-bottom:12px;font-size:12px;line-height:1.45;color:var(--rose);background:var(--rose-bg);border-radius:8px;padding:9px 11px;">{{ connectErr }}</div>
             </sc-if>
-            <button onMouseDown="{{ doConnect }}" style-hover="{{ primaryHover }}" style="width:100%;height:46px;border:none;border-radius:11px;background:var(--violet);color:#fff;font-family:'Hanken Grotesk',sans-serif;font-weight:600;font-size:14px;cursor:pointer;box-shadow:var(--shadow-md);">{{ connectBtnLabel }}</button>
-            <button onMouseDown="{{ connBack }}" style="width:100%;height:38px;margin-top:8px;border:none;border-radius:10px;background:transparent;color:var(--ink-500);font-family:'Hanken Grotesk',sans-serif;font-weight:600;font-size:12.5px;cursor:pointer;">← Use a different key</button>
+            <button onMouseDown="{{ loadDbTables }}" style-hover="{{ primaryHover }}" style="width:100%;height:46px;border:none;border-radius:11px;background:var(--violet);color:#fff;font-family:'Hanken Grotesk',sans-serif;font-weight:600;font-size:14px;cursor:pointer;box-shadow:var(--shadow-md);">{{ loadDbTablesLabel }}</button>
+            <sc-if value="{{ hasDbTables }}" hint-placeholder-val="{{ false }}">
+              <div style="margin-top:14px;">
+                <label style="display:block;font-size:12px;font-weight:600;color:var(--ink-700);margin-bottom:6px;">Choose a table</label>
+                <select value="{{ connDbTable }}" onChange="{{ onConnDbTable }}" style="width:100%;height:42px;padding:0 13px;border:1px solid var(--border);border-radius:10px;background:var(--bg-sub);font-family:'Hanken Grotesk',sans-serif;font-size:14px;color:var(--ink-900);outline:none;margin-bottom:14px;cursor:pointer;">
+                  <sc-for list="{{ connDbTableOptions }}" as="opt" hint-placeholder-count="3">
+                    <option value="{{ opt.value }}">{{ opt.label }}</option>
+                  </sc-for>
+                </select>
+                <button onMouseDown="{{ doDbConnect }}" style-hover="{{ primaryHover }}" style="width:100%;height:46px;border:none;border-radius:11px;background:var(--violet);color:#fff;font-family:'Hanken Grotesk',sans-serif;font-weight:600;font-size:14px;cursor:pointer;box-shadow:var(--shadow-md);">{{ connectDbBtnLabel }}</button>
+              </div>
+            </sc-if>
           </div>
         </sc-if>
       </div>
@@ -456,6 +488,7 @@ class Component extends DCLogic {
   state = {
     connected: false, connecting: false, connectErr: '', connKey: '', connName: '',
     connStage: 'key', connDatasets: [], connDatasetId: '', connLoading: false, showConnect: false,
+    connSourceType: 'inflectiv', connDbString: '', connDbTable: '', connDbTables: [], connDbLoading: false,
     sessionId: null, datasetId: null, datasetName: '', usedBackend: false, suggestedQueries: [], savedFlash: false,
     theme: 'light', goal: '', followup: '', focused: false,
     phase: 'idle', thinkSteps: [], dragging: false, dragDraft: null,
@@ -468,24 +501,44 @@ class Component extends DCLogic {
   componentDidMount() { try { const t = localStorage.getItem('ada-theme'); if (t === 'dark' || t === 'light') this.setState({ theme: t }); } catch (x) {} this.restoreConnection(); }
   componentWillUnmount() { this.timers.forEach(clearTimeout); }
   async restoreConnection() {
-    // 1) logged-in user with a stored Inflectiv key → auto-connect, no overlay
     let token = null; try { token = localStorage.getItem('ada-token'); } catch (x) {}
     if (token) {
       try {
         const me = await fetch(BACKEND + '/me', { headers: authHeaders() }).then(r => r.ok ? r.json() : null);
-        if (me && me.user && me.user.inflectiv_dataset_id) {
-          this.setState({ connected: true, usedBackend: true, datasetName: me.user.inflectiv_dataset_name || '' });
-          const data = await fetch(BACKEND + '/session', { method: 'POST', headers: authHeaders(), body: '{}' }).then(r => r.json());
-          this.setState({ sessionId: data.session_id, datasetId: data.dataset_id, datasetName: data.dataset_name || '', suggestedQueries: data.suggested_queries || [] });
-          this.loadDashboardFromUrl();
-          return;
+        if (me && me.user) {
+          // Database user
+          if (me.user.has_db && me.user.db_connection_string && me.user.db_table_name) {
+            this.setState({ connected: true, usedBackend: true, datasetName: me.user.db_table_name || '' });
+            const data = await fetch(BACKEND + '/session', { method: 'POST', headers: authHeaders(), body: JSON.stringify({ source_type: 'database', conn_string: me.user.db_connection_string, table_name: me.user.db_table_name }) }).then(r => r.json());
+            this.setState({ sessionId: data.session_id, datasetName: data.dataset_name || '', suggestedQueries: data.suggested_queries || [] });
+            this.loadDashboardFromUrl();
+            return;
+          }
+          // Inflectiv user
+          if (me.user.inflectiv_dataset_id) {
+            this.setState({ connected: true, usedBackend: true, datasetName: me.user.inflectiv_dataset_name || '' });
+            const data = await fetch(BACKEND + '/session', { method: 'POST', headers: authHeaders(), body: '{}' }).then(r => r.json());
+            this.setState({ sessionId: data.session_id, datasetId: data.dataset_id, datasetName: data.dataset_name || '', suggestedQueries: data.suggested_queries || [] });
+            this.loadDashboardFromUrl();
+            return;
+          }
         }
       } catch (x) {}
     }
-    // 2) fallback: per-tab Connect persisted to localStorage
     let saved = null;
     try { saved = JSON.parse(localStorage.getItem('ada-conn') || 'null'); } catch (x) {}
-    if (!saved || !saved.datasetId) return;
+    if (!saved) return;
+    if (saved.sourceType === 'database') {
+      this.setState({ connected: true, usedBackend: true, datasetName: saved.tableName || '' });
+      try {
+        const res = await fetch(BACKEND + '/session', { method: 'POST', headers: authHeaders(), body: JSON.stringify({ source_type: 'database', conn_string: saved.connString || '', table_name: saved.tableName }) });
+        const data = await res.json();
+        if (res.ok) this.setState({ sessionId: data.session_id, datasetName: data.dataset_name || saved.tableName || '', suggestedQueries: data.suggested_queries || [] });
+      } catch (x) {}
+      this.loadDashboardFromUrl();
+      return;
+    }
+    if (!saved.datasetId) return;
     this.setState({ connected: true, usedBackend: true, connKey: saved.key || '', datasetId: saved.datasetId, datasetName: saved.datasetName || '' });
     try {
       const res = await fetch(BACKEND + '/session', { method: 'POST', headers: authHeaders(), body: JSON.stringify({ global_key: saved.key || '', dataset_id: saved.datasetId }) });
@@ -933,8 +986,12 @@ class Component extends DCLogic {
   onConnKey(e) { this.setState({ connKey: e.target.value, connectErr: '' }); }
   onConnDataset(e) { this.setState({ connDatasetId: e.target.value, connectErr: '' }); }
   connBack() { this.setState({ connStage: 'key', connectErr: '' }); }
-  openConnect() { this.setState({ showConnect: true, connStage: 'key', connectErr: '' }); }
+  openConnect() { this.setState({ showConnect: true, connStage: 'key', connectErr: '', connSourceType: 'inflectiv' }); }
   closeConnect() { if (this.state.connected) this.setState({ showConnect: false, connectErr: '' }); }
+  setSrcInflectiv() { this.setState({ connSourceType: 'inflectiv', connectErr: '' }); }
+  setSrcDatabase() { this.setState({ connSourceType: 'database', connectErr: '' }); }
+  onConnDbString(e) { this.setState({ connDbString: e.target.value, connectErr: '' }); }
+  onConnDbTable(e) { this.setState({ connDbTable: e.target.value, connectErr: '' }); }
   async loadDatasets() {
     const key = (this.state.connKey || '').trim();
     this.setState({ connLoading: true, connectErr: '' });
@@ -960,6 +1017,36 @@ class Component extends DCLogic {
       if (!res.ok) throw new Error(data.detail || ('HTTP ' + res.status));
       try { localStorage.setItem('ada-conn', JSON.stringify({ key: key, datasetId: data.dataset_id, datasetName: data.dataset_name || '' })); } catch (x) {}
       this.setState({ connected: true, connecting: false, showConnect: false, usedBackend: true, sessionId: data.session_id, datasetId: data.dataset_id, datasetName: data.dataset_name || '', suggestedQueries: data.suggested_queries || [], drafts: [], widgets: [], phase: 'idle', thinkSteps: [] });
+    } catch (e) {
+      this.setState({ connecting: false, connectErr: 'Could not connect: ' + (e.message || e) });
+    }
+  }
+  async loadDbTables() {
+    const cs = (this.state.connDbString || '').trim();
+    this.setState({ connDbLoading: true, connectErr: '' });
+    try {
+      const res = await fetch(BACKEND + '/db/tables', { method: 'POST', headers: authHeaders(), body: JSON.stringify({ conn_string: cs }) });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.detail || ('HTTP ' + res.status));
+      const list = (data.tables || []).filter(t => t.table_name);
+      if (!list.length) throw new Error('No tables found.');
+      this.setState({ connDbLoading: false, connDbTables: list, connDbTable: list[0].table_name });
+    } catch (e) {
+      this.setState({ connDbLoading: false, connectErr: 'Could not load tables: ' + (e.message || e) });
+    }
+  }
+  async doDbConnect() {
+    const cs = (this.state.connDbString || '').trim();
+    const tb = (this.state.connDbTable || '').trim();
+    if (!cs) { this.setState({ connectErr: 'Enter a connection string.' }); return; }
+    if (!tb) { this.setState({ connectErr: 'Select a table.' }); return; }
+    this.setState({ connecting: true, connectErr: '' });
+    try {
+      const res = await fetch(BACKEND + '/session', { method: 'POST', headers: authHeaders(), body: JSON.stringify({ source_type: 'database', conn_string: cs, table_name: tb }) });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.detail || ('HTTP ' + res.status));
+      try { localStorage.setItem('ada-conn', JSON.stringify({ sourceType: 'database', connString: cs, tableName: tb })); } catch (x) {}
+      this.setState({ connected: true, connecting: false, showConnect: false, usedBackend: true, sessionId: data.session_id, datasetName: data.dataset_name || tb, suggestedQueries: data.suggested_queries || [], drafts: [], widgets: [], phase: 'idle', thinkSteps: [] });
     } catch (e) {
       this.setState({ connecting: false, connectErr: 'Could not connect: ' + (e.message || e) });
     }
@@ -1137,6 +1224,22 @@ class Component extends DCLogic {
       connBack: () => this.connBack(),
       openConnect: () => this.openConnect(),
       closeConnect: () => this.closeConnect(),
+      isSrcInflectiv: s.connSourceType === 'inflectiv',
+      isSrcDatabase: s.connSourceType === 'database',
+      setSrcInflectiv: () => this.setSrcInflectiv(),
+      setSrcDatabase: () => this.setSrcDatabase(),
+      srcInflectivBg: s.connSourceType === 'inflectiv' ? 'var(--bg-panel)' : 'transparent',
+      srcInflectivFg: s.connSourceType === 'inflectiv' ? 'var(--violet)' : 'var(--ink-500)',
+      srcInflectivShadow: s.connSourceType === 'inflectiv' ? 'var(--shadow-sm)' : 'none',
+      srcDatabaseBg: s.connSourceType === 'database' ? 'var(--bg-panel)' : 'transparent',
+      srcDatabaseFg: s.connSourceType === 'database' ? 'var(--violet)' : 'var(--ink-500)',
+      srcDatabaseShadow: s.connSourceType === 'database' ? 'var(--shadow-sm)' : 'none',
+      connDbString: s.connDbString, onConnDbString: (e) => this.onConnDbString(e),
+      connDbTable: s.connDbTable, onConnDbTable: (e) => this.onConnDbTable(e),
+      connDbTableOptions: s.connDbTables.map(t => ({ value: t.table_name, label: t.table_name + (t.row_estimate ? ' · ~' + t.row_estimate + ' rows' : '') })),
+      hasDbTables: s.connDbTables.length > 0, loadDbTables: () => this.loadDbTables(),
+      loadDbTablesLabel: s.connDbLoading ? 'Loading…' : 'Load tables',
+      doDbConnect: () => this.doDbConnect(), connectDbBtnLabel: s.connecting ? 'Connecting…' : 'Connect table',
       goal: s.goal,
       followup: s.followup,
       sidebarOpen: s.sidebarOpen,

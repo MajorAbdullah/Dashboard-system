@@ -2,21 +2,23 @@
 
 Numbers come from an LLM extracting over a non-exhaustive vector sample, so the
 honesty layer (grounded flag, provenance sources, score-based confidence) is
-load-bearing, not decorative.
+load-bearing, not decorative. Supports both Inflectiv and direct database modes.
 """
 from __future__ import annotations
 
 import asyncio
+from typing import Optional
 
 import cache
 import prompts
+from datasource import BaseDataSource
 from inflectiv import InflectivClient, InflectivError
-from openrouter import chat_json, chat_text
+from llm import chat_json, chat_text
 from schemas import ChartSpec, DashboardPlan, DatasetProfile, SourceRef
 import config
 
 
-# ---------------- retrieval ----------------
+# ---------------- retrieval (Inflectiv-only) ----------------
 async def _retrieve(client: InflectivClient, dataset_id: int, queries: list[str],
                     top_k: int, emit) -> dict[str, list[dict]]:
     """Return {query: [chunk,...]} using cache + dedupe + batch (with sequential fallback)."""
@@ -38,7 +40,6 @@ async def _retrieve(client: InflectivClient, dataset_id: int, queries: list[str]
                 q = item.get("query", "")
                 results_by_query[q] = item.get("results", [])
         except InflectivError:
-            # batch may be gated to higher tiers — fall back to parallel single queries
             async def one(q: str):
                 try:
                     r = await client.query(dataset_id, q, top_k, None)
@@ -70,12 +71,11 @@ def _chunks_for(plan_needs: list[int], subqueries: list[str], retrieved: dict[st
 
 
 def _confidence(chunks: list[dict], grounded: bool) -> int:
-    """Confidence from real retrieval: avg score scaled, nudged by chunk count + grounding."""
     if not chunks:
         return 35
     avg = sum(c.get("score", 0) for c in chunks) / len(chunks)
     base = max(0.0, min(1.0, avg)) * 100
-    base = min(98, base + min(len(chunks), 8))  # more supporting chunks => a little more confident
+    base = min(98, base + min(len(chunks), 8))
     if not grounded:
         base *= 0.8
     return int(max(30, min(98, base)))
@@ -88,42 +88,71 @@ def _format_chunks(chunks: list[dict], limit: int = 12) -> str:
     return "\n\n".join(lines) if lines else "(no passages retrieved)"
 
 
-async def _structure_one(chart, subqueries, retrieved, source_name: str, exact: bool, pool: list) -> ChartSpec | None:
+async def _structure_one(chart, subqueries, retrieved, source_name: str, exact: bool, pool: list,
+                         source_type: str = "inflectiv") -> ChartSpec | None:
     chunks = _chunks_for(chart.needs, subqueries, retrieved)
     if not chunks:
-        chunks = pool[:14]  # fall back to the global pool so every chart gets context
-    user = (
-        f"Chart intent: type={chart.type}, title={chart.title!r}, data source={source_name!r}.\n\n"
-        f"Retrieved passages:\n{_format_chunks(chunks)}"
-    )
+        chunks = pool[:14]
+    if source_type == "database":
+        prompt = prompts.DB_STRUCTURER
+        results_text = "\n".join(c.get("text", "") for c in chunks[:20]) or "(no results)"
+        user = (
+            f"Chart intent: type={chart.type}, title={chart.title!r}, data source={source_name!r}.\n\n"
+            f"Query results:\n{results_text}"
+        )
+    else:
+        prompt = prompts.STRUCTURER
+        user = (
+            f"Chart intent: type={chart.type}, title={chart.title!r}, data source={source_name!r}.\n\n"
+            f"Retrieved passages:\n{_format_chunks(chunks)}"
+        )
     try:
-        spec = await chat_json(prompts.STRUCTURER, user, ChartSpec)
+        spec = await chat_json(prompt, user, ChartSpec)
     except Exception:
         return None
     spec.type = chart.type
     spec.title = spec.title or chart.title
     spec.source = source_name
-    spec.exact = exact and spec.grounded
+    spec.exact = exact and spec.grounded if source_type != "database" else True
     spec.sources = [
         SourceRef(text=c.get("text", "")[:400], score=c.get("score", 0.0),
                   knowledge_source_id=c.get("knowledge_source_id"))
         for c in chunks[:6]
     ]
-    spec.confidence = _confidence(chunks, spec.grounded)
+    spec.confidence = 95 if source_type == "database" else _confidence(chunks, spec.grounded)
     return spec
 
 
+def _plan_for_source(datasource: BaseDataSource, goal: str, profile: DatasetProfile | None) -> str:
+    """Choose the right planner prompt based on datasource type."""
+    if hasattr(datasource, '_conn_string'):
+        schema = getattr(datasource, '_schema', None) or {}
+        cols = "\n".join(f"  - {c['column_name']} ({c['data_type']})"
+                         for c in schema.get("columns", []))
+        fks = schema.get("foreign_keys", [])
+        if fks:
+            cols += "\nForeign keys:\n" + "\n".join(
+                f"  {fk['column_name']} -> {fk['ref_table']}({fk['ref_column']})" for fk in fks)
+        if not cols:
+            cols = "(schema not yet loaded)"
+        return prompts.DB_PLANNER.replace("{columns}", cols)
+    return prompts.PLANNER
+
+
 # ---------------- top-level generate ----------------
-async def generate(client: InflectivClient, dataset_id: int, dataset_name: str, goal: str,
+async def generate(datasource: BaseDataSource, goal: str,
                    profile: DatasetProfile | None, emit) -> dict:
     await emit("Understanding your goal")
+    source_type = getattr(datasource, '_conn_string', None) and "database" or "inflectiv"
+
+    plan_prompt = _plan_for_source(datasource, goal, profile)
     profile_hint = profile.model_dump_json() if profile else "{}"
     plan = await chat_json(
-        prompts.PLANNER,
+        plan_prompt,
         f"Goal: {goal}\n\nDataset profile: {profile_hint}",
         DashboardPlan,
     )
-    # dedupe subqueries while preserving order + index mapping
+
     seen, subqueries, remap = set(), [], {}
     for i, q in enumerate(plan.subqueries):
         n = cache.normalize(q)
@@ -136,8 +165,6 @@ async def generate(client: InflectivClient, dataset_id: int, dataset_name: str, 
     for ch in plan.charts:
         ch.needs = sorted({remap.get(i, 0) for i in ch.needs}) if ch.needs else []
 
-    # broad seed queries guarantee a retrieval pool even when the planner's specific
-    # queries semantically miss (this dataset returns 0 for over-specified phrases)
     seeds = [" ".join(goal.split()[:4])]
     if profile:
         seeds += (profile.entities or [])[:3] + (profile.categorical_fields or [])[:2]
@@ -149,9 +176,8 @@ async def generate(client: InflectivClient, dataset_id: int, dataset_name: str, 
 
     await emit(f"Planned {len(plan.charts)} components from {len(subqueries)} analyses", "done")
 
-    retrieved = await _retrieve(client, dataset_id, subqueries, config.DEFAULT_TOP_K, emit)
+    retrieved = await datasource.query("", subqueries, config.DEFAULT_TOP_K, emit)
 
-    # global pool: all retrieved chunks, deduped, best score first
     pool, seenc = [], set()
     for q in subqueries:
         for c in retrieved.get(q, []):
@@ -163,10 +189,14 @@ async def generate(client: InflectivClient, dataset_id: int, dataset_name: str, 
     await emit(f"Retrieved {len(pool)} relevant passages", "done")
 
     exact = (profile.size_estimate == "small") if profile else False
+    if source_type == "database":
+        exact = True
+
+    source_name = datasource.source_name
     drafts: list[ChartSpec] = []
     for ch in plan.charts:
         await emit(f"Drafting: {ch.title}")
-        spec = await _structure_one(ch, subqueries, retrieved, dataset_name, exact, pool)
+        spec = await _structure_one(ch, subqueries, retrieved, source_name, exact, pool, source_type)
         if spec:
             drafts.append(spec)
     await emit(f"Generated {len(drafts)} components", "done")
@@ -174,17 +204,17 @@ async def generate(client: InflectivClient, dataset_id: int, dataset_name: str, 
             "exactness": "exact" if exact else "illustrative"}
 
 
-async def refine(client: InflectivClient, dataset_id: int, dataset_name: str, message: str, emit) -> dict:
+async def refine(datasource: BaseDataSource, message: str, emit) -> dict:
     await emit("Investigating your question")
-    queries = [message]
-    # keyword form: drop stopwords so natural questions still retrieve
     stop = {"which", "what", "who", "where", "when", "why", "how", "do", "does", "did",
             "is", "are", "the", "a", "an", "of", "on", "in", "to", "for", "and", "or",
             "by", "with", "top", "focus", "show", "me", "our", "their", "this", "that"}
     kw = " ".join(w for w in message.lower().replace("?", "").split() if w not in stop)
+    queries = [message]
     if kw and cache.normalize(kw) != cache.normalize(message):
         queries.append(kw)
-    retrieved = await _retrieve(client, dataset_id, queries, config.DEFAULT_TOP_K, emit)
+
+    retrieved = await datasource.query("", queries, config.DEFAULT_TOP_K, emit)
     chunks, seenc = [], set()
     for q in queries:
         for c in retrieved.get(q, []):
@@ -193,17 +223,28 @@ async def refine(client: InflectivClient, dataset_id: int, dataset_name: str, me
                 seenc.add(k)
                 chunks.append(c)
     chunks.sort(key=lambda c: c.get("score", 0), reverse=True)
-    user = (
-        f"Follow-up question: {message!r}. data source={dataset_name!r}.\n\n"
-        f"Retrieved passages:\n{_format_chunks(chunks)}"
-    )
+
+    source_type = getattr(datasource, '_conn_string', None) and "database" or "inflectiv"
+    source_name = datasource.source_name
+
+    if source_type == "database":
+        results_text = "\n".join(c.get("text", "") for c in chunks[:20]) or "(no results)"
+        user = (
+            f"Follow-up question: {message!r}. data source={source_name!r}.\n\n"
+            f"Query results:\n{results_text}"
+        )
+    else:
+        user = (
+            f"Follow-up question: {message!r}. data source={source_name!r}.\n\n"
+            f"Retrieved passages:\n{_format_chunks(chunks)}"
+        )
     spec = await chat_json(prompts.REFINER, user, ChartSpec)
-    spec.source = dataset_name
+    spec.source = source_name
     spec.sources = [
         SourceRef(text=c.get("text", "")[:400], score=c.get("score", 0.0),
                   knowledge_source_id=c.get("knowledge_source_id"))
         for c in chunks[:6]
     ]
-    spec.confidence = _confidence(chunks, spec.grounded)
+    spec.confidence = 95 if source_type == "database" else _confidence(chunks, spec.grounded)
     await emit("Done", "done")
     return {"draft": spec.model_dump(exclude_none=True)}

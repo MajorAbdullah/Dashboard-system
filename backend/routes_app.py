@@ -9,7 +9,7 @@ from auth import current_user
 from inflectiv import InflectivClient, InflectivError
 from schemas import (
     ComponentSave, DashboardSave, ForgotRequest, LoginRequest, ProfileUpdate,
-    ResetRequest, SettingsUpdate, SignupRequest, TeamInvite, WorkspaceSave,
+    ResetRequest, SessionRequest, SettingsUpdate, SignupRequest, TeamInvite, WorkspaceSave,
 )
 
 router = APIRouter(prefix="/api")
@@ -25,10 +25,12 @@ def signup(req: SignupRequest):
     token = auth.make_token()
     user = db.execute(
         """INSERT INTO users (email,name,company,pw_hash,pw_salt,api_token,
-             inflectiv_key,inflectiv_dataset_id,inflectiv_dataset_name,onboarding,ai_prefs)
-           VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s) RETURNING *""",
+             inflectiv_key,inflectiv_dataset_id,inflectiv_dataset_name,
+             db_type,db_connection_string,db_table_name,onboarding,ai_prefs)
+           VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s) RETURNING *""",
         (email, req.name, req.company, auth.hash_pw(req.password, salt), salt, token,
          req.inflectiv_key, req.inflectiv_dataset_id, req.inflectiv_dataset_name,
+         req.db_type, req.db_connection_string, req.db_table_name,
          db.Json(req.onboarding or {}), db.Json(req.ai_prefs or {})),
     )
     # seed the owner into team_members
@@ -72,7 +74,8 @@ def get_me(user: dict = Depends(current_user)):
 @router.patch("/me")
 def update_me(req: ProfileUpdate, user: dict = Depends(current_user)):
     fields, vals = [], []
-    for k in ("name", "company", "inflectiv_dataset_id", "inflectiv_dataset_name"):
+    for k in ("name", "company", "inflectiv_dataset_id", "inflectiv_dataset_name",
+              "db_type", "db_connection_string", "db_table_name"):
         v = getattr(req, k)
         if v is not None:
             fields.append(f"{k}=%s"); vals.append(v)
@@ -138,14 +141,19 @@ def delete_dashboard(dash_id: int, user: dict = Depends(current_user)):
 # ---------------- datasets for the logged-in user (App Datasets page) ----------------
 @router.get("/my-datasets")
 async def my_datasets(user: dict = Depends(current_user)):
+    result = {"datasets": [], "db": None}
     key = user.get("inflectiv_key")
-    if not key:
-        return {"datasets": []}
-    try:
-        ds = await InflectivClient(key).list_datasets()
-    except InflectivError:
-        return {"datasets": []}
-    return {"datasets": ds}
+    if key:
+        try:
+            result["datasets"] = await InflectivClient(key).list_datasets()
+        except InflectivError:
+            pass
+    if user.get("db_type"):
+        result["db"] = {
+            "type": user["db_type"],
+            "table_name": user.get("db_table_name"),
+        }
+    return result
 
 
 # ---------------- workspace (live canvas autosave) ----------------

@@ -15,24 +15,32 @@ from schemas import DatasetProfile
 @dataclass
 class Session:
     session_id: str
-    global_key: str
-    dataset_id: int
-    dataset_name: str
+    global_key: str = ""
+    dataset_id: int = 0
+    dataset_name: str = ""
     profile: Optional[DatasetProfile] = None
     knowledge_source_count: int = 0
+    source_type: str = "inflectiv"
+    conn_string: str = ""
+    table_name: str = ""
 
 
 _sessions: dict[str, Session] = {}
 
 
-def create(global_key: str, dataset: dict) -> Session:
+def create(global_key: str = "", dataset: Optional[dict] = None,
+           source_type: str = "inflectiv", conn_string: str = "",
+           table_name: str = "") -> Session:
     sid = "sess_" + secrets.token_urlsafe(16)
     s = Session(
         session_id=sid,
         global_key=global_key,
-        dataset_id=dataset["id"],
-        dataset_name=dataset.get("name", ""),
-        knowledge_source_count=dataset.get("knowledge_source_count", 0),
+        dataset_id=dataset["id"] if dataset else 0,
+        dataset_name=dataset.get("name", "") if dataset else table_name,
+        knowledge_source_count=dataset.get("knowledge_source_count", 0) if dataset else 0,
+        source_type=source_type,
+        conn_string=conn_string,
+        table_name=table_name,
     )
     _sessions[sid] = s
     return s
