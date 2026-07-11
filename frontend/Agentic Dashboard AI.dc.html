@@ -506,10 +506,11 @@ class Component extends DCLogic {
       try {
         const me = await fetch(BACKEND + '/me', { headers: authHeaders() }).then(r => r.ok ? r.json() : null);
         if (me && me.user) {
-          // Database user
-          if (me.user.has_db && me.user.db_connection_string && me.user.db_table_name) {
+          // Database user — server resolves the saved connection string from the
+          // authenticated user record; the browser never holds or re-sends the secret.
+          if (me.user.has_db && me.user.db_table_name) {
             this.setState({ connected: true, usedBackend: true, datasetName: me.user.db_table_name || '' });
-            const data = await fetch(BACKEND + '/session', { method: 'POST', headers: authHeaders(), body: JSON.stringify({ source_type: 'database', conn_string: me.user.db_connection_string, table_name: me.user.db_table_name }) }).then(r => r.json());
+            const data = await fetch(BACKEND + '/session', { method: 'POST', headers: authHeaders(), body: JSON.stringify({ source_type: 'database' }) }).then(r => r.json());
             this.setState({ sessionId: data.session_id, datasetName: data.dataset_name || '', suggestedQueries: data.suggested_queries || [] });
             this.loadDashboardFromUrl();
             return;

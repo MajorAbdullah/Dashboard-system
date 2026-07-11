@@ -115,6 +115,10 @@ async def create_session(req: SessionRequest, user: Optional[dict] = Depends(opt
     if source_type == "database":
         conn_string = (req.conn_string or "").strip()
         table_name = (req.table_name or "").strip()
+        if not conn_string and user and user.get("db_connection_string"):
+            conn_string = user["db_connection_string"]
+            if not table_name:
+                table_name = user.get("db_table_name") or ""
         if not conn_string:
             raise HTTPException(400, "Database connection string is required.")
         if not table_name:
