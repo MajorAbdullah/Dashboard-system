@@ -1,22 +1,24 @@
-"""Demo-grade auth: sha256(salt+password) + opaque bearer token stored on the user row."""
+"""Demo-grade auth: bcrypt password hashing + opaque bearer token stored on the user row."""
 from __future__ import annotations
 
-import hashlib
 import re
 import secrets
 from typing import Optional
 
+import bcrypt
 from fastapi import Header, HTTPException
 
 import db
 
 
 def make_salt() -> str:
+    """The users.pw_salt column is NOT NULL for historical reasons; bcrypt embeds
+    its own salt in the hash, so this value is stored but never used for hashing."""
     return secrets.token_hex(8)
 
 
-def hash_pw(password: str, salt: str) -> str:
-    return hashlib.sha256((salt + (password or "")).encode()).hexdigest()
+def hash_pw(password: str, salt: str = "") -> str:
+    return bcrypt.hashpw((password or "").encode(), bcrypt.gensalt()).decode()
 
 
 def make_token() -> str:
@@ -24,7 +26,11 @@ def make_token() -> str:
 
 
 def verify_pw(user: dict, password: str) -> bool:
-    return hash_pw(password, user.get("pw_salt", "")) == user.get("pw_hash")
+    stored = user.get("pw_hash") or ""
+    try:
+        return bcrypt.checkpw((password or "").encode(), stored.encode())
+    except ValueError:
+        return False
 
 
 def _token_from_header(authorization: Optional[str]) -> Optional[str]:

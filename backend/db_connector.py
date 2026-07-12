@@ -19,35 +19,51 @@ class DbConnectorError(RuntimeError):
     pass
 
 
-def _is_private_host(host: str) -> bool:
-    """True if any address the host resolves to is loopback/private/link-local —
-    used to block SSRF via the (unauthenticated, pre-signup) db/test and
-    db/tables endpoints. Unresolvable hosts are left to fail at connect time."""
+class DbConnectionFailed(DbConnectorError):
+    """Raised specifically when the underlying psycopg2.connect() call fails.
+    str() is a generic, safe-for-unauthenticated-callers message — the raw
+    driver exception text (which can leak infra details: open vs filtered
+    ports, auth-failure vs host-unreachable, database existence) is kept on
+    .detail for server-side logging only, never returned to a client."""
+
+    def __init__(self, detail: str):
+        self.detail = detail
+        super().__init__("Could not connect to the database. Check your connection string and try again.")
+
+
+def _resolve_safe_ip(host: str) -> str:
+    """Resolve host once and return a single validated non-private IP — used to
+    block SSRF via the (unauthenticated, pre-signup) db/test and db/tables
+    endpoints. The caller connects directly to this IP (via hostaddr=) rather
+    than letting psycopg2 re-resolve the hostname at connect time, which would
+    reopen a DNS-rebinding TOCTOU gap (attacker's DNS answers public here,
+    private by the time libpq connects). Fails closed: unresolvable hosts are
+    rejected rather than allowed through."""
     try:
         infos = socket.getaddrinfo(host, None)
-    except socket.gaierror:
-        return False
+    except socket.gaierror as e:
+        raise DbConnectorError(f"Could not resolve host: {host}") from e
     for info in infos:
         try:
             ip = ipaddress.ip_address(info[4][0])
         except ValueError:
             continue
-        if ip.is_private or ip.is_loopback or ip.is_link_local or ip.is_reserved or ip.is_multicast:
-            return True
-    return False
+        if not (ip.is_private or ip.is_loopback or ip.is_link_local or ip.is_reserved or ip.is_multicast):
+            return str(ip)
+    raise DbConnectorError("Connections to private/internal network addresses are not allowed.")
 
 
 def _connect(conn_string: str):
     dsn = conn_string.replace("postgres://", "postgresql://", 1)
-    if not config.ALLOW_PRIVATE_DB_HOSTS:
-        try:
-            host = psycopg2.extensions.parse_dsn(dsn).get("host")
-        except Exception:
-            host = None
-        if host and _is_private_host(host):
-            raise DbConnectorError(
-                "Connections to private/internal network addresses are not allowed."
-            )
+    try:
+        host = psycopg2.extensions.parse_dsn(dsn).get("host")
+    except Exception as e:
+        raise DbConnectorError(f"Invalid connection string: {e}")
+    if not config.ALLOW_PRIVATE_DB_HOSTS and host:
+        safe_ip = _resolve_safe_ip(host)
+        # host= stays for TLS SNI/cert verification; hostaddr= pins the actual
+        # socket connection to the address we just validated, closing the gap.
+        dsn = psycopg2.extensions.make_dsn(dsn, hostaddr=safe_ip)
     try:
         conn = psycopg2.connect(dsn)
         conn.autocommit = True
@@ -55,7 +71,8 @@ def _connect(conn_string: str):
     except DbConnectorError:
         raise
     except Exception as e:
-        raise DbConnectorError(f"Connection failed: {e}")
+        print(f"[db_connector] connect failed for host={host}: {e}")
+        raise DbConnectionFailed(str(e)) from e
 
 
 def test_connection(conn_string: str) -> dict:

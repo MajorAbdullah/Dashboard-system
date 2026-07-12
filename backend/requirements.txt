@@ -7,5 +7,6 @@ sse-starlette==2.2.1
 python-dotenv==1.0.1
 psycopg2-binary==2.9.10
 sqlparse==0.5.1
+bcrypt==5.0.0
 pytest==8.3.4
 redis==5.2.1
