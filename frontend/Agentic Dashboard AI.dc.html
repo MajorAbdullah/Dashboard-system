@@ -200,6 +200,15 @@ body{font-family:'Hanken Grotesk',system-ui,sans-serif;-webkit-font-smoothing:an
     </div>
   </div>
 
+  <!-- ============ CONNECT BANNER ============ -->
+  <sc-if value="{{ showConnectBanner }}" hint-placeholder-val="{{ false }}">
+    <div style="flex:0 0 auto;display:flex;align-items:center;justify-content:center;gap:12px;padding:9px 16px;background:var(--violet-bg);border-bottom:1px solid var(--violet-border);" data-testid="connect-banner">
+      <span style="font-size:12.5px;font-weight:600;color:var(--violet);">Connect a data source to get started — you can explore the dashboard first and connect whenever you're ready.</span>
+      <button onMouseDown="{{ openConnectFromBanner }}" data-testid="connect-banner-cta" style="height:26px;padding:0 12px;border:none;border-radius:7px;background:var(--violet);color:#fff;font-family:'Hanken Grotesk',sans-serif;font-weight:600;font-size:11.5px;cursor:pointer;">Connect now</button>
+      <button onMouseDown="{{ dismissConnectBanner }}" title="Dismiss" data-testid="connect-banner-dismiss" style="width:22px;height:22px;border:none;border-radius:6px;background:transparent;color:var(--violet);cursor:pointer;display:flex;align-items:center;justify-content:center;"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg></button>
+    </div>
+  </sc-if>
+
   <!-- ============ BODY ============ -->
   <div style="flex:1;display:flex;min-height:0;">
 
@@ -486,7 +495,7 @@ function authHeaders() { const hd = { 'Content-Type': 'application/json' }; try 
 
 class Component extends DCLogic {
   state = {
-    connected: false, connecting: false, connectErr: '', connKey: '', connName: '',
+    connected: false, connecting: false, connectErr: '', connKey: '', connName: '', connectBannerDismissed: false,
     connStage: 'key', connDatasets: [], connDatasetId: '', connLoading: false, showConnect: false,
     connSourceType: 'inflectiv', connDbString: '', connDbTable: '', connDbTables: [], connDbLoading: false,
     sessionId: null, datasetId: null, datasetName: '', usedBackend: false, suggestedQueries: [], savedFlash: false,
@@ -954,6 +963,12 @@ class Component extends DCLogic {
       const res = await fetch(BACKEND + '/refine', { method: 'POST', headers: authHeaders(), body: JSON.stringify({ session_id: this.state.sessionId, message: g, job_id: jobId }) });
       if (!res.ok) { const ed = await res.json().catch(() => ({})); throw new Error(ed.detail || ('HTTP ' + res.status)); }
       const data = await res.json();
+      if (data.status && data.status !== 'ready') {
+        try { if (es) es.close(); } catch (x) {}
+        this.pushStep(data.message || 'Could not refine — check your data source.', 'done');
+        this.setState({ phase: 'ready' });
+        return;
+      }
       const d = this.specToDraft(data.draft);
       this.setState(s => ({ thinkSteps: s.thinkSteps.map(x => Object.assign({}, x, { status: 'done' })), phase: 'ready', drafts: [d].concat(s.drafts) }));
       this.scheduleSave();
@@ -988,7 +1003,8 @@ class Component extends DCLogic {
   onConnDataset(e) { this.setState({ connDatasetId: e.target.value, connectErr: '' }); }
   connBack() { this.setState({ connStage: 'key', connectErr: '' }); }
   openConnect() { this.setState({ showConnect: true, connStage: 'key', connectErr: '', connSourceType: 'inflectiv' }); }
-  closeConnect() { if (this.state.connected) this.setState({ showConnect: false, connectErr: '' }); }
+  closeConnect() { this.setState({ showConnect: false, connectErr: '' }); }
+  dismissConnectBanner() { this.setState({ connectBannerDismissed: true }); }
   setSrcInflectiv() { this.setState({ connSourceType: 'inflectiv', connectErr: '' }); }
   setSrcDatabase() { this.setState({ connSourceType: 'database', connectErr: '' }); }
   onConnDbString(e) { this.setState({ connDbString: e.target.value, connectErr: '' }); }
@@ -1070,7 +1086,7 @@ class Component extends DCLogic {
     const g = (forced || this.state.goal || '').trim();
     if (!g) return;
     this.timers.forEach(clearTimeout); this.timers = [];
-    if (!this.state.sessionId) { this.setState({ phase: 'thinking', goal: g, thinkSteps: [{ id: 's0', t: 'Connect a dataset first', status: 'done' }] }); return; }
+    if (!this.state.sessionId) { this.setState({ phase: 'thinking', goal: g, thinkSteps: [{ id: 's0', t: 'Connect a data source first', status: 'done' }] }); return; }
     const jobId = 'job_' + this.uid();
     this.setState({ phase: 'thinking', focused: false, goal: g, thinkSteps: [] });
     const es = this.openStream(jobId);
@@ -1078,6 +1094,12 @@ class Component extends DCLogic {
       const res = await fetch(BACKEND + '/generate', { method: 'POST', headers: authHeaders(), body: JSON.stringify({ session_id: this.state.sessionId, goal: g, job_id: jobId }) });
       if (!res.ok) { const ed = await res.json().catch(() => ({})); throw new Error(ed.detail || ('HTTP ' + res.status)); }
       const data = await res.json();
+      if (data.status && data.status !== 'ready') {
+        try { if (es) es.close(); } catch (x) {}
+        this.pushStep(data.message || 'Could not generate — check your data source.', 'done');
+        this.setState({ phase: 'ready' });
+        return;
+      }
       const fresh = (data.drafts || []).map(spec => this.specToDraft(spec));
       this.setState(s => ({ thinkSteps: s.thinkSteps.map(x => Object.assign({}, x, { status: 'done' })), phase: 'ready', drafts: fresh.concat(s.drafts) }));
       this.scheduleSave();
@@ -1205,8 +1227,11 @@ class Component extends DCLogic {
 
     return {
       theme: s.theme,
-      needsConnect: !s.connected || s.showConnect,
-      canCloseConnect: s.connected,
+      needsConnect: s.showConnect,
+      canCloseConnect: true,
+      showConnectBanner: !s.connected && !s.connectBannerDismissed,
+      openConnectFromBanner: () => this.openConnect(),
+      dismissConnectBanner: () => this.dismissConnectBanner(),
       connStageKey: s.connStage === 'key',
       connStageSelect: s.connStage === 'select',
       connecting: s.connecting,
