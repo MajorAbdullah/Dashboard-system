@@ -31,7 +31,7 @@ from datasource import make_datasource
 from guardrails import READINESS_MESSAGES, classify_readiness
 from inflectiv import InflectivClient, InflectivError
 from profiler import profile_dataset
-from schemas import DatasetsRequest, GenerateRequest, RefineRequest, SessionRequest
+from schemas import ChatRequest, DatasetsRequest, GenerateRequest, RefineRequest, SessionRequest
 
 app = FastAPI(title="Agentic Dashboard AI — backend")
 
@@ -278,6 +278,24 @@ async def refine(req: RefineRequest):
         print(f"[refine] pipeline error: {e}")
         return {"status": "unreachable", "message": READINESS_MESSAGES["unreachable"]}
     await agentbus.finish(req.job_id, 1)
+    result["status"] = "ready"
+    return result
+
+
+@app.post("/api/chat")
+async def chat(req: ChatRequest):
+    sess = sessions.get(req.session_id)
+    state = classify_readiness(sess)
+    if state != "ready":
+        return {"status": state, "message": READINESS_MESSAGES[state]}
+    _require_llm()
+    ds = make_datasource(sess)
+    emit = agentbus.make_emit(None)
+    try:
+        result = await pipeline.chat(ds, req.message, emit)
+    except Exception as e:
+        print(f"[chat] pipeline error: {e}")
+        return {"status": "unreachable", "message": READINESS_MESSAGES["unreachable"]}
     result["status"] = "ready"
     return result
 

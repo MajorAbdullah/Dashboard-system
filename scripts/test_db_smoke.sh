@@ -244,6 +244,24 @@ msgs = d.get('chatMessages', [])
 assert len(msgs) == 1 and msgs[0]['text'] == 'hi', f'chatMessages did not round-trip: {msgs}'
 " && ok "chatMessages persisted and restored" || nok "chatMessages missing from workspace"
 
+# ── 15. POST /api/chat (direct Q&A over the connected table) ──
+echo ""
+echo "── 15. POST /api/chat ──"
+RES=$(curl -sf --max-time 120 -X POST "$BASE/chat" \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer $TOKEN" \
+  -d "{
+    \"session_id\": \"$SID\",
+    \"message\": \"How many rows are in this table?\"
+  }") || { nok "Chat failed"; exit 1; }
+echo "$RES" | python3 -c "
+import sys, json
+d = json.load(sys.stdin)
+assert d.get('status') == 'ready', f\"expected ready, got {d.get('status')}\"
+assert d.get('answer'), 'answer should be non-empty'
+print(f'  → answer: {d[\"answer\"][:80]}')
+" && ok "Chat produced a direct answer" || nok "Chat response missing/malformed"
+
 # ── Summary ──────────────────────────────────────────────────────────────────
 echo ""
 echo "╔══════════════════════════════════════════════════════════════╗"

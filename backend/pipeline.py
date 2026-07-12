@@ -14,7 +14,7 @@ import prompts
 from datasource import BaseDataSource
 from inflectiv import InflectivClient, InflectivError
 from llm import chat_json, chat_text
-from schemas import ChartSpec, DashboardPlan, DatasetProfile, SourceRef
+from schemas import ChartSpec, ChatAnswer, DashboardPlan, DatasetProfile, SourceRef
 import config
 
 
@@ -204,8 +204,9 @@ async def generate(datasource: BaseDataSource, goal: str,
             "exactness": "exact" if exact else "illustrative"}
 
 
-async def refine(datasource: BaseDataSource, message: str, emit) -> dict:
-    await emit("Investigating your question")
+async def _retrieve_for_message(datasource: BaseDataSource, message: str, emit) -> tuple[list[dict], str, str]:
+    """Shared by refine() and chat(): keyword-augmented retrieval for a free-form
+    message. Returns (pooled chunks sorted by score desc, source_type, source_name)."""
     stop = {"which", "what", "who", "where", "when", "why", "how", "do", "does", "did",
             "is", "are", "the", "a", "an", "of", "on", "in", "to", "for", "and", "or",
             "by", "with", "top", "focus", "show", "me", "our", "their", "this", "that"}
@@ -223,9 +224,13 @@ async def refine(datasource: BaseDataSource, message: str, emit) -> dict:
                 seenc.add(k)
                 chunks.append(c)
     chunks.sort(key=lambda c: c.get("score", 0), reverse=True)
-
     source_type = getattr(datasource, '_conn_string', None) and "database" or "inflectiv"
-    source_name = datasource.source_name
+    return chunks, source_type, datasource.source_name
+
+
+async def refine(datasource: BaseDataSource, message: str, emit) -> dict:
+    await emit("Investigating your question")
+    chunks, source_type, source_name = await _retrieve_for_message(datasource, message, emit)
 
     if source_type == "database":
         results_text = "\n".join(c.get("text", "") for c in chunks[:20]) or "(no results)"
@@ -248,3 +253,38 @@ async def refine(datasource: BaseDataSource, message: str, emit) -> dict:
     spec.confidence = 95 if source_type == "database" else _confidence(chunks, spec.grounded)
     await emit("Done", "done")
     return {"draft": spec.model_dump(exclude_none=True)}
+
+
+async def chat(datasource: BaseDataSource, message: str, emit) -> dict:
+    """Direct Q&A over the connected source: reuses the same retrieval refine()
+    uses, but asks for a written answer (with an optional attached chart) instead
+    of forcing everything into a ChartSpec."""
+    await emit("Answering your question")
+    chunks, source_type, source_name = await _retrieve_for_message(datasource, message, emit)
+
+    if source_type == "database":
+        prompt = prompts.CHAT_DB_ANSWERER
+        results_text = "\n".join(c.get("text", "") for c in chunks[:20]) or "(no results)"
+        user = f"Question: {message!r}. data source={source_name!r}.\n\nQuery results:\n{results_text}"
+    else:
+        prompt = prompts.CHAT_INFLECTIV_ANSWERER
+        user = f"Question: {message!r}. data source={source_name!r}.\n\nRetrieved passages:\n{_format_chunks(chunks)}"
+
+    result = await chat_json(prompt, user, ChatAnswer)
+    result.confidence = 95 if source_type == "database" else _confidence(chunks, result.grounded)
+    sources = [
+        SourceRef(text=c.get("text", "")[:400], score=c.get("score", 0.0),
+                  knowledge_source_id=c.get("knowledge_source_id"))
+        for c in chunks[:6]
+    ]
+    if result.chart:
+        result.chart.source = source_name
+        result.chart.sources = sources
+        result.chart.confidence = result.confidence
+    await emit("Done", "done")
+    return {
+        "answer": result.answer,
+        "chart": result.chart.model_dump(exclude_none=True) if result.chart else None,
+        "confidence": result.confidence,
+        "sources": [s.model_dump() for s in sources] if source_type != "database" else None,
+    }
