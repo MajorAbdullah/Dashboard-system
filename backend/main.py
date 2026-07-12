@@ -133,12 +133,16 @@ async def create_session(req: SessionRequest, user: Optional[dict] = Depends(opt
         sess = sessions.create(global_key=key, source_type="database",
                                conn_string=conn_string, table_name=table_name)
         ds = datasource.DatabaseDataSource(conn_string, table_name)
+        try:
+            schema = db_connector.get_table_schema(conn_string, table_name)
+            sess.record_count = schema.get("row_count", 0)
+        except Exception:
+            pass
         profile = None
         if config.have_llm():
             try:
                 profile = await ds.get_profile(emit=None)
                 sess.profile = profile
-                sess.record_count = ds.row_count
             except Exception:
                 pass
         return {

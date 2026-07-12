@@ -608,7 +608,7 @@ class Component extends DCLogic {
     if (token) {
       try { ws = await fetch(BACKEND + '/workspace', { headers: authHeaders() }).then(r => r.ok ? r.json() : null).then(d => d && d.workspace); } catch (x) {}
     }
-    if (!ws || (!(ws.widgets || []).length && !(ws.drafts || []).length)) {
+    if (!ws || (!(ws.widgets || []).length && !(ws.drafts || []).length && !(ws.chatMessages || []).length)) {
       try { ws = JSON.parse(localStorage.getItem('ada-workspace') || 'null'); } catch (x) { ws = null; }
     }
     if (ws && ((ws.widgets || []).length || (ws.drafts || []).length || (ws.chatMessages || []).length)) {
