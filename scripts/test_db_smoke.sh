@@ -27,8 +27,8 @@ DB_URL="postgresql://postgres:postgres@localhost:5432/onedollarstore"
 TABLE="${TABLE:-products}"   # default table to query
 pass=0; fail=0
 
-ok()   { echo "  ✓ $1"; ((pass++)); }
-nok()  { echo "  ✗ $1"; ((fail++)); }
+ok()   { echo "  ✓ $1"; pass=$((pass+1)); }
+nok()  { echo "  ✗ $1"; fail=$((fail+1)); }
 json() { python3 -c "import sys,json; print(json.dumps(json.load(sys.stdin),indent=2))" 2>/dev/null || cat; }
 extract() { python3 -c "import sys,json; print(json.load(sys.stdin)$1)" 2>/dev/null; }
 
@@ -214,6 +214,20 @@ echo "── 12. Edge: unauthenticated request ──"
 RES=$(curl -sf --max-time 5 "$BASE/me" 2>&1) \
   && nok "Unauthenticated /me should fail" \
   || ok "Unauthenticated /me rejected"
+
+# ── 13. Guardrail: generate() on an unknown session returns soft not_connected ──
+echo ""
+echo "── 13. Edge: generate on unknown/missing session ──"
+RES=$(curl -sf --max-time 10 -X POST "$BASE/generate" \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer $TOKEN" \
+  -d '{"session_id": "sess_does_not_exist", "goal": "anything"}') || { nok "Generate request failed transport-level"; RES='{}'; }
+echo "$RES" | python3 -c "
+import sys, json
+d = json.load(sys.stdin)
+assert d.get('status') == 'not_connected', f\"expected not_connected, got {d.get('status')}\"
+assert 'drafts' not in d, 'should not have run the pipeline'
+" && ok "Unknown session returns soft not_connected status" || nok "Guardrail response wrong shape"
 
 # ── Summary ──────────────────────────────────────────────────────────────────
 echo ""

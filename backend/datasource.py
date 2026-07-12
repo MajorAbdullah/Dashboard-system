@@ -184,6 +184,10 @@ class DatabaseDataSource(BaseDataSource):
     def size_estimate(self) -> str:
         return "small"
 
+    @property
+    def row_count(self) -> int:
+        return (self._schema or {}).get("row_count", 0)
+
 
 def make_datasource(session) -> BaseDataSource:
     if session.source_type == "database" and session.conn_string:
