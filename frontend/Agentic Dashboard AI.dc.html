@@ -305,6 +305,13 @@ body{font-family:'Hanken Grotesk',system-ui,sans-serif;-webkit-font-smoothing:an
                   <button onClick="{{ w.onDup }}" title="Duplicate" style="width:24px;height:24px;border-radius:7px;border:1px solid var(--border);background:var(--bg-panel);color:var(--ink-500);display:flex;align-items:center;justify-content:center;cursor:pointer;box-shadow:var(--shadow-sm);"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15V5a2 2 0 012-2h10"/></svg></button>
                   <button onClick="{{ w.onRemove }}" title="Remove" style="width:24px;height:24px;border-radius:7px;border:1px solid var(--border);background:var(--bg-panel);color:var(--rose);display:flex;align-items:center;justify-content:center;cursor:pointer;box-shadow:var(--shadow-sm);"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg></button>
                 </div>
+                <sc-if value="{{ w.hasSwitcher }}" hint-placeholder-val="{{ false }}">
+                  <div style="position:absolute;bottom:9px;left:9px;display:flex;gap:3px;" data-testid="chart-type-switcher" onClick="{{ stopProp }}">
+                    <sc-for list="{{ w.switchTypes }}" as="st" hint-placeholder-count="3">
+                      <button onClick="{{ st.onPick }}" title="{{ st.label }}" data-testid="switch-to-{{ st.value }}" style="{{ st.style }}">{{ st.short }}</button>
+                    </sc-for>
+                  </div>
+                </sc-if>
                 <sc-if value="{{ w.selected }}" hint-placeholder-val="{{ false }}">
                   <div style="position:absolute;inset:0;border:2px solid var(--violet);border-radius:14px;pointer-events:none;box-shadow:0 0 0 4px var(--violet-bg);"></div>
                 </sc-if>
@@ -951,7 +958,7 @@ class Component extends DCLogic {
   }
 
   buildPreview(o, mini) {
-    switch (o.type) {
+    switch (o.renderType || o.type) {
       case 'kpi': return this.kpi(o, mini);
       case 'area': case 'line': return this.areaChart(o, mini);
       case 'bar': return this.barChart(o, mini);
@@ -967,6 +974,19 @@ class Component extends DCLogic {
     }
   }
   defSpan(t) { return ({ kpi: 3, area: 8, line: 8, bar: 4, donut: 4, funnel: 4, heatmap: 4, forecast: 8, insight: 6, risk: 6, summary: 12, table: 12 })[t] || 4; }
+  compatibleTypes(spec) {
+    const cur = spec.renderType || spec.type;
+    const out = [];
+    if (spec.data && spec.data.length) out.push('bar', 'donut', 'funnel');
+    if (spec.series && spec.series.length) out.push('area', 'line', 'forecast');
+    if (!out.length) return [];
+    if (!out.includes(cur)) out.push(cur);
+    return out;
+  }
+  switchChartType(id, type) {
+    this.setState(s => ({ widgets: s.widgets.map(w => w.id === id ? Object.assign({}, w, { renderType: type }) : w) }));
+    this.scheduleSave();
+  }
 
   // ---------------- interactions ----------------
   onGoalInput(e) { this.setState({ goal: e.target.value }); }
@@ -1201,19 +1221,31 @@ class Component extends DCLogic {
 
   renderVals() {
     const s = this.state; const f = this.fonts();
-    const widgets = s.widgets.map(w => ({
-      id: w.id, type: w.type,
-      spanStyle: { gridColumn: 'span ' + (w.span || this.defSpan(w.type)), minHeight: (w.type === 'kpi') ? '0' : '0' },
-      preview: this.buildPreview(w, false),
-      cite: this.widgetCite(w),
-      selected: s.selected.includes(w.id),
-      borderColor: s.selected.includes(w.id) ? 'var(--violet)' : 'var(--border)',
-      shadow: s.newIds.includes(w.id) ? 'var(--shadow-md)' : 'var(--shadow-sm)',
-      onSelect: (e) => this.selectWidget(w.id, e),
-      onDragStart: (e) => this.widgetDragStart(w.id, e),
-      onRemove: (e) => { e.stopPropagation(); this.removeWidget(w.id); },
-      onDup: (e) => { e.stopPropagation(); this.dupWidget(w.id); }
-    }));
+    const widgets = s.widgets.map(w => {
+      const switchTypes = this.compatibleTypes(w).map(t => {
+        const active = (w.renderType || w.type) === t;
+        return {
+          value: t, short: this.typeMeta(t).l.slice(0, 1), label: this.typeMeta(t).l,
+          style: 'width:22px;height:22px;border-radius:6px;border:1px solid ' + (active ? 'var(--violet)' : 'var(--border)') + ';background:' + (active ? 'var(--violet-bg)' : 'var(--bg-panel)') + ';color:' + (active ? 'var(--violet)' : 'var(--ink-500)') + ';cursor:pointer;font-size:9px;font-weight:700;display:flex;align-items:center;justify-content:center;box-shadow:var(--shadow-sm);',
+          onPick: () => this.switchChartType(w.id, t)
+        };
+      });
+      return {
+        id: w.id, type: w.type,
+        spanStyle: { gridColumn: 'span ' + (w.span || this.defSpan(w.type)), minHeight: (w.type === 'kpi') ? '0' : '0' },
+        preview: this.buildPreview(w, false),
+        cite: this.widgetCite(w),
+        selected: s.selected.includes(w.id),
+        borderColor: s.selected.includes(w.id) ? 'var(--violet)' : 'var(--border)',
+        shadow: s.newIds.includes(w.id) ? 'var(--shadow-md)' : 'var(--shadow-sm)',
+        onSelect: (e) => this.selectWidget(w.id, e),
+        onDragStart: (e) => this.widgetDragStart(w.id, e),
+        onRemove: (e) => { e.stopPropagation(); this.removeWidget(w.id); },
+        onDup: (e) => { e.stopPropagation(); this.dupWidget(w.id); },
+        hasSwitcher: switchTypes.length > 1,
+        switchTypes
+      };
+    });
 
     const drafts = s.drafts.map(d => {
       const tm = this.typeMeta(d.type);
@@ -1385,6 +1417,7 @@ class Component extends DCLogic {
       cmdShadow: s.focused ? '0 0 0 3px var(--violet-bg)' : 'none',
       ghostHover: { background: 'var(--bg-inset)', color: 'var(--ink-900)' },
       primaryHover: { filter: 'brightness(1.08)' },
+      stopProp: (e) => e.stopPropagation(),
       cardHover: { boxShadow: 'var(--shadow-md)', borderColor: 'var(--border-strong)' },
       toolbarHover: { opacity: 1 },
       draftHover: { boxShadow: 'var(--shadow-md)', borderColor: 'var(--violet-border)', transform: 'translateY(-1px)' },
