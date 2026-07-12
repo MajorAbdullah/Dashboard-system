@@ -28,9 +28,10 @@ import routes_app
 import sessions
 from auth import optional_user
 from datasource import make_datasource
+from guardrails import READINESS_MESSAGES, classify_readiness
 from inflectiv import InflectivClient, InflectivError
 from profiler import profile_dataset
-from schemas import DatasetsRequest, GenerateRequest, RefineRequest, SessionRequest
+from schemas import ChatRequest, DatasetsRequest, GenerateRequest, RefineRequest, SessionRequest
 
 app = FastAPI(title="Agentic Dashboard AI — backend")
 
@@ -115,6 +116,10 @@ async def create_session(req: SessionRequest, user: Optional[dict] = Depends(opt
     if source_type == "database":
         conn_string = (req.conn_string or "").strip()
         table_name = (req.table_name or "").strip()
+        if not conn_string and user and user.get("db_connection_string"):
+            conn_string = user["db_connection_string"]
+            if not table_name:
+                table_name = user.get("db_table_name") or ""
         if not conn_string:
             raise HTTPException(400, "Database connection string is required.")
         if not table_name:
@@ -128,6 +133,11 @@ async def create_session(req: SessionRequest, user: Optional[dict] = Depends(opt
         sess = sessions.create(global_key=key, source_type="database",
                                conn_string=conn_string, table_name=table_name)
         ds = datasource.DatabaseDataSource(conn_string, table_name)
+        try:
+            schema = db_connector.get_table_schema(conn_string, table_name)
+            sess.record_count = schema.get("row_count", 0)
+        except Exception:
+            pass
         profile = None
         if config.have_llm():
             try:
@@ -210,30 +220,32 @@ async def db_tables(req: SessionRequest):
         raise HTTPException(400, str(e))
 
 
-def _require_session(session_id: str) -> sessions.Session:
-    sess = sessions.get(session_id)
-    if not sess:
-        raise HTTPException(401, "Unknown or expired session. Reconnect on the Connect screen.")
+def _require_llm() -> None:
     if not config.have_llm():
         raise HTTPException(503, "No LLM provider configured. Set FIREWORKS_API_KEY "
                                  "(preferred) or OPENROUTER_API_KEY in backend/.env.")
-    return sess
 
 
 @app.post("/api/generate")
 async def generate(req: GenerateRequest, user: Optional[dict] = Depends(optional_user)):
-    sess = _require_session(req.session_id)
+    sess = sessions.get(req.session_id)
+    state = classify_readiness(sess)
+    if state != "ready":
+        return {"status": state, "message": READINESS_MESSAGES[state]}
+    _require_llm()
     ds = make_datasource(sess)
     emit = agentbus.make_emit(req.job_id)
     try:
         result = await pipeline.generate(ds, req.goal, sess.profile, emit)
     except Exception as e:
         await agentbus.finish(req.job_id, 0)
-        raise HTTPException(502, f"generate failed: {e}")
+        print(f"[generate] pipeline error: {e}")
+        return {"status": "unreachable", "message": READINESS_MESSAGES["unreachable"]}
     await agentbus.finish(req.job_id, len(result["drafts"]))
     if user:
         _persist_drafts(user["id"], req.goal, result.get("drafts", []))
     result["job_id"] = req.job_id
+    result["status"] = "ready"
     return result
 
 
@@ -256,15 +268,39 @@ def _persist_drafts(user_id: int, goal: str, drafts: list) -> None:
 
 @app.post("/api/refine")
 async def refine(req: RefineRequest):
-    sess = _require_session(req.session_id)
+    sess = sessions.get(req.session_id)
+    state = classify_readiness(sess)
+    if state != "ready":
+        return {"status": state, "message": READINESS_MESSAGES[state]}
+    _require_llm()
     ds = make_datasource(sess)
     emit = agentbus.make_emit(req.job_id)
     try:
         result = await pipeline.refine(ds, req.message, emit)
     except Exception as e:
         await agentbus.finish(req.job_id, 0)
-        raise HTTPException(502, f"refine failed: {e}")
+        print(f"[refine] pipeline error: {e}")
+        return {"status": "unreachable", "message": READINESS_MESSAGES["unreachable"]}
     await agentbus.finish(req.job_id, 1)
+    result["status"] = "ready"
+    return result
+
+
+@app.post("/api/chat")
+async def chat(req: ChatRequest):
+    sess = sessions.get(req.session_id)
+    state = classify_readiness(sess)
+    if state != "ready":
+        return {"status": state, "message": READINESS_MESSAGES[state]}
+    _require_llm()
+    ds = make_datasource(sess)
+    emit = agentbus.make_emit(None)
+    try:
+        result = await pipeline.chat(ds, req.message, emit)
+    except Exception as e:
+        print(f"[chat] pipeline error: {e}")
+        return {"status": "unreachable", "message": READINESS_MESSAGES["unreachable"]}
+    result["status"] = "ready"
     return result
 
 

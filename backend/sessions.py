@@ -23,6 +23,7 @@ class Session:
     source_type: str = "inflectiv"
     conn_string: str = ""
     table_name: str = ""
+    record_count: int = 0
 
 
 _sessions: dict[str, Session] = {}
@@ -32,15 +33,17 @@ def create(global_key: str = "", dataset: Optional[dict] = None,
            source_type: str = "inflectiv", conn_string: str = "",
            table_name: str = "") -> Session:
     sid = "sess_" + secrets.token_urlsafe(16)
+    ks_count = dataset.get("knowledge_source_count", 0) if dataset else 0
     s = Session(
         session_id=sid,
         global_key=global_key,
         dataset_id=dataset["id"] if dataset else 0,
         dataset_name=dataset.get("name", "") if dataset else table_name,
-        knowledge_source_count=dataset.get("knowledge_source_count", 0) if dataset else 0,
+        knowledge_source_count=ks_count,
         source_type=source_type,
         conn_string=conn_string,
         table_name=table_name,
+        record_count=ks_count,
     )
     _sessions[sid] = s
     return s

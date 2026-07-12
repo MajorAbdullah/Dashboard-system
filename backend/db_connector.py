@@ -3,23 +3,57 @@ Handles connection, schema introspection, and read-only SQL execution.
 """
 from __future__ import annotations
 
-import re
-from typing import Any
+import ipaddress
+import socket
 
 import psycopg2
 import psycopg2.extras
+import psycopg2.extensions
+import sqlparse
+from psycopg2 import sql as psql
+
+import config
 
 
 class DbConnectorError(RuntimeError):
     pass
 
 
-def _connect(conn_string: str):
+def _is_private_host(host: str) -> bool:
+    """True if any address the host resolves to is loopback/private/link-local —
+    used to block SSRF via the (unauthenticated, pre-signup) db/test and
+    db/tables endpoints. Unresolvable hosts are left to fail at connect time."""
     try:
-        dsn = conn_string.replace("postgres://", "postgresql://", 1)
+        infos = socket.getaddrinfo(host, None)
+    except socket.gaierror:
+        return False
+    for info in infos:
+        try:
+            ip = ipaddress.ip_address(info[4][0])
+        except ValueError:
+            continue
+        if ip.is_private or ip.is_loopback or ip.is_link_local or ip.is_reserved or ip.is_multicast:
+            return True
+    return False
+
+
+def _connect(conn_string: str):
+    dsn = conn_string.replace("postgres://", "postgresql://", 1)
+    if not config.ALLOW_PRIVATE_DB_HOSTS:
+        try:
+            host = psycopg2.extensions.parse_dsn(dsn).get("host")
+        except Exception:
+            host = None
+        if host and _is_private_host(host):
+            raise DbConnectorError(
+                "Connections to private/internal network addresses are not allowed."
+            )
+    try:
         conn = psycopg2.connect(dsn)
         conn.autocommit = True
         return conn
+    except DbConnectorError:
+        raise
     except Exception as e:
         raise DbConnectorError(f"Connection failed: {e}")
 
@@ -66,7 +100,7 @@ def get_table_schema(conn_string: str, table_name: str) -> dict:
             )
             columns = [dict(r) for r in c.fetchall()]
 
-            c.execute("SELECT COUNT(*) AS n FROM " + _quote(table_name))
+            c.execute(psql.SQL("SELECT COUNT(*) AS n FROM {}").format(psql.Identifier(table_name)))
             row_count = c.fetchone()["n"]
 
             # Foreign keys
@@ -90,7 +124,7 @@ def get_table_schema(conn_string: str, table_name: str) -> dict:
 
             sample_rows = []
             try:
-                c.execute("SELECT * FROM " + _quote(table_name) + " LIMIT 20")
+                c.execute(psql.SQL("SELECT * FROM {} LIMIT 20").format(psql.Identifier(table_name)))
                 sample_rows = [dict(r) for r in c.fetchall()]
             except Exception:
                 pass
@@ -98,13 +132,16 @@ def get_table_schema(conn_string: str, table_name: str) -> dict:
             stats = {}
             for col in columns:
                 col_name = col["column_name"]
-                qt = _quote(col_name)
+                col_id = psql.Identifier(col_name)
+                tbl_id = psql.Identifier(table_name)
                 if col["data_type"] in ("integer", "bigint", "numeric", "real", "double precision", "smallint"):
                     try:
                         c.execute(
-                            f"SELECT COUNT(DISTINCT {qt}) AS distinct_count, "
-                            f"MIN({qt}) AS min_val, MAX({qt}) AS max_val, "
-                            f"AVG({qt}) AS avg_val FROM " + _quote(table_name)
+                            psql.SQL(
+                                "SELECT COUNT(DISTINCT {col}) AS distinct_count, "
+                                "MIN({col}) AS min_val, MAX({col}) AS max_val, "
+                                "AVG({col}) AS avg_val FROM {tbl}"
+                            ).format(col=col_id, tbl=tbl_id)
                         )
                         stats[col_name] = dict(c.fetchone())
                     except Exception:
@@ -112,7 +149,8 @@ def get_table_schema(conn_string: str, table_name: str) -> dict:
                 elif col["data_type"] in ("text", "character varying", "varchar", "char", "name"):
                     try:
                         c.execute(
-                            f"SELECT COUNT(DISTINCT {qt}) AS distinct_count FROM " + _quote(table_name)
+                            psql.SQL("SELECT COUNT(DISTINCT {col}) AS distinct_count FROM {tbl}")
+                            .format(col=col_id, tbl=tbl_id)
                         )
                         stats[col_name] = dict(c.fetchone())
                     except Exception:
@@ -131,18 +169,30 @@ def get_table_schema(conn_string: str, table_name: str) -> dict:
 
 
 def execute_readonly(conn_string: str, sql: str) -> list[dict]:
-    safe = sql.strip()
-    if not safe.upper().startswith("SELECT"):
-        raise DbConnectorError("Only SELECT queries are allowed")
+    """Run exactly one SELECT and nothing else. Defense in depth: sqlparse
+    rejects multi-statement payloads and non-SELECT statements up front, and
+    the query additionally runs inside an explicit read-only transaction so
+    Postgres itself refuses any write even if a parsing edge case slips by."""
+    statements = [s for s in sqlparse.split(sql) if s.strip().rstrip(";").strip()]
+    if len(statements) != 1:
+        raise DbConnectorError("Only a single SELECT statement is allowed.")
+    safe = statements[0].strip()
+    parsed = sqlparse.parse(safe)
+    if not parsed or parsed[0].get_type() != "SELECT":
+        raise DbConnectorError("Only SELECT queries are allowed.")
+
     conn = _connect(conn_string)
     try:
+        conn.autocommit = False
         with conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor) as c:
             c.execute("SET statement_timeout = '15s'")
+            c.execute("SET TRANSACTION READ ONLY")
             c.execute(safe)
-            return [dict(r) for r in c.fetchall()]
+            rows = [dict(r) for r in c.fetchall()]
+        conn.rollback()
+        return rows
+    except Exception:
+        conn.rollback()
+        raise
     finally:
         conn.close()
-
-
-def _quote(name: str) -> str:
-    return f'"{name}"'

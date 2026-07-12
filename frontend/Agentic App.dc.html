@@ -1196,11 +1196,9 @@ class Component extends DCLogic {
       wsOptions: [((s.me && s.me.company) || 'Your workspace')].map(v => ({ v })),
       insightStyleSeg: ['Concise', 'Balanced', 'Detailed'].map(v => this.seg(v, p.insightStyle, (x) => this.setP('insightStyle', x))),
       toneSeg: ['Casual', 'Executive', 'Technical'].map(v => this.seg(v, p.tone, (x) => this.setP('tone', x))),
-      hasDbSource: s.me && s.me.has_db && s.me.db_connection_string && s.me.db_table_name,
+      hasDbSource: s.me && s.me.has_db && s.me.db_table_name,
       dbTableName: (s.me && s.me.db_table_name) || '',
-      dbConnStringMasked: (s.me && s.me.db_connection_string)
-        ? s.me.db_connection_string.replace(/\/\/.*?@/, '//***:***@').replace(/\/[^/]+$/, '/***')
-        : ''
+      dbConnStringMasked: (s.me && s.me.db_host_masked) || ''
     };
   }
 }

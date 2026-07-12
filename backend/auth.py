@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import hashlib
+import re
 import secrets
 from typing import Optional
 
@@ -51,6 +52,15 @@ def optional_user(authorization: Optional[str] = Header(None)) -> Optional[dict]
     return db.one("SELECT * FROM users WHERE api_token=%s", (token,))
 
 
+def _mask_conn_string(cs: Optional[str]) -> Optional[str]:
+    """host/db only, credentials and full path stripped — safe to send to the browser."""
+    if not cs:
+        return None
+    masked = re.sub(r"//.*?@", "//***:***@", cs)
+    masked = re.sub(r"/[^/]+$", "/***", masked)
+    return masked
+
+
 def public_user(user: dict) -> dict:
     """Strip secrets for client responses."""
     if not user:
@@ -62,7 +72,7 @@ def public_user(user: dict) -> dict:
         "inflectiv_dataset_name": user.get("inflectiv_dataset_name"),
         "has_key": bool(user.get("inflectiv_key")),
         "db_type": user.get("db_type"),
-        "db_connection_string": user.get("db_connection_string"),
+        "db_host_masked": _mask_conn_string(user.get("db_connection_string")),
         "db_table_name": user.get("db_table_name"),
         "has_db": bool(user.get("db_connection_string")),
         "ai_prefs": user.get("ai_prefs"), "onboarding": user.get("onboarding"),

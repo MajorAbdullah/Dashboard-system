@@ -246,6 +246,7 @@ body{font-family:'Hanken Grotesk',system-ui,sans-serif;-webkit-font-smoothing:an
               <button onMouseDown="{{ pickInflectiv }}" style="flex:1;height:36px;border:none;border-radius:8px;background:{{ inflectivBtnBg }};color:{{ inflectivBtnFg }};font:600 13px 'Hanken Grotesk',sans-serif;cursor:pointer;box-shadow:{{ inflectivBtnShadow }};transition:all .12s;">Inflectiv Platform</button>
               <button onMouseDown="{{ pickDatabase }}" style="flex:1;height:36px;border:none;border-radius:8px;background:{{ dbBtnBg }};color:{{ dbBtnFg }};font:600 13px 'Hanken Grotesk',sans-serif;cursor:pointer;box-shadow:{{ dbBtnShadow }};transition:all .12s;">PostgreSQL Database</button>
             </div>
+            <p style="margin:0 0 14px;font-size:12px;line-height:1.5;color:var(--ink-500);" data-testid="step2-skip-hint">You can skip this and connect a data source later from the dashboard — filling it in now just saves a step.</p>
             <sc-if value="{{ isSuSourceInflectiv }}" hint-placeholder-val="{{ true }}">
               <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:11px;">
                 <sc-for list="{{ integrations }}" as="g" hint-placeholder-count="11">
@@ -434,10 +435,7 @@ class Component extends DCLogic {
     const s = this.state.su, st = this.state.step;
     if (st === 0) return !!(s.name && this.emailOk(s.email) && s.company && s.password.length >= 8 && s.terms);
     if (st === 1) return !!(s.industry && s.size && s.useCase && s.team);
-    if (st === 2) {
-      if (s.sourceType === 'database') return !!(s.connString.trim() && s.tableName.trim());
-      return !!(s.inflectivKey.trim() && s.datasetId);
-    }
+    if (st === 2) return true;
     if (st === 3) return !!(s.goal.trim() || s.goals.length >= 1);
     return true;
   }

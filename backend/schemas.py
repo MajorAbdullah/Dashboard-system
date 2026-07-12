@@ -89,6 +89,7 @@ class WorkspaceSave(BaseModel):
     model_config = {"extra": "ignore"}
     widgets: list = Field(default_factory=list)
     drafts: list = Field(default_factory=list)
+    chatMessages: list = Field(default_factory=list)
 
 
 class SessionRequest(BaseModel):
@@ -110,6 +111,11 @@ class RefineRequest(BaseModel):
     session_id: str
     message: str
     job_id: Optional[str] = None
+
+
+class ChatRequest(BaseModel):
+    session_id: str
+    message: str
 
 
 # ---------- chart-spec (the heart) ----------
@@ -171,6 +177,14 @@ class ChartSpec(BaseModel):
 
     # provenance (attached by the pipeline, not the LLM)
     sources: Optional[list[SourceRef]] = None
+
+
+class ChatAnswer(BaseModel):
+    model_config = {"extra": "ignore"}
+    answer: str
+    chart: Optional[ChartSpec] = None
+    grounded: bool = True
+    confidence: int = 70
 
 
 # ---------- planning ----------

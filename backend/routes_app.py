@@ -166,7 +166,8 @@ def get_workspace(user: dict = Depends(current_user)):
 @router.put("/workspace")
 def put_workspace(req: WorkspaceSave, user: dict = Depends(current_user)):
     db.execute("UPDATE users SET workspace=%s WHERE id=%s",
-               (db.Json({"widgets": req.widgets, "drafts": req.drafts}), user["id"]))
+               (db.Json({"widgets": req.widgets, "drafts": req.drafts,
+                         "chatMessages": req.chatMessages}), user["id"]))
     return {"ok": True}
 
 

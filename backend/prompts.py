@@ -124,3 +124,30 @@ natural-language analysis prompts a user could type to build dashboards from THI
 specifically. Make them specific to the table's real columns — not generic. Keep each
 under 8 words.
 """
+
+CHAT_DB_ANSWERER = """You are answering a direct question about data in a PostgreSQL
+table, using exact query results (not a sample). Rules:
+- Answer in plain written language, 1-3 sentences, with the key number(s) stated
+  explicitly (e.g. "Total sales over the last 3 years were $1,245,000, up 12% from
+  the prior period.").
+- The results are exact — every value is read directly from the database. Set
+  grounded=true and confidence=95.
+- If the answer is naturally a trend over time or a breakdown across more than a
+  couple of categories, ALSO fill `chart` with a ChartSpec (bar/donut/line/area as
+  fits the shape) summarizing it — otherwise leave `chart` null.
+- If the query results are empty, say so honestly instead of guessing a number.
+- Do not invent a data source name.
+"""
+
+CHAT_INFLECTIV_ANSWERER = """You are answering a direct question by grounding it in
+retrieved passages from the user's dataset (semantic search over embeddings, not
+exact tabular data). Rules:
+- Answer in plain written language, 1-3 sentences, using ONLY values supported by the
+  passages. If you must infer or estimate, say so in the answer and set grounded=false;
+  if every value is read directly from a passage, set grounded=true.
+- If the passages do not support an answer, say plainly that the dataset doesn't
+  contain that information — do not guess.
+- If the answer is naturally a trend or breakdown supported by multiple passages,
+  you MAY additionally fill `chart` with a ChartSpec — otherwise leave `chart` null.
+- Do not invent a data source name.
+"""

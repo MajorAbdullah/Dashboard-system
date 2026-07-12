@@ -27,8 +27,8 @@ DB_URL="postgresql://postgres:postgres@localhost:5432/onedollarstore"
 TABLE="${TABLE:-products}"   # default table to query
 pass=0; fail=0
 
-ok()   { echo "  ✓ $1"; ((pass++)); }
-nok()  { echo "  ✗ $1"; ((fail++)); }
+ok()   { echo "  ✓ $1"; pass=$((pass+1)); }
+nok()  { echo "  ✗ $1"; fail=$((fail+1)); }
 json() { python3 -c "import sys,json; print(json.dumps(json.load(sys.stdin),indent=2))" 2>/dev/null || cat; }
 extract() { python3 -c "import sys,json; print(json.load(sys.stdin)$1)" 2>/dev/null; }
 
@@ -108,9 +108,9 @@ curl -sf --max-time 5 "$BASE/me" \
 import sys,json
 u = json.load(sys.stdin)['user']
 assert u['has_db'] == True
-assert u['db_connection_string'] != ''
+assert '***' in (u.get('db_host_masked') or ''), 'db_host_masked should be present and masked, not the raw connection string'
 assert u['db_table_name'] == '$TABLE'
-" && ok "Profile returns DB fields" || nok "DB fields missing from /me"
+" && ok "Profile returns DB fields (masked)" || nok "DB fields missing from /me"
 
 # ── 6. GET /my-datasets ──────────────────────────────────────────────────────
 echo ""
@@ -214,6 +214,53 @@ echo "── 12. Edge: unauthenticated request ──"
 RES=$(curl -sf --max-time 5 "$BASE/me" 2>&1) \
   && nok "Unauthenticated /me should fail" \
   || ok "Unauthenticated /me rejected"
+
+# ── 13. Guardrail: generate() on an unknown session returns soft not_connected ──
+echo ""
+echo "── 13. Edge: generate on unknown/missing session ──"
+RES=$(curl -sf --max-time 10 -X POST "$BASE/generate" \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer $TOKEN" \
+  -d '{"session_id": "sess_does_not_exist", "goal": "anything"}') || { nok "Generate request failed transport-level"; RES='{}'; }
+echo "$RES" | python3 -c "
+import sys, json
+d = json.load(sys.stdin)
+assert d.get('status') == 'not_connected', f\"expected not_connected, got {d.get('status')}\"
+assert 'drafts' not in d, 'should not have run the pipeline'
+" && ok "Unknown session returns soft not_connected status" || nok "Guardrail response wrong shape"
+
+# ── 14. Workspace persists chatMessages ──
+echo ""
+echo "── 14. PUT/GET /api/workspace roundtrips chatMessages ──"
+curl -sf --max-time 10 -X PUT "$BASE/workspace" \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer $TOKEN" \
+  -d '{"widgets": [], "drafts": [], "chatMessages": [{"role": "user", "text": "hi"}]}' > /dev/null
+RES=$(curl -sf --max-time 10 "$BASE/workspace" -H "Authorization: Bearer $TOKEN")
+echo "$RES" | python3 -c "
+import sys, json
+d = json.load(sys.stdin)['workspace']
+msgs = d.get('chatMessages', [])
+assert len(msgs) == 1 and msgs[0]['text'] == 'hi', f'chatMessages did not round-trip: {msgs}'
+" && ok "chatMessages persisted and restored" || nok "chatMessages missing from workspace"
+
+# ── 15. POST /api/chat (direct Q&A over the connected table) ──
+echo ""
+echo "── 15. POST /api/chat ──"
+RES=$(curl -sf --max-time 120 -X POST "$BASE/chat" \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer $TOKEN" \
+  -d "{
+    \"session_id\": \"$SID\",
+    \"message\": \"How many rows are in this table?\"
+  }") || { nok "Chat failed"; exit 1; }
+echo "$RES" | python3 -c "
+import sys, json
+d = json.load(sys.stdin)
+assert d.get('status') == 'ready', f\"expected ready, got {d.get('status')}\"
+assert d.get('answer'), 'answer should be non-empty'
+print(f'  → answer: {d[\"answer\"][:80]}')
+" && ok "Chat produced a direct answer" || nok "Chat response missing/malformed"
 
 # ── Summary ──────────────────────────────────────────────────────────────────
 echo ""

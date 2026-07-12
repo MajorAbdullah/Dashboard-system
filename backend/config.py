@@ -45,6 +45,13 @@ CORS_ORIGINS = os.getenv("CORS_ORIGINS", "*").split(",")
 # --- Database (Postgres) ---
 DATABASE_URL = os.getenv("DATABASE_URL", "")
 
+# --- User-supplied DB connections (SSRF guard) ---
+# Blocks connections to private/loopback/link-local hosts by default, since
+# /api/db/test and /api/db/tables accept an arbitrary connection string from
+# an unauthenticated onboarding flow. Flip to "true" only for local dev where
+# the target Postgres genuinely lives on localhost/a private network.
+ALLOW_PRIVATE_DB_HOSTS = os.getenv("ALLOW_PRIVATE_DB_HOSTS", "false").strip().lower() == "true"
+
 # --- Redis cache ---
 REDIS_URL = os.getenv("REDIS_URL", "")
 
