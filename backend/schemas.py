@@ -89,6 +89,7 @@ class WorkspaceSave(BaseModel):
     model_config = {"extra": "ignore"}
     widgets: list = Field(default_factory=list)
     drafts: list = Field(default_factory=list)
+    chatMessages: list = Field(default_factory=list)
 
 
 class SessionRequest(BaseModel):

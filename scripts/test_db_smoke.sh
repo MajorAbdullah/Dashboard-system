@@ -229,6 +229,21 @@ assert d.get('status') == 'not_connected', f\"expected not_connected, got {d.get
 assert 'drafts' not in d, 'should not have run the pipeline'
 " && ok "Unknown session returns soft not_connected status" || nok "Guardrail response wrong shape"
 
+# ── 14. Workspace persists chatMessages ──
+echo ""
+echo "── 14. PUT/GET /api/workspace roundtrips chatMessages ──"
+curl -sf --max-time 10 -X PUT "$BASE/workspace" \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer $TOKEN" \
+  -d '{"widgets": [], "drafts": [], "chatMessages": [{"role": "user", "text": "hi"}]}' > /dev/null
+RES=$(curl -sf --max-time 10 "$BASE/workspace" -H "Authorization: Bearer $TOKEN")
+echo "$RES" | python3 -c "
+import sys, json
+d = json.load(sys.stdin)['workspace']
+msgs = d.get('chatMessages', [])
+assert len(msgs) == 1 and msgs[0]['text'] == 'hi', f'chatMessages did not round-trip: {msgs}'
+" && ok "chatMessages persisted and restored" || nok "chatMessages missing from workspace"
+
 # ── Summary ──────────────────────────────────────────────────────────────────
 echo ""
 echo "╔══════════════════════════════════════════════════════════════╗"
