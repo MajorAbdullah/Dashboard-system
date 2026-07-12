@@ -47,7 +47,7 @@ class Provider:
             "Content-Type": "application/json",
             # Optional attribution headers (harmless on providers that ignore them):
             "HTTP-Referer": "http://localhost",
-            "X-Title": "Agentic Dashboard AI",
+            "X-Title": "Cogni Board",
         }
 
 

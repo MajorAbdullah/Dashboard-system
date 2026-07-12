@@ -3,6 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Cogni Board</title>
 <script src="./support.js"></script>
 </head>
 <body>
@@ -71,8 +72,8 @@ body{font-family:'Hanken Grotesk',system-ui,sans-serif;-webkit-font-smoothing:an
           <div style="width:34px;height:34px;border-radius:10px;background:rgba(255,255,255,.16);backdrop-filter:blur(8px);display:flex;align-items:center;justify-content:center;border:1px solid rgba(255,255,255,.2);">
             <svg width="19" height="19" viewBox="0 0 24 24" fill="none"><path d="M12 2.5l2.2 5.6L20 10.3l-5.8 2.2L12 18l-2.2-5.5L4 10.3l5.8-2.2z" fill="#fff"/><circle cx="18.5" cy="5.5" r="1.7" fill="#fff" opacity=".85"/></svg>
           </div>
-          <span style="font-family:'Newsreader',serif;font-weight:600;font-size:19px;">Agentic</span>
-          <span style="font-family:'IBM Plex Mono',monospace;font-size:9px;letter-spacing:.18em;opacity:.6;text-transform:uppercase;margin-top:3px;">Dashboard AI</span>
+          <span style="font-family:'Newsreader',serif;font-weight:600;font-size:19px;">Cogni</span>
+          <span style="font-family:'IBM Plex Mono',monospace;font-size:9px;letter-spacing:.18em;opacity:.6;text-transform:uppercase;margin-top:3px;">Board AI</span>
         </div>
 
         <div style="position:relative;max-width:520px;">
@@ -122,7 +123,7 @@ body{font-family:'Hanken Grotesk',system-ui,sans-serif;-webkit-font-smoothing:an
             <svg width="22" height="22" viewBox="0 0 24 24" fill="none"><path d="M12 2.5l2.2 5.6L20 10.3l-5.8 2.2L12 18l-2.2-5.5L4 10.3l5.8-2.2z" fill="#fff"/><circle cx="18.5" cy="5.5" r="1.7" fill="#fff" opacity=".85"/></svg>
           </div>
           <h2 style="margin:0;font-family:'Newsreader',serif;font-weight:600;font-size:27px;letter-spacing:-.01em;">Welcome back</h2>
-          <p style="margin:7px 0 26px;font-size:14px;color:var(--ink-500);">Sign in to your Agentic workspace.</p>
+          <p style="margin:7px 0 26px;font-size:14px;color:var(--ink-500);">Sign in to your Cogni Board workspace.</p>
 
           <label style="display:block;font-size:12.5px;font-weight:600;color:var(--ink-700);margin-bottom:7px;">Work email</label>
           <input value="{{ si_email }}" onInput="{{ onSiEmail }}" type="email" placeholder="you@company.com" style-focus="{{ inputFocus }}" style="width:100%;height:44px;padding:0 14px;border:1px solid var(--border);border-radius:11px;background:var(--bg-panel);font:14px 'Hanken Grotesk',sans-serif;color:var(--ink-900);outline:none;transition:border-color .14s,box-shadow .14s;" />
@@ -157,7 +158,7 @@ body{font-family:'Hanken Grotesk',system-ui,sans-serif;-webkit-font-smoothing:an
             </sc-for>
           </div>
 
-          <p style="text-align:center;margin:26px 0 0;font-size:13.5px;color:var(--ink-500);">New to Agentic Dashboard AI? <button onClick="{{ goSignup }}" style="border:none;background:transparent;color:var(--violet);font-weight:600;font-size:13.5px;cursor:pointer;padding:0;">Create account</button></p>
+          <p style="text-align:center;margin:26px 0 0;font-size:13.5px;color:var(--ink-500);">New to Cogni Board? <button onClick="{{ goSignup }}" style="border:none;background:transparent;color:var(--violet);font-weight:600;font-size:13.5px;cursor:pointer;padding:0;">Create account</button></p>
         </div>
       </div>
     </div>
@@ -170,7 +171,7 @@ body{font-family:'Hanken Grotesk',system-ui,sans-serif;-webkit-font-smoothing:an
       <div style="width:100%;max-width:760px;display:flex;align-items:center;justify-content:space-between;">
         <div style="display:flex;align-items:center;gap:10px;">
           <div style="width:30px;height:30px;border-radius:9px;background:linear-gradient(150deg,var(--violet),#4D38B0);display:flex;align-items:center;justify-content:center;"><svg width="17" height="17" viewBox="0 0 24 24" fill="none"><path d="M12 2.5l2.2 5.6L20 10.3l-5.8 2.2L12 18l-2.2-5.5L4 10.3l5.8-2.2z" fill="#fff"/></svg></div>
-          <span style="font-family:'Newsreader',serif;font-weight:600;font-size:17px;">Agentic</span>
+          <span style="font-family:'Newsreader',serif;font-weight:600;font-size:17px;">Cogni Board</span>
         </div>
         <button onClick="{{ goSignin }}" style="border:none;background:transparent;color:var(--ink-500);font-size:13px;font-weight:500;cursor:pointer;">Already have an account? <span style="color:var(--violet);font-weight:600;">Sign in</span></button>
       </div>
@@ -233,7 +234,7 @@ body{font-family:'Hanken Grotesk',system-ui,sans-serif;-webkit-font-smoothing:an
             <div><label style="display:block;font-size:12.5px;font-weight:600;color:var(--ink-700);margin-bottom:9px;">Primary use case</label>
               <div style="display:flex;flex-wrap:wrap;gap:8px;"><sc-for list="{{ useCases }}" as="c" hint-placeholder-count="4"><button onClick="{{ c.onPick }}" style="{{ c.style }}">{{ c.label }}</button></sc-for></div>
             </div>
-            <div><label style="display:block;font-size:12.5px;font-weight:600;color:var(--ink-700);margin-bottom:9px;">Team size on Agentic</label>
+            <div><label style="display:block;font-size:12.5px;font-weight:600;color:var(--ink-700);margin-bottom:9px;">Team size on Cogni Board</label>
               <div style="display:flex;flex-wrap:wrap;gap:8px;"><sc-for list="{{ teams }}" as="c" hint-placeholder-count="4"><button onClick="{{ c.onPick }}" style="{{ c.style }}">{{ c.label }}</button></sc-for></div>
             </div>
           </div>
@@ -583,7 +584,7 @@ class Component extends DCLogic {
     });
     const stepTitles = ['Create your account', 'Tell us about your company', 'Connect your data', 'What do you want to analyze?', 'Configure your AI agent'];
     const stepSubs = [
-      'Start your Agentic workspace in under five minutes.',
+      'Start your Cogni Board workspace in under five minutes.',
       'We use this to tailor AI recommendations to your business.',
       'Select the sources your agent should analyze. You can add more later.',
       'Your agent will generate dashboards and components from these goals.',

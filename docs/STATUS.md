@@ -1,4 +1,4 @@
-# Project Status — Agentic Dashboard AI
+# Project Status — Cogni Board
 
 _Last updated: 2026-06-16_
 

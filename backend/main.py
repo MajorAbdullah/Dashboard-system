@@ -1,4 +1,4 @@
-"""Agentic Dashboard AI — backend.
+"""Cogni Board — backend.
 
 Holds the Inflectiv data key and LLM provider config (Fireworks / OpenRouter),
 and runs the plan -> retrieve -> structure pipeline that turns a natural-language
@@ -33,7 +33,7 @@ from inflectiv import InflectivClient, InflectivError
 from profiler import profile_dataset
 from schemas import ChatRequest, DatasetsRequest, GenerateRequest, RefineRequest, SessionRequest
 
-app = FastAPI(title="Agentic Dashboard AI — backend")
+app = FastAPI(title="Cogni Board — backend")
 
 app.add_middleware(
     CORSMiddleware,

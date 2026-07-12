@@ -1,6 +1,6 @@
 # Architecture
 
-Agentic Dashboard AI is a single deployable service: a **FastAPI** backend that also serves
+Cogni Board is a single deployable service: a **FastAPI** backend that also serves
 the **`frontend/`** single-page UI. The agent turns a natural-language goal into real chart
 components by retrieving from a vector/RAG store (Inflectiv) and structuring the results with
 an LLM (OpenRouter), keeping a citation trail on every value.

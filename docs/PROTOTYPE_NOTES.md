@@ -1,4 +1,4 @@
-# Agentic Dashboard AI — Comprehensive Documentation
+# Cogni Board — Comprehensive Documentation
 
 > Generated: 2026-06-14
 > Scope: Full static analysis of the `Dashboard system` project directory.
@@ -7,7 +7,7 @@
 
 ## 0. Quick Orientation (read this first)
 
-This project is **not** a conventional client/server web application. It is a **high‑fidelity, fully client‑side interactive prototype** of an AI‑native analytics SaaS product called **“Agentic Dashboard AI.”** It is built on a small in‑browser reactive runtime (`support.js`, the **“dc‑runtime” / DataCanvas** engine) that turns each `*.dc.html` file into a live React application — with **no real backend, no database, and no real AI or payment processing.**
+This project is **not** a conventional client/server web application. It is a **high‑fidelity, fully client‑side interactive prototype** of an AI‑native analytics SaaS product called **“Cogni Board.”** It is built on a small in‑browser reactive runtime (`support.js`, the **“dc‑runtime” / DataCanvas** engine) that turns each `*.dc.html` file into a live React application — with **no real backend, no database, and no real AI or payment processing.**
 
 All data shown (datasets, KPIs, charts, team members, invoices, AI insights) is **hard‑coded mock data**. The “AI agent” is a **simulated** sequence of timed UI steps. This distinction is essential for every section below and is the basis of the blocker review in the final section.
 
@@ -16,7 +16,7 @@ All data shown (datasets, KPIs, charts, team members, invoices, AI insights) is 
 ## 1. System Overview
 
 ### Purpose
-Agentic Dashboard AI is presented as a **premium enterprise SaaS platform** that transforms raw business data (text, documents, spreadsheets, CSVs, databases, unstructured data) into **intelligent dashboards automatically** using an autonomous AI agent. The product narrative (captured in `uploads/pasted-*.txt`) is:
+Cogni Board is presented as a **premium enterprise SaaS platform** that transforms raw business data (text, documents, spreadsheets, CSVs, databases, unstructured data) into **intelligent dashboards automatically** using an autonomous AI agent. The product narrative (captured in `uploads/pasted-*.txt`) is:
 
 > “Upload data, describe your goal, let AI generate insights and dashboard components automatically, then curate the perfect dashboard from AI‑created visual assets.”
 

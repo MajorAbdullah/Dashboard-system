@@ -1,4 +1,4 @@
-# Local dev infra for Agentic Dashboard AI.
+# Local dev infra for Cogni Board.
 # Ports/credentials match backend/.env.example (DATABASE_URL / REDIS_URL).
 # The app itself is not containerized here — it runs on the host via `make start`.
 

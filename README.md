@@ -1,4 +1,4 @@
-# Agentic Dashboard AI
+# Cogni Board
 
 Turn a natural-language goal into a **real, sourced analytics dashboard**. You connect a
 dataset (via [Inflectiv](https://app.inflectiv.ai)), describe what you want to analyze, and

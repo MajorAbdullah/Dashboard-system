@@ -1,4 +1,4 @@
-Design a premium AI-native SaaS platform called Agentic Dashboard AI that transforms raw text, documents, spreadsheets, CSVs, databases, and unstructured business data into intelligent dashboards automatically.
+Design a premium AI-native SaaS platform called Cogni Board that transforms raw text, documents, spreadsheets, CSVs, databases, and unstructured business data into intelligent dashboards automatically.
 
 The core experience is simple: users describe what they want in plain English, upload data, or paste raw information, and the AI agent independently analyzes the data, identifies key metrics, detects patterns, selects the most suitable visualizations, generates insights, creates dashboard components, and presents them as reusable blocks.
 

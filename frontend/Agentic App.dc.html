@@ -3,6 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Cogni Board</title>
 <script src="./support.js"></script>
 </head>
 <body>
@@ -58,7 +59,7 @@ body{font-family:'Hanken Grotesk',system-ui,sans-serif;-webkit-font-smoothing:an
   <div style="height:56px;flex:0 0 auto;display:flex;align-items:center;gap:16px;padding:0 16px;background:var(--bg-panel);border-bottom:1px solid var(--border);z-index:30;">
     <div style="display:flex;align-items:center;gap:11px;width:228px;flex:0 0 auto;">
       <div style="width:30px;height:30px;border-radius:9px;background:linear-gradient(150deg,var(--violet),#4D38B0);display:flex;align-items:center;justify-content:center;box-shadow:var(--shadow-sm);"><svg width="17" height="17" viewBox="0 0 24 24" fill="none"><path d="M12 2.5l2.2 5.6L20 10.3l-5.8 2.2L12 18l-2.2-5.5L4 10.3l5.8-2.2z" fill="#fff"/><circle cx="18.5" cy="5.5" r="1.7" fill="#fff" opacity=".85"/></svg></div>
-      <div style="display:flex;flex-direction:column;line-height:1;"><span style="font-family:'Newsreader',serif;font-weight:600;font-size:16px;">Agentic</span><span style="font-family:'IBM Plex Mono',monospace;font-size:8.5px;letter-spacing:.18em;color:var(--ink-400);text-transform:uppercase;margin-top:2px;">Dashboard AI</span></div>
+      <div style="display:flex;flex-direction:column;line-height:1;"><span style="font-family:'Newsreader',serif;font-weight:600;font-size:16px;">Cogni</span><span style="font-family:'IBM Plex Mono',monospace;font-size:8.5px;letter-spacing:.18em;color:var(--ink-400);text-transform:uppercase;margin-top:2px;">Board AI</span></div>
     </div>
     <div style="flex:1;max-width:440px;display:flex;align-items:center;gap:9px;height:36px;padding:0 12px;background:var(--bg-sub);border:1px solid var(--border);border-radius:10px;">
       <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--ink-400)" stroke-width="1.8" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4-4"/></svg>
@@ -711,7 +712,7 @@ class Component extends DCLogic {
   saveProfile() { const p = this.state.profile; try { fetch(BACKEND + '/me', { method: 'PATCH', headers: authHeaders(), body: JSON.stringify({ name: p.name, company: p.company, ai_prefs: { style: p.insightStyle, tone: p.tone } }) }); } catch (x) {} }
   logout() { try { localStorage.removeItem('ada-token'); } catch (x) {} window.location.href = 'Agentic Auth.dc.html'; }
   goBuilder() { window.location.href = 'Agentic Dashboard AI.dc.html'; }
-  contactSales() { try { window.location.href = 'mailto:sales@agentic.ai?subject=Agentic%20Dashboard%20AI%20—%20Plan%20enquiry'; } catch (x) {} }
+  contactSales() { try { window.location.href = 'mailto:sales@cogniboard.ai?subject=Cogni%20Board%20—%20Plan%20enquiry'; } catch (x) {} }
   exportReport() {
     const data = { generated_at: new Date().toISOString(), account: (this.state.me && this.state.me.email), stats: this.state.statsData, datasets: (this.state.dsData || []).map(d => ({ id: d.id, name: d.name, sources: d.knowledge_source_count })), activity: this.state.activityData };
     try {

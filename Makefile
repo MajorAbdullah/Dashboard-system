@@ -1,4 +1,4 @@
-# Agentic Dashboard AI — Makefile
+# Cogni Board — Makefile
 # Canonical make targets wired to this project's stack.
 #
 # The app is a single FastAPI service that serves both the API and the
@@ -29,7 +29,7 @@ APP_URL     := http://localhost:$(APP_PORT)/Agentic%20Auth.dc.html
 # ─── Help ──────────────────────────────────────────────────────────────────────
 .PHONY: help
 help: ## Show this help
-	@echo "Agentic Dashboard AI — available make targets:"
+	@echo "Cogni Board — available make targets:"
 	@echo ""
 	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) \
 		| awk 'BEGIN {FS = ":.*?## "}; {printf "  \033[36m%-16s\033[0m %s\n", $$1, $$2}'

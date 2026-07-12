@@ -1,4 +1,4 @@
-Remaining pages of Agentic Dashboard AI while maintaining the same visual language, AI-first philosophy, and enterprise-grade quality shown in your dashboard mockup.
+Remaining pages of Cogni Board while maintaining the same visual language, AI-first philosophy, and enterprise-grade quality shown in your dashboard mockup.
 
 ⸻
 
@@ -6,7 +6,7 @@ Remaining pages of Agentic Dashboard AI while maintaining the same visual langua
 
 Prompt
 
-Design a premium AI-native SaaS authentication experience for Agentic Dashboard AI, an enterprise platform that automatically transforms raw business data into intelligent dashboards using autonomous AI agents.
+Design a premium AI-native SaaS authentication experience for Cogni Board, an enterprise platform that automatically transforms raw business data into intelligent dashboards using autonomous AI agents.
 
 Create a high-fidelity Sign In page optimized for B2B SaaS users.
 
@@ -60,7 +60,7 @@ Secondary authentication:
 
 Footer:
 
-“New to Agentic Dashboard AI? Create Account”
+“New to Cogni Board? Create Account”
 
 Design Style:
 
@@ -81,7 +81,7 @@ Design Style:
 
 Prompt
 
-Design an enterprise-grade onboarding experience for Agentic Dashboard AI.
+Design an enterprise-grade onboarding experience for Cogni Board.
 
 Goal:
 
@@ -168,7 +168,7 @@ Visual Style:
 
 Prompt
 
-Design a sophisticated User Profile & Preferences page for Agentic Dashboard AI.
+Design a sophisticated User Profile & Preferences page for Cogni Board.
 
 Purpose:
 
@@ -246,7 +246,7 @@ Design:
 
 Prompt
 
-Design a comprehensive Settings Center for Agentic Dashboard AI.
+Design a comprehensive Settings Center for Cogni Board.
 
 Layout:
 
@@ -331,7 +331,7 @@ Design Style:
 
 Prompt
 
-Design a collaborative Team Workspace Management page for Agentic Dashboard AI.
+Design a collaborative Team Workspace Management page for Cogni Board.
 
 Purpose:
 
@@ -403,7 +403,7 @@ Design:
 
 Prompt
 
-Design a premium Billing and Subscription Management page for Agentic Dashboard AI.
+Design a premium Billing and Subscription Management page for Cogni Board.
 
 Layout:
 
@@ -466,7 +466,7 @@ Design:
 
 Prompt
 
-Design a powerful Dataset Management Hub for Agentic Dashboard AI.
+Design a powerful Dataset Management Hub for Cogni Board.
 
 Features:
 
@@ -523,7 +523,7 @@ Design:
 
 Prompt
 
-Design an AI-generated Component Library page for Agentic Dashboard AI.
+Design an AI-generated Component Library page for Cogni Board.
 
 Showcase all AI-created dashboard assets before users add them to dashboards.
 
@@ -577,7 +577,7 @@ Design:
 
 Prompt
 
-Design a secure and elegant Password Recovery Flow for Agentic Dashboard AI.
+Design a secure and elegant Password Recovery Flow for Cogni Board.
 
 Screens:
 
@@ -609,7 +609,7 @@ Design:
 
 Prompt
 
-Design a powerful Enterprise Admin Console for Agentic Dashboard AI.
+Design a powerful Enterprise Admin Console for Cogni Board.
 
 Features:
 
@@ -657,8 +657,8 @@ Design:
 
 ⸻
 
-These pages complete the full Agentic Dashboard AI ecosystem, covering the entire user journey:
+These pages complete the full Cogni Board ecosystem, covering the entire user journey:
 
 Auth → Onboarding → Data Connection → Dashboard Creation → AI Component Generation → Collaboration → Administration → Billing → Settings.
 
-Together, they establish Agentic Dashboard AI as a truly AI-native enterprise analytics platform rather than just another dashboard builder.
+Together, they establish Cogni Board as a truly AI-native enterprise analytics platform rather than just another dashboard builder.
