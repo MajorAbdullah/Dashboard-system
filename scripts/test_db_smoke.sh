@@ -108,9 +108,9 @@ curl -sf --max-time 5 "$BASE/me" \
 import sys,json
 u = json.load(sys.stdin)['user']
 assert u['has_db'] == True
-assert u['db_connection_string'] != ''
+assert '***' in (u.get('db_host_masked') or ''), 'db_host_masked should be present and masked, not the raw connection string'
 assert u['db_table_name'] == '$TABLE'
-" && ok "Profile returns DB fields" || nok "DB fields missing from /me"
+" && ok "Profile returns DB fields (masked)" || nok "DB fields missing from /me"
 
 # ── 6. GET /my-datasets ──────────────────────────────────────────────────────
 echo ""
